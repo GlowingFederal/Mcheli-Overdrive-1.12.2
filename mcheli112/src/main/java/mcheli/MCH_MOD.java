@@ -212,7 +212,7 @@ public class MCH_MOD {
     registerItemAircraft();
     blockDraftingTable = new MCH_DraftingTableBlock(MCH_Config.BlockID_DraftingTableOFF.prmInt, false);
     blockDraftingTable.setUnlocalizedName("drafting_table");
-    blockDraftingTable.func_149647_a(creativeTabs);
+    blockDraftingTable.setCreativeTab(creativeTabs);
     blockDraftingTableLit = new MCH_DraftingTableBlock(MCH_Config.BlockID_DraftingTableON.prmInt, true);
     blockDraftingTableLit.setUnlocalizedName("lit_drafting_table");
     MCH_Blocks.register((Block)blockDraftingTable, "drafting_table");
