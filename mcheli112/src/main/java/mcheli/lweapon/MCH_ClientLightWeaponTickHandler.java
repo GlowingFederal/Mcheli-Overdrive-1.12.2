@@ -74,7 +74,7 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
   
   public static Entity markEntity = null;
   
-  public static Vec3d markPos = Vec3d.field_186680_a;
+  public static Vec3d markPos = Vec3d.ZERO;
   
   public static MCH_WeaponGuidanceSystem gs = new MCH_WeaponGuidanceSystem();
   
@@ -99,8 +99,8 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
       GL11.glGetInteger(2978, matViewport);
       GLU.gluProject((float)x, (float)y, (float)z, matModel, matProjection, matViewport, screenPos);
       MCH_AircraftInfo i = (entity instanceof MCH_EntityAircraft) ? ((MCH_EntityAircraft)entity).getAcInfo() : null;
-      float w = (entity.field_70130_N > entity.field_70131_O) ? entity.field_70130_N : ((i != null) ? i.markerWidth : entity.field_70131_O);
-      float h = (i != null) ? i.markerHeight : entity.field_70131_O;
+      float w = (entity.width > entity.height) ? entity.width : ((i != null) ? i.markerWidth : entity.height);
+      float h = (i != null) ? i.markerHeight : entity.height;
       GLU.gluProject((float)x + w, (float)y + h, (float)z + w, matModel, matProjection, matViewport, screenPosBB);
       markEntity = entity;
     } 
@@ -139,38 +139,38 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
     for (MCH_Key k : this.Keys)
       k.update(); 
     this.isBeforeHeldItem = this.isHeldItem;
-    EntityPlayerSP entityPlayerSP = this.mc.field_71439_g;
+    EntityPlayerSP entityPlayerSP = this.mc.player;
     if (this.prevThePlayer == null || this.prevThePlayer != entityPlayerSP) {
       initWeaponParam((EntityPlayer)entityPlayerSP);
       this.prevThePlayer = (EntityPlayer)entityPlayerSP;
     } 
-    ItemStack is = (entityPlayerSP != null) ? entityPlayerSP.func_184614_ca() : ItemStack.field_190927_a;
-    if (entityPlayerSP == null || entityPlayerSP.func_184187_bx() instanceof mcheli.gltd.MCH_EntityGLTD || entityPlayerSP
-      .func_184187_bx() instanceof MCH_EntityAircraft)
+    ItemStack is = (entityPlayerSP != null) ? entityPlayerSP.getHeldItemMainhand() : ItemStack.field_190927_a;
+    if (entityPlayerSP == null || entityPlayerSP.getRidingEntity() instanceof mcheli.gltd.MCH_EntityGLTD || entityPlayerSP
+      .getRidingEntity() instanceof MCH_EntityAircraft)
       is = ItemStack.field_190927_a; 
     if (gs.getLockingEntity() == null)
       markEntity = null; 
-    if (!is.func_190926_b() && is.func_77973_b() instanceof MCH_ItemLightWeaponBase) {
-      MCH_ItemLightWeaponBase lweapon = (MCH_ItemLightWeaponBase)is.func_77973_b();
-      if (this.prevItemStack.func_190926_b() || (!this.prevItemStack.func_77969_a(is) && 
-        !this.prevItemStack.func_77977_a().equals(is.func_77977_a()))) {
+    if (!is.func_190926_b() && is.getItem() instanceof MCH_ItemLightWeaponBase) {
+      MCH_ItemLightWeaponBase lweapon = (MCH_ItemLightWeaponBase)is.getItem();
+      if (this.prevItemStack.func_190926_b() || (!this.prevItemStack.isItemEqual(is) && 
+        !this.prevItemStack.getUnlocalizedName().equals(is.getUnlocalizedName()))) {
         initWeaponParam((EntityPlayer)entityPlayerSP);
-        weapon = MCH_WeaponCreator.createWeapon(((EntityPlayer)entityPlayerSP).field_70170_p, MCH_ItemLightWeaponBase.getName(is), Vec3d.field_186680_a, 0.0F, 0.0F, null, false);
+        weapon = MCH_WeaponCreator.createWeapon(((EntityPlayer)entityPlayerSP).world, MCH_ItemLightWeaponBase.getName(is), Vec3d.ZERO, 0.0F, 0.0F, null, false);
         if (weapon != null && weapon.getInfo() != null && weapon.getGuidanceSystem() != null)
           gs = weapon.getGuidanceSystem(); 
       } 
       if (weapon == null || gs == null)
         return; 
-      gs.setWorld(((EntityPlayer)entityPlayerSP).field_70170_p);
+      gs.setWorld(((EntityPlayer)entityPlayerSP).world);
       gs.lockRange = lockRange;
-      if (entityPlayerSP.func_184612_cw() > 10) {
+      if (entityPlayerSP.getItemInUseMaxCount() > 10) {
         selectedZoom %= (weapon.getInfo()).zoom.length;
         W_Reflection.setCameraZoom((weapon.getInfo()).zoom[selectedZoom]);
       } else {
         W_Reflection.restoreCameraZoom();
       } 
-      if (is.func_77960_j() < is.func_77958_k()) {
-        if (entityPlayerSP.func_184612_cw() > 10) {
+      if (is.getMetadata() < is.getMaxDamage()) {
+        if (entityPlayerSP.getItemInUseMaxCount() > 10) {
           gs.lock((Entity)entityPlayerSP);
           if (gs.getLockCount() > 0)
             if (lockonSoundCount > 0) {
@@ -189,7 +189,7 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
         reloadCount = 0;
       } else {
         lockonSoundCount = 0;
-        if (W_EntityPlayer.hasItem((EntityPlayer)entityPlayerSP, (Item)lweapon.bullet) && entityPlayerSP.func_184605_cv() <= 0) {
+        if (W_EntityPlayer.hasItem((EntityPlayer)entityPlayerSP, (Item)lweapon.bullet) && entityPlayerSP.getItemInUseCount() <= 0) {
           if (reloadCount == 10)
             W_McClient.MOD_playSoundFX("fim92_reload", 1.0F, 1.0F); 
           if (reloadCount < 40) {
@@ -203,7 +203,7 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
         gs.clearLock();
       } 
       if (!inGUI)
-        playerControl((EntityPlayer)entityPlayerSP, is, (MCH_ItemLightWeaponBase)is.func_77973_b()); 
+        playerControl((EntityPlayer)entityPlayerSP, is, (MCH_ItemLightWeaponBase)is.getItem()); 
       this.isHeldItem = MCH_ItemLightWeaponBase.isHeld((EntityPlayer)entityPlayerSP);
     } else {
       lockonSoundCount = 0;
@@ -217,7 +217,7 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
           MCH_PacketLightWeaponPlayerControl pc = new MCH_PacketLightWeaponPlayerControl();
           pc.camMode = 1;
           W_Network.sendToServer((W_PacketBase)pc);
-          entityPlayerSP.func_184589_d(MobEffects.field_76439_r);
+          entityPlayerSP.removePotionEffect(MobEffects.NIGHT_VISION);
         } 
         W_Reflection.restoreCameraZoom();
       } 
@@ -237,7 +237,7 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
     boolean send = false;
     boolean autoShot = false;
     if (MCH_Config.LWeaponAutoFire.prmBool)
-      if (is.func_77960_j() < is.func_77958_k() && gs.isLockComplete())
+      if (is.getMetadata() < is.getMaxDamage() && gs.isLockComplete())
         autoShot = true;  
     if (this.KeySwWeaponMode.isKeyDown() && weapon.numMode > 1) {
       weaponMode = (weaponMode + 1) % weapon.numMode;
@@ -245,28 +245,28 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
     } 
     if (this.KeyAttack.isKeyPress() || autoShot) {
       boolean result = false;
-      if (is.func_77960_j() < is.func_77958_k())
+      if (is.getMetadata() < is.getMaxDamage())
         if (gs.isLockComplete()) {
           boolean canFire = true;
           if (weaponMode > 0 && gs.getTargetEntity() != null) {
-            double dx = (gs.getTargetEntity()).field_70165_t - player.field_70165_t;
-            double dz = (gs.getTargetEntity()).field_70161_v - player.field_70161_v;
+            double dx = (gs.getTargetEntity()).posX - player.posX;
+            double dz = (gs.getTargetEntity()).posZ - player.posZ;
             canFire = (Math.sqrt(dx * dx + dz * dz) >= 40.0D);
           } 
           if (canFire) {
             pc.useWeapon = true;
             pc.useWeaponOption1 = W_Entity.getEntityId(gs.lastLockEntity);
             pc.useWeaponOption2 = weaponMode;
-            pc.useWeaponPosX = player.field_70165_t;
-            pc.useWeaponPosY = player.field_70163_u + player.func_70047_e();
-            pc.useWeaponPosZ = player.field_70161_v;
+            pc.useWeaponPosX = player.posX;
+            pc.useWeaponPosY = player.posY + player.getEyeHeight();
+            pc.useWeaponPosZ = player.posZ;
             gs.clearLock();
             send = true;
             result = true;
           } 
         }  
       if (this.KeyAttack.isKeyDown())
-        if (!result && player.func_184612_cw() > 5)
+        if (!result && player.getItemInUseMaxCount() > 5)
           playSoundNG();  
     } 
     if (this.KeyZoom.isKeyDown()) {
@@ -276,14 +276,14 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
         playSound("zoom", 0.5F, 1.0F); 
     } 
     if (this.KeyCameraMode.isKeyDown()) {
-      PotionEffect pe = player.func_70660_b(MobEffects.field_76439_r);
+      PotionEffect pe = player.getActivePotionEffect(MobEffects.NIGHT_VISION);
       MCH_Lib.DbgLog(true, "LWeapon NV %s", new Object[] { (pe != null) ? "ON->OFF" : "OFF->ON" });
       if (pe != null) {
-        player.func_184589_d(MobEffects.field_76439_r);
+        player.removePotionEffect(MobEffects.NIGHT_VISION);
         pc.camMode = 1;
         send = true;
         W_McClient.MOD_playSoundFX("pi", 0.5F, 0.9F);
-      } else if (player.func_184612_cw() > 60) {
+      } else if (player.getItemInUseMaxCount() > 60) {
         pc.camMode = 2;
         send = true;
         W_McClient.MOD_playSoundFX("pi", 0.5F, 0.9F);
@@ -296,7 +296,7 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
   }
   
   public static int getPotionNightVisionDuration(EntityPlayer player) {
-    PotionEffect cpe = player.func_70660_b(MobEffects.field_76439_r);
-    return (player == null || cpe == null) ? 0 : cpe.func_76459_b();
+    PotionEffect cpe = player.getActivePotionEffect(MobEffects.NIGHT_VISION);
+    return (player == null || cpe == null) ? 0 : cpe.getDuration();
   }
 }

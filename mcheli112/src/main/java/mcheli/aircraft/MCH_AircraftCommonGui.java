@@ -50,7 +50,7 @@ public abstract class MCH_AircraftCommonGui extends MCH_Gui {
     int dstBlend = GL11.glGetInteger(3040);
     GL11.glBlendFunc(1, 1);
     W_McClient.MOD_bindTexture("textures/gui/alpha.png");
-    drawTexturedModalRectRotate(0.0D, 0.0D, this.field_146294_l, this.field_146295_m, this.rand.nextInt(256), this.rand.nextInt(256), 256.0D, 256.0D, 0.0F);
+    drawTexturedModalRectRotate(0.0D, 0.0D, this.width, this.height, this.rand.nextInt(256), this.rand.nextInt(256), 256.0D, 256.0D, 0.0F);
     GL11.glBlendFunc(srcBlend, dstBlend);
     GL11.glDisable(3042);
   }
@@ -84,7 +84,7 @@ public abstract class MCH_AircraftCommonGui extends MCH_Gui {
     int dstBlend = GL11.glGetInteger(3040);
     GL11.glBlendFunc(1, 1);
     W_McClient.MOD_bindTexture("textures/gui/noise.png");
-    drawTexturedModalRectRotate(0.0D, 0.0D, this.field_146294_l, this.field_146295_m, this.rand.nextInt(256), this.rand.nextInt(256), 256.0D, 256.0D, 0.0F);
+    drawTexturedModalRectRotate(0.0D, 0.0D, this.width, this.height, this.rand.nextInt(256), this.rand.nextInt(256), 256.0D, 256.0D, 0.0F);
     GL11.glBlendFunc(srcBlend, dstBlend);
     GL11.glDisable(3042);
   }
@@ -104,7 +104,7 @@ public abstract class MCH_AircraftCommonGui extends MCH_Gui {
       msg = "RideRack : " + MCH_KeyName.getDescOrName(MCH_Config.KeyPutToRack.prmInt);
       drawString(msg, LX, this.centerY + 10, colorActive);
     } 
-    if (seatID == 0 && ac.func_184187_bx() != null) {
+    if (seatID == 0 && ac.getRidingEntity() != null) {
       msg = "DismountRack : " + MCH_KeyName.getDescOrName(MCH_Config.KeyDownFromRack.prmInt);
       drawString(msg, LX, this.centerY + 10, colorActive);
     } 

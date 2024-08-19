@@ -22,7 +22,7 @@ public class MCH_RenderGunner extends RenderLivingBase<MCH_EntityGunner> {
   
   private static final ResourceLocation steveTextures = new ResourceLocation("mcheli", "textures/mob/heligunner.png");
   
-  private static final ResourceLocation EMB4_TEXTURE = DefaultPlayerSkin.func_177335_a();
+  private static final ResourceLocation EMB4_TEXTURE = DefaultPlayerSkin.getDefaultSkinLegacy();
   
   public ModelBiped modelBipedMain;
   
@@ -32,7 +32,7 @@ public class MCH_RenderGunner extends RenderLivingBase<MCH_EntityGunner> {
   
   public MCH_RenderGunner(RenderManager renderManager) {
     super(renderManager, (ModelBase)new ModelBiped(0.0F, 0.0F, 64, MCH_MOD.isTodaySep01() ? 64 : 32), 0.5F);
-    this.modelBipedMain = (ModelBiped)this.field_77045_g;
+    this.modelBipedMain = (ModelBiped)this.mainModel;
     this.modelArmorChestplate = new ModelBiped(1.0F, 0.0F, 64, MCH_MOD.isTodaySep01() ? 64 : 32);
     this.modelArmor = new ModelBiped(0.5F, 0.0F, 64, MCH_MOD.isTodaySep01() ? 64 : 32);
   }
@@ -42,21 +42,21 @@ public class MCH_RenderGunner extends RenderLivingBase<MCH_EntityGunner> {
   }
   
   protected boolean canRenderName(MCH_EntityGunner targetEntity) {
-    return (targetEntity.func_96124_cp() != null);
+    return (targetEntity.getTeam() != null);
   }
   
   public void doRender(MCH_EntityGunner entity, double x, double y, double z, float entityYaw, float partialTicks) {
     GL11.glColor3f(1.0F, 1.0F, 1.0F);
     this.modelBipedMain
-      .field_78117_n = entity.func_70093_af();
+      .isSneak = entity.isSneaking();
     double d3 = y;
-    if (entity.func_70093_af())
+    if (entity.isSneaking())
       d3 -= 0.125D; 
     MCH_EntityAircraft ac = entity.getAc();
     if (ac != null && ac.getAcInfo() != null && (!(ac.getAcInfo()).hideEntity || !ac.isPilot((Entity)entity)))
-      super.func_76986_a(entity, x, d3, z, entityYaw, partialTicks); 
-    this.modelBipedMain.field_78117_n = false;
-    this.modelBipedMain.field_187076_m = ModelBiped.ArmPose.EMPTY;
+      super.doRender(entity, x, d3, z, entityYaw, partialTicks); 
+    this.modelBipedMain.isSneak = false;
+    this.modelBipedMain.rightArmPose = ModelBiped.ArmPose.EMPTY;
   }
   
   protected void preRenderCallback(MCH_EntityGunner entitylivingbaseIn, float partialTickTime) {
@@ -67,9 +67,9 @@ public class MCH_RenderGunner extends RenderLivingBase<MCH_EntityGunner> {
   public void renderFirstPersonArm(EntityPlayer p_82441_1_) {
     float f = 1.0F;
     GL11.glColor3f(f, f, f);
-    this.modelBipedMain.field_78095_p = 0.0F;
-    this.modelBipedMain.func_78087_a(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, (Entity)p_82441_1_);
-    this.modelBipedMain.field_178723_h.func_78785_a(0.0625F);
+    this.modelBipedMain.swingProgress = 0.0F;
+    this.modelBipedMain.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, (Entity)p_82441_1_);
+    this.modelBipedMain.bipedRightArm.render(0.0625F);
   }
   
   protected void _renderOffsetLivingLabel(MCH_EntityGunner p_96449_1_, double p_96449_2_, double p_96449_4_, double p_96449_6_, String p_96449_8_, float p_96449_9_, double p_96449_10_) {}
@@ -85,11 +85,11 @@ public class MCH_RenderGunner extends RenderLivingBase<MCH_EntityGunner> {
   protected void _renderEquippedItems(MCH_EntityGunner p_77029_1_, float p_77029_2_) {}
   
   protected void _rotateCorpse(MCH_EntityGunner entityLiving, float p_77043_2_, float rotationYaw, float partialTicks) {
-    func_77043_a(entityLiving, p_77043_2_, rotationYaw, partialTicks);
+    rotateCorpse(entityLiving, p_77043_2_, rotationYaw, partialTicks);
   }
   
   protected void _renderLivingAt(MCH_EntityGunner entityLivingBaseIn, double x, double y, double z) {
-    func_77039_a(entityLivingBaseIn, x, y, z);
+    renderLivingAt(entityLivingBaseIn, x, y, z);
   }
   
   public void _doRender(MCH_EntityGunner entity, double x, double y, double z, float entityYaw, float partialTicks) {

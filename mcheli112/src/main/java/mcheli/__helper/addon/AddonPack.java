@@ -88,18 +88,18 @@ public class AddonPack {
   
   public static AddonPack create(File addonFile) {
     JsonObject packMetaJson = loadPackMeta(addonFile);
-    JsonObject packJson = JsonUtils.func_151218_a(packMetaJson, "pack", new JsonObject());
-    JsonObject addonJson = JsonUtils.func_151218_a(packMetaJson, "addon", new JsonObject());
-    String addonDomain = JsonUtils.func_151219_a(addonJson, "domain", null);
-    String packName = JsonUtils.func_151219_a(packJson, "description", addonFile.getName());
-    String version = JsonUtils.func_151219_a(addonJson, "version", "0.0");
+    JsonObject packJson = JsonUtils.getJsonObject(packMetaJson, "pack", new JsonObject());
+    JsonObject addonJson = JsonUtils.getJsonObject(packMetaJson, "addon", new JsonObject());
+    String addonDomain = JsonUtils.getString(addonJson, "domain", null);
+    String packName = JsonUtils.getString(packJson, "description", addonFile.getName());
+    String version = JsonUtils.getString(addonJson, "version", "0.0");
     if (addonDomain == null) {
       MCH_Logger.get().warn("A addon domain is not specified! file:{}", addonFile.getName());
       addonDomain = "<!mcheli_share_domain>";
     } 
-    String credits = JsonUtils.func_151219_a(addonJson, "credits", "");
-    String description = JsonUtils.func_151219_a(addonJson, "description", "");
-    String loaderVersion = JsonUtils.func_151219_a(addonJson, "loader_version", "1");
+    String credits = JsonUtils.getString(addonJson, "credits", "");
+    String description = JsonUtils.getString(addonJson, "description", "");
+    String loaderVersion = JsonUtils.getString(addonJson, "loader_version", "1");
     List<String> authors = getAuthors(addonJson);
     return new AddonPack(addonDomain, packName, version, addonFile, credits, authors, description, loaderVersion, 
         ImmutableMap.copyOf(packMetaJson.entrySet()));

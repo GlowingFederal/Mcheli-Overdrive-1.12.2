@@ -7,6 +7,6 @@ import net.minecraft.client.renderer.vertex.VertexFormatElement;
 public class MCH_Verts {
   public static final VertexFormatElement TEX_2S = new VertexFormatElement(0, VertexFormatElement.EnumType.SHORT, VertexFormatElement.EnumUsage.UV, 2);
   
-  public static final VertexFormat POS_COLOR_LMAP = (new VertexFormat()).func_181721_a(DefaultVertexFormats.field_181713_m)
-    .func_181721_a(DefaultVertexFormats.field_181714_n).func_181721_a(TEX_2S);
+  public static final VertexFormat POS_COLOR_LMAP = (new VertexFormat()).addElement(DefaultVertexFormats.POSITION_3F)
+    .addElement(DefaultVertexFormats.COLOR_4UB).addElement(TEX_2S);
 }

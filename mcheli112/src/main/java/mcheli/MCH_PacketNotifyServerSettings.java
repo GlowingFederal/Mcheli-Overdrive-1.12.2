@@ -71,7 +71,7 @@ public class MCH_PacketNotifyServerSettings extends MCH_Packet {
     MCH_PacketNotifyServerSettings s = new MCH_PacketNotifyServerSettings();
     s.enableCamDistChange = !MCH_Config.DisableCameraDistChange.prmBool;
     s.enableEntityMarker = MCH_Config.DisplayEntityMarker.prmBool;
-    s.enablePVP = MCH_Utils.getServer().func_71219_W();
+    s.enablePVP = MCH_Utils.getServer().isPVPEnabled();
     s.stingerLockRange = MCH_Config.StingerLockRange.prmDouble;
     s.enableDebugBoundingBox = MCH_Config.EnableDebugBoundingBox.prmBool;
     s.enableRotationLimit = MCH_Config.EnableRotationLimit.prmBool;

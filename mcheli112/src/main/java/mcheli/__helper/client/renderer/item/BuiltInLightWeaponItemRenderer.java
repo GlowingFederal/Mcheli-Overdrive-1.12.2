@@ -44,7 +44,7 @@ public class BuiltInLightWeaponItemRenderer implements IItemModelRenderer {
       GL11.glShadeModel(7425); 
     GL11.glEnable(2884);
     W_McClient.MOD_bindTexture("textures/lweapon/" + name + ".png");
-    if (isFirstPerson && entity.func_184587_cr() && entity.func_184600_cs() == EnumHand.MAIN_HAND)
+    if (isFirstPerson && entity.isHandActive() && entity.getActiveHand() == EnumHand.MAIN_HAND)
       GL11.glTranslated(0.12999999523162842D, 0.27000001072883606D, 0.009999999776482582D); 
     MCH_ModelManager.render("lweapons", name);
     GL11.glShadeModel(7424);

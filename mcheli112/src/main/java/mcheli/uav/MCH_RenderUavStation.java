@@ -23,7 +23,7 @@ public class MCH_RenderUavStation extends W_Render<MCH_EntityUavStation> {
   
   public MCH_RenderUavStation(RenderManager renderManager) {
     super(renderManager);
-    this.field_76989_e = 1.0F;
+    this.shadowSize = 1.0F;
   }
   
   public void doRender(MCH_EntityUavStation entity, double posX, double posY, double posZ, float par8, float tickTime) {
@@ -36,8 +36,8 @@ public class MCH_RenderUavStation extends W_Render<MCH_EntityUavStation> {
     GL11.glPushMatrix();
     GL11.glTranslated(posX, posY + 0.3499999940395355D, posZ);
     GL11.glEnable(2884);
-    GL11.glRotatef(entity.field_70177_z, 0.0F, -1.0F, 0.0F);
-    GL11.glRotatef(entity.field_70125_A, 1.0F, 0.0F, 0.0F);
+    GL11.glRotatef(entity.rotationYaw, 0.0F, -1.0F, 0.0F);
+    GL11.glRotatef(entity.rotationPitch, 1.0F, 0.0F, 0.0F);
     GL11.glColor4f(0.75F, 0.75F, 0.75F, 1.0F);
     GL11.glEnable(3042);
     int srcBlend = GL11.glGetInteger(3041);

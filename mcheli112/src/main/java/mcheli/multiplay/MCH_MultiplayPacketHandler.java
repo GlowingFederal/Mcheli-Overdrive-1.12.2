@@ -44,11 +44,11 @@ public class MCH_MultiplayPacketHandler {
   
   @HandleSide({Side.SERVER})
   public static void onPacket_Command(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_PacketIndMultiplayCommand pc = new MCH_PacketIndMultiplayCommand();
     pc.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           ICommandManager icommandmanager;
           MinecraftServer minecraftServer = MCH_Utils.getServer();
           MCH_Lib.DbgLog(false, "MCH_MultiplayPacketHandler.onPacket_Command cmd:%d:%s", new Object[] { Integer.valueOf(pc.CmdID), pc.CmdStr });
@@ -60,12 +60,12 @@ public class MCH_MultiplayPacketHandler {
               MCH_Multiplay.jumpSpawnPoint(player);
               return;
             case 768:
-              icommandmanager = minecraftServer.func_71187_D();
-              icommandmanager.func_71556_a((ICommandSender)player, pc.CmdStr);
+              icommandmanager = minecraftServer.getCommandManager();
+              icommandmanager.executeCommand((ICommandSender)player, pc.CmdStr);
               return;
             case 1024:
-              if ((new CommandScoreboard()).func_184882_a(minecraftServer, (ICommandSender)player)) {
-                minecraftServer.func_71188_g(!minecraftServer.func_71219_W());
+              if ((new CommandScoreboard()).checkPermission(minecraftServer, (ICommandSender)player)) {
+                minecraftServer.setAllowPvp(!minecraftServer.isPVPEnabled());
                 MCH_PacketNotifyServerSettings.send(null);
               } 
               return;
@@ -79,20 +79,20 @@ public class MCH_MultiplayPacketHandler {
   
   private static void destoryAllAircraft(EntityPlayer player) {
     CommandSummon cmd = new CommandSummon();
-    if (cmd.func_184882_a(MCH_Utils.getServer(), (ICommandSender)player))
-      for (Entity e : player.field_70170_p.field_72996_f) {
+    if (cmd.checkPermission(MCH_Utils.getServer(), (ICommandSender)player))
+      for (Entity e : player.world.loadedEntityList) {
         if (e instanceof MCH_EntityAircraft)
-          ((MCH_EntityAircraft)e).func_70106_y(); 
+          ((MCH_EntityAircraft)e).setDead(); 
       }  
   }
   
   @HandleSide({Side.CLIENT})
   public static void onPacket_NotifySpotedEntity(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (!player.field_70170_p.field_72995_K)
+    if (!player.world.isRemote)
       return; 
     MCH_PacketNotifySpotedEntity pc = new MCH_PacketNotifySpotedEntity();
     pc.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           if (pc.count > 0)
             for (int i = 0; i < pc.num; i++)
               MCH_GuiTargetMarker.addSpotedEntity(pc.entityId[i], pc.count);  
@@ -101,20 +101,20 @@ public class MCH_MultiplayPacketHandler {
   
   @HandleSide({Side.CLIENT})
   public static void onPacket_NotifyMarkPoint(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (!player.field_70170_p.field_72995_K)
+    if (!player.world.isRemote)
       return; 
     MCH_PacketNotifyMarkPoint pc = new MCH_PacketNotifyMarkPoint();
     pc.readData(data);
-    scheduler.func_152344_a(() -> MCH_GuiTargetMarker.markPoint(pc.px, pc.py, pc.pz));
+    scheduler.addScheduledTask(() -> MCH_GuiTargetMarker.markPoint(pc.px, pc.py, pc.pz));
   }
   
   @HandleSide({Side.SERVER})
   public static void onPacket_LargeData(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_PacketLargeData pc = new MCH_PacketLargeData();
     pc.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           try {
             if (pc.imageDataIndex < 0 || pc.imageDataTotalSize <= 0)
               return; 
@@ -122,17 +122,17 @@ public class MCH_MultiplayPacketHandler {
               if (imageData != null && !lastPlayerName.isEmpty())
                 LogError("[mcheli]Err1:Saving the %s screen shot to server FAILED!!!", new Object[] { lastPlayerName }); 
               imageData = new byte[pc.imageDataTotalSize];
-              lastPlayerName = player.func_145748_c_().func_150254_d();
+              lastPlayerName = player.getDisplayName().getFormattedText();
               lastDataPercent = 0.0D;
             } 
             double dataPercent = ((pc.imageDataIndex + pc.imageDataSize) / pc.imageDataTotalSize) * 100.0D;
             if (dataPercent - lastDataPercent >= 10.0D || lastDataPercent == 0.0D) {
-              LogInfo("[mcheli]Saving the %s screen shot to server. %.0f%% : %dbyte / %dbyte", new Object[] { player.func_145748_c_(), Double.valueOf(dataPercent), Integer.valueOf(pc.imageDataIndex), Integer.valueOf(pc.imageDataTotalSize) });
+              LogInfo("[mcheli]Saving the %s screen shot to server. %.0f%% : %dbyte / %dbyte", new Object[] { player.getDisplayName(), Double.valueOf(dataPercent), Integer.valueOf(pc.imageDataIndex), Integer.valueOf(pc.imageDataTotalSize) });
               lastDataPercent = dataPercent;
             } 
             if (imageData == null) {
               if (imageData != null && lastPlayerName.isEmpty())
-                LogError("[mcheli]Err2:Saving the %s screen shot to server FAILED!!!", new Object[] { player.func_145748_c_() }); 
+                LogError("[mcheli]Err2:Saving the %s screen shot to server FAILED!!!", new Object[] { player.getDisplayName() }); 
               imageData = null;
               lastPlayerName = "";
               lastDataPercent = 0.0D;
@@ -145,7 +145,7 @@ public class MCH_MultiplayPacketHandler {
               String dt = dateFormat.format(new Date()).toString();
               File file = new File("screenshots_op");
               file.mkdir();
-              file = new File(file, player.func_145748_c_() + "_" + dt + ".png");
+              file = new File(file, player.getDisplayName() + "_" + dt + ".png");
               String s = file.getAbsolutePath();
               LogInfo("[mcheli]Save Screenshot has been completed: %s", new Object[] { s });
               FileOutputStream fos = new FileOutputStream(s);
@@ -173,15 +173,15 @@ public class MCH_MultiplayPacketHandler {
   
   @HandleSide({Side.CLIENT})
   public static void onPacket_IndClient(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (!player.field_70170_p.field_72995_K)
+    if (!player.world.isRemote)
       return; 
     MCH_PacketIndClient pc = new MCH_PacketIndClient();
     pc.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           if (pc.CmdID == 1) {
             MCH_MultiplayClient.startSendImageData();
           } else if (pc.CmdID == 2) {
-            MCH_MultiplayClient.sendModsInfo(player.func_145748_c_().func_150254_d(), player.func_145748_c_().func_150260_c(), Integer.parseInt(pc.CmdStr));
+            MCH_MultiplayClient.sendModsInfo(player.getDisplayName().getFormattedText(), player.getDisplayName().getUnformattedText(), Integer.parseInt(pc.CmdStr));
           } 
         });
   }
@@ -198,23 +198,23 @@ public class MCH_MultiplayPacketHandler {
   public static void onPacket_ModList(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
     MCH_PacketModList pc = new MCH_PacketModList();
     pc.readData(data);
-    if (player.field_70170_p.field_72995_K) {
-      scheduler.func_152344_a(() -> {
-            MCH_Lib.DbgLog(player.field_70170_p, "MCH_MultiplayPacketHandler.onPacket_ModList : ID=%d, Num=%d", new Object[] { Integer.valueOf(pc.id), Integer.valueOf(pc.num) });
+    if (player.world.isRemote) {
+      scheduler.addScheduledTask(() -> {
+            MCH_Lib.DbgLog(player.world, "MCH_MultiplayPacketHandler.onPacket_ModList : ID=%d, Num=%d", new Object[] { Integer.valueOf(pc.id), Integer.valueOf(pc.num) });
             if (pc.firstData)
-              MCH_Lib.Log(TextFormatting.RED + "###### " + player.func_145748_c_() + " ######", new Object[0]); 
+              MCH_Lib.Log(TextFormatting.RED + "###### " + player.getDisplayName() + " ######", new Object[0]); 
             for (String s : pc.list) {
               MCH_Lib.Log(s, new Object[0]);
-              player.func_145747_a((ITextComponent)new TextComponentString(s));
+              player.addChatMessage((ITextComponent)new TextComponentString(s));
             } 
           });
     } else if (pc.id == playerInfoId) {
-      scheduler.func_152344_a(() -> {
+      scheduler.addScheduledTask(() -> {
             if (modListRequestPlayer != null) {
               MCH_PacketModList.send(modListRequestPlayer, pc);
             } else {
               if (pc.firstData)
-                LogInfo("###### " + player.func_145748_c_() + " ######", new Object[0]); 
+                LogInfo("###### " + player.getDisplayName() + " ######", new Object[0]); 
               for (String s : pc.list)
                 LogInfo(s, new Object[0]); 
             } 

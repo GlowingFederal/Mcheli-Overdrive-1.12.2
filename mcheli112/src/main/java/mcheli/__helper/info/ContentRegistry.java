@@ -52,7 +52,7 @@ public class ContentRegistry<T extends MCH_BaseInfo> {
   public void reloadAll() {
     List<T> contents = ContentRegistries.reloadAllAddonContents(this);
     for (MCH_BaseInfo mCH_BaseInfo : contents)
-      this.registry.replace(mCH_BaseInfo.getLoation().func_110623_a(), (T)mCH_BaseInfo); 
+      this.registry.replace(mCH_BaseInfo.getLoation().getResourcePath(), (T)mCH_BaseInfo); 
   }
   
   public List<T> values() {
@@ -84,7 +84,7 @@ public class ContentRegistry<T extends MCH_BaseInfo> {
   }
   
   private static <TYPE extends IContentData> void putTable(Map<String, TYPE> table, TYPE content) {
-    table.put(content.getLoation().func_110623_a(), content);
+    table.put(content.getLoation().getResourcePath(), content);
   }
   
   public static <TYPE extends MCH_BaseInfo> Builder<TYPE> builder(Class<TYPE> type, String dir) {

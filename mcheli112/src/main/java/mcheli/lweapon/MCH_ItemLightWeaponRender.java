@@ -42,7 +42,7 @@ public class MCH_ItemLightWeaponRender implements _IItemRenderer {
   
   @SideOnly(Side.CLIENT)
   public static void renderItem(ItemStack pitem, Entity entity, boolean isFirstPerson) {
-    if (pitem == null || pitem.func_77973_b() == null)
+    if (pitem == null || pitem.getItem() == null)
       return; 
     String name = MCH_ItemLightWeaponBase.getName(pitem);
     GL11.glEnable(32826);

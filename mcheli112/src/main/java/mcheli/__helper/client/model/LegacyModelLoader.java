@@ -19,21 +19,21 @@ public enum LegacyModelLoader implements ICustomModelLoader {
     TEMPLATE = "{'parent':'item/generated','textures':{'layer0':'__item__'}}".replaceAll("'", "\"");
   }
   
-  public void func_110549_a(IResourceManager resourceManager) {}
+  public void onResourceManagerReload(IResourceManager resourceManager) {}
   
   public boolean accepts(ResourceLocation modelLocation) {
     if (modelLocation instanceof ModelResourceLocation) {
       ModelResourceLocation location = (ModelResourceLocation)modelLocation;
-      return (location.func_110624_b().equals("mcheli") && location.func_177518_c().equals("mcheli_legacy"));
+      return (location.getResourceDomain().equals("mcheli") && location.getVariant().equals("mcheli_legacy"));
     } 
     return false;
   }
   
   public IModel loadModel(ResourceLocation modelLocation) throws Exception {
-    String path = modelLocation.func_110624_b() + ":items/" + modelLocation.func_110623_a();
-    ModelBlock modelblock = ModelBlock.func_178294_a(TEMPLATE.replaceAll("__item__", path));
-    ModelBlock parent = ModelLoaderRegistry.getModel(modelblock.func_178305_e()).asVanillaModel().get();
-    modelblock.field_178315_d = parent;
+    String path = modelLocation.getResourceDomain() + ":items/" + modelLocation.getResourcePath();
+    ModelBlock modelblock = ModelBlock.deserialize(TEMPLATE.replaceAll("__item__", path));
+    ModelBlock parent = ModelLoaderRegistry.getModel(modelblock.getParentLocation()).asVanillaModel().get();
+    modelblock.parent = parent;
     return new MCH_WrapperItemLayerModel(modelblock);
   }
 }

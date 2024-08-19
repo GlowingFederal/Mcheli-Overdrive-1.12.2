@@ -11,14 +11,14 @@ import net.minecraftforge.fml.relauncher.Side;
 public class MCH_VehiclePacketHandler {
   @HandleSide({Side.SERVER})
   public static void onPacket_PlayerControl(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (!(player.func_184187_bx() instanceof MCH_EntityVehicle))
+    if (!(player.getRidingEntity() instanceof MCH_EntityVehicle))
       return; 
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_PacketVehiclePlayerControl pc = new MCH_PacketVehiclePlayerControl();
     pc.readData(data);
-    scheduler.func_152344_a(() -> {
-          MCH_EntityVehicle vehicle = (MCH_EntityVehicle)player.func_184187_bx();
+    scheduler.addScheduledTask(() -> {
+          MCH_EntityVehicle vehicle = (MCH_EntityVehicle)player.getRidingEntity();
           if (pc.isUnmount == 1) {
             vehicle.unmountEntity();
           } else if (pc.isUnmount == 2) {
@@ -48,9 +48,9 @@ public class MCH_VehiclePacketHandler {
             if (pc.useFlareType > 0)
               vehicle.useFlare(pc.useFlareType); 
             if (pc.unhitchChainId >= 0) {
-              Entity e = player.field_70170_p.func_73045_a(pc.unhitchChainId);
+              Entity e = player.world.getEntityByID(pc.unhitchChainId);
               if (e instanceof mcheli.chain.MCH_EntityChain)
-                e.func_70106_y(); 
+                e.setDead(); 
             } 
             if (pc.openGui)
               vehicle.openGui(player); 

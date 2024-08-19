@@ -48,33 +48,33 @@ public class MCH_ClientTankTickHandler extends MCH_AircraftClientTickHandler {
         setRotLimitPitch(seatInfo.minPitch, seatInfo.maxPitch, (Entity)player); 
     } 
     tank.updateRadar(10);
-    tank.updateCameraRotate(player.field_70177_z, player.field_70125_A);
+    tank.updateCameraRotate(player.rotationYaw, player.rotationPitch);
   }
   
   protected void onTick(boolean inGUI) {
     for (MCH_Key k : this.Keys)
       k.update(); 
     this.isBeforeRiding = this.isRiding;
-    EntityPlayerSP entityPlayerSP = this.mc.field_71439_g;
+    EntityPlayerSP entityPlayerSP = this.mc.player;
     MCH_EntityTank tank = null;
     boolean isPilot = true;
     if (entityPlayerSP != null)
-      if (entityPlayerSP.func_184187_bx() instanceof MCH_EntityTank) {
-        tank = (MCH_EntityTank)entityPlayerSP.func_184187_bx();
-      } else if (entityPlayerSP.func_184187_bx() instanceof MCH_EntitySeat) {
-        MCH_EntitySeat seat = (MCH_EntitySeat)entityPlayerSP.func_184187_bx();
+      if (entityPlayerSP.getRidingEntity() instanceof MCH_EntityTank) {
+        tank = (MCH_EntityTank)entityPlayerSP.getRidingEntity();
+      } else if (entityPlayerSP.getRidingEntity() instanceof MCH_EntitySeat) {
+        MCH_EntitySeat seat = (MCH_EntitySeat)entityPlayerSP.getRidingEntity();
         if (seat.getParent() instanceof MCH_EntityTank) {
           isPilot = false;
           tank = (MCH_EntityTank)seat.getParent();
         } 
-      } else if (entityPlayerSP.func_184187_bx() instanceof MCH_EntityUavStation) {
-        MCH_EntityUavStation uavStation = (MCH_EntityUavStation)entityPlayerSP.func_184187_bx();
+      } else if (entityPlayerSP.getRidingEntity() instanceof MCH_EntityUavStation) {
+        MCH_EntityUavStation uavStation = (MCH_EntityUavStation)entityPlayerSP.getRidingEntity();
         if (uavStation.getControlAircract() instanceof MCH_EntityTank)
           tank = (MCH_EntityTank)uavStation.getControlAircract(); 
       }  
     if (tank != null && tank.getAcInfo() != null) {
       update((EntityPlayer)entityPlayerSP, tank);
-      MCH_ViewEntityDummy viewEntityDummy = MCH_ViewEntityDummy.getInstance((World)this.mc.field_71441_e);
+      MCH_ViewEntityDummy viewEntityDummy = MCH_ViewEntityDummy.getInstance((World)this.mc.world);
       viewEntityDummy.update(tank.camera);
       if (!inGUI) {
         if (!tank.isDestroyed())
@@ -91,14 +91,14 @@ public class MCH_ClientTankTickHandler extends MCH_AircraftClientTickHandler {
           hideHand = false; 
       } 
       if (hideHand)
-        MCH_Lib.disableFirstPersonItemRender(entityPlayerSP.func_184614_ca()); 
+        MCH_Lib.disableFirstPersonItemRender(entityPlayerSP.getHeldItemMainhand()); 
       this.isRiding = true;
     } else {
       this.isRiding = false;
     } 
     if (!this.isBeforeRiding && this.isRiding && tank != null) {
       W_Reflection.setThirdPersonDistance(tank.thirdPersonDist);
-      MCH_ViewEntityDummy.getInstance((World)this.mc.field_71441_e).func_70107_b(tank.field_70165_t, tank.field_70163_u + 0.5D, tank.field_70161_v);
+      MCH_ViewEntityDummy.getInstance((World)this.mc.world).setPosition(tank.posX, tank.posY + 0.5D, tank.posZ);
     } else if (this.isBeforeRiding && !this.isRiding) {
       W_Reflection.restoreDefaultThirdPersonDistance();
       MCH_Lib.enableFirstPersonItemRender();

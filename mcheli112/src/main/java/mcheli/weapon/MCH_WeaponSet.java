@@ -148,9 +148,9 @@ public class MCH_WeaponSet {
     MCH_WeaponBase crtWpn = getCurrentWeapon();
     if (getAmmoNumMax() > 0 && getAmmoNum() < getAmmoNumMax() && crtWpn.getReloadCount() > 0) {
       this.countReloadWait = crtWpn.getReloadCount();
-      if (crtWpn.worldObj.field_72995_K)
+      if (crtWpn.worldObj.isRemote)
         setAmmoNum(0); 
-      if (!crtWpn.worldObj.field_72995_K) {
+      if (!crtWpn.worldObj.isRemote) {
         this.countReloadWait -= 20;
         if (this.countReloadWait <= 0)
           this.countReloadWait = 1; 
@@ -183,7 +183,7 @@ public class MCH_WeaponSet {
         } else {
           this.countWait = -cntSwitch;
         }  
-      if ((getCurrentWeapon()).worldObj.field_72995_K)
+      if ((getCurrentWeapon()).worldObj.isRemote)
         W_McClient.playSoundClick(1.0F, 1.0F); 
     } 
   }
@@ -272,12 +272,12 @@ public class MCH_WeaponSet {
   public void updateWeapon(Entity shooter, boolean isUsed, int index) {
     MCH_WeaponBase crtWpn = getWeapon(index);
     if (isUsed)
-      if (shooter.field_70170_p.field_72995_K && crtWpn != null && crtWpn.cartridge != null) {
+      if (shooter.world.isRemote && crtWpn != null && crtWpn.cartridge != null) {
         Vec3d v = crtWpn.getShotPos(shooter);
-        float yaw = shooter.field_70177_z;
-        float pitch = shooter.field_70125_A;
-        if (!(shooter instanceof mcheli.vehicle.MCH_EntityVehicle) || shooter.func_184207_aI());
-        MCH_EntityCartridge.spawnCartridge(shooter.field_70170_p, crtWpn.cartridge, shooter.field_70165_t + v.field_72450_a, shooter.field_70163_u + v.field_72448_b, shooter.field_70161_v + v.field_72449_c, shooter.field_70159_w, shooter.field_70181_x, shooter.field_70179_y, yaw + this.rotationYaw, pitch + this.rotationPitch);
+        float yaw = shooter.rotationYaw;
+        float pitch = shooter.rotationPitch;
+        if (!(shooter instanceof mcheli.vehicle.MCH_EntityVehicle) || shooter.isBeingRidden());
+        MCH_EntityCartridge.spawnCartridge(shooter.world, crtWpn.cartridge, shooter.posX + v.xCoord, shooter.posY + v.yCoord, shooter.posZ + v.zCoord, shooter.motionX, shooter.motionY, shooter.motionZ, yaw + this.rotationYaw, pitch + this.rotationPitch);
       }  
     if (index < this.recoilBuf.length) {
       Recoil r = this.recoilBuf[index];
@@ -293,7 +293,7 @@ public class MCH_WeaponSet {
           if (r.recoilBufCount > r.recoilBufCountMax / 2)
             r.recoilBufCount -= r.recoilBufCountSpeed; 
           float rb = (r.recoilBufCount / r.recoilBufCountMax);
-          r.recoilBuf = MathHelper.func_76126_a(rb * 3.1415927F);
+          r.recoilBuf = MathHelper.sin(rb * 3.1415927F);
         } 
         r.recoilBufCount--;
       } else {
@@ -308,16 +308,16 @@ public class MCH_WeaponSet {
       MCH_WeaponInfo info = crtWpn.getInfo();
       if ((getAmmoNumMax() <= 0 || getAmmoNum() > 0) && (info.maxHeatCount <= 0 || this.currentHeat < info.maxHeatCount)) {
         crtWpn.canPlaySound = (this.soundWait == 0);
-        prm.rotYaw = (prm.entity != null) ? prm.entity.field_70177_z : 0.0F;
-        prm.rotPitch = (prm.entity != null) ? prm.entity.field_70125_A : 0.0F;
+        prm.rotYaw = (prm.entity != null) ? prm.entity.rotationYaw : 0.0F;
+        prm.rotPitch = (prm.entity != null) ? prm.entity.rotationPitch : 0.0F;
         prm.rotYaw += this.rotationYaw + crtWpn.fixRotationYaw;
         prm.rotPitch += this.rotationPitch + crtWpn.fixRotationPitch;
         if (info.accuracy > 0.0F) {
           prm.rotYaw += (rand.nextFloat() - 0.5F) * info.accuracy;
           prm.rotPitch += (rand.nextFloat() - 0.5F) * info.accuracy;
         } 
-        prm.rotYaw = MathHelper.func_76142_g(prm.rotYaw);
-        prm.rotPitch = MathHelper.func_76142_g(prm.rotPitch);
+        prm.rotYaw = MathHelper.wrapDegrees(prm.rotYaw);
+        prm.rotPitch = MathHelper.wrapDegrees(prm.rotPitch);
         if (crtWpn.use(prm)) {
           if (info.maxHeatCount > 0) {
             this.cooldownSpeed = 1;
@@ -361,7 +361,7 @@ public class MCH_WeaponSet {
       if (reload)
         if (getAmmoNumMax() > 0 && crtWpn.getReloadCount() > 0) {
           this.countReloadWait = crtWpn.getReloadCount();
-          if (!crtWpn.worldObj.field_72995_K) {
+          if (!crtWpn.worldObj.isRemote) {
             this.countReloadWait -= 20;
             if (this.countReloadWait <= 0)
               this.countReloadWait = 1; 
@@ -408,12 +408,12 @@ public class MCH_WeaponSet {
     double ret = -1.0D;
     MCH_WeaponBase crtWpn = getCurrentWeapon();
     if (crtWpn != null && crtWpn.getInfo() != null) {
-      prm.rotYaw = (prm.entity != null) ? prm.entity.field_70177_z : 0.0F;
-      prm.rotPitch = (prm.entity != null) ? prm.entity.field_70125_A : 0.0F;
+      prm.rotYaw = (prm.entity != null) ? prm.entity.rotationYaw : 0.0F;
+      prm.rotPitch = (prm.entity != null) ? prm.entity.rotationPitch : 0.0F;
       prm.rotYaw += this.rotationYaw + crtWpn.fixRotationYaw;
       prm.rotPitch += this.rotationPitch + crtWpn.fixRotationPitch;
-      prm.rotYaw = MathHelper.func_76142_g(prm.rotYaw);
-      prm.rotPitch = MathHelper.func_76142_g(prm.rotPitch);
+      prm.rotYaw = MathHelper.wrapDegrees(prm.rotYaw);
+      prm.rotPitch = MathHelper.wrapDegrees(prm.rotPitch);
       return crtWpn.getLandInDistance(prm);
     } 
     return ret;

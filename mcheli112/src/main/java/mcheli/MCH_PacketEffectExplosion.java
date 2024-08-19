@@ -87,9 +87,9 @@ public class MCH_PacketEffectExplosion extends MCH_Packet {
     void writeAffectedPositions(DataOutputStream dos) throws IOException {
       dos.writeInt(this.affectedPositions.size());
       for (BlockPos blockpos : this.affectedPositions) {
-        dos.writeInt(blockpos.func_177958_n());
-        dos.writeInt(blockpos.func_177956_o());
-        dos.writeInt(blockpos.func_177952_p());
+        dos.writeInt(blockpos.getX());
+        dos.writeInt(blockpos.getY());
+        dos.writeInt(blockpos.getZ());
       } 
     }
     

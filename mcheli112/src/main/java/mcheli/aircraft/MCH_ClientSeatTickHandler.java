@@ -48,10 +48,10 @@ public class MCH_ClientSeatTickHandler extends MCH_ClientTickHandlerBase {
     for (MCH_Key k : this.Keys)
       k.update(); 
     this.isBeforeRiding = this.isRiding;
-    EntityPlayerSP entityPlayerSP = this.mc.field_71439_g;
+    EntityPlayerSP entityPlayerSP = this.mc.player;
     MCH_EntityAircraft ac = null;
-    if (entityPlayerSP != null && entityPlayerSP.func_184187_bx() instanceof MCH_EntitySeat) {
-      MCH_EntitySeat seat = (MCH_EntitySeat)entityPlayerSP.func_184187_bx();
+    if (entityPlayerSP != null && entityPlayerSP.getRidingEntity() instanceof MCH_EntitySeat) {
+      MCH_EntitySeat seat = (MCH_EntitySeat)entityPlayerSP.getRidingEntity();
       if (seat.getParent() == null || seat.getParent().getAcInfo() == null)
         return; 
       ac = seat.getParent();
@@ -66,7 +66,7 @@ public class MCH_ClientSeatTickHandler extends MCH_ClientTickHandlerBase {
       if (this.isRiding) {
         W_Reflection.setThirdPersonDistance(ac.thirdPersonDist);
       } else {
-        if (entityPlayerSP == null || !(entityPlayerSP.func_184187_bx() instanceof MCH_EntityAircraft))
+        if (entityPlayerSP == null || !(entityPlayerSP.getRidingEntity() instanceof MCH_EntityAircraft))
           W_Reflection.restoreDefaultThirdPersonDistance(); 
         MCH_Lib.setRenderViewEntity((EntityLivingBase)entityPlayerSP);
       }  

@@ -22,7 +22,7 @@ public class PacketHelper {
     } else {
       dos.writeByte(1);
       try {
-        CompressedStreamTools.func_74800_a(nbt, dos);
+        CompressedStreamTools.write(nbt, dos);
       } catch (IOException ioexception) {
         throw new EncoderException(ioexception);
       } 
@@ -35,7 +35,7 @@ public class PacketHelper {
     if (b0 == 0)
       return null; 
     try {
-      return CompressedStreamTools.func_152456_a((DataInput)data, new NBTSizeTracker(2097152L));
+      return CompressedStreamTools.read((DataInput)data, new NBTSizeTracker(2097152L));
     } catch (IOException ioexception) {
       throw new EncoderException(ioexception);
     } 
@@ -45,12 +45,12 @@ public class PacketHelper {
     if (itemstack.func_190926_b()) {
       dos.writeShort(-1);
     } else {
-      dos.writeShort(Item.func_150891_b(itemstack.func_77973_b()));
+      dos.writeShort(Item.getIdFromItem(itemstack.getItem()));
       dos.writeByte(itemstack.func_190916_E());
-      dos.writeShort(itemstack.func_77960_j());
+      dos.writeShort(itemstack.getMetadata());
       NBTTagCompound nbttagcompound = null;
-      if (itemstack.func_77973_b().func_77645_m() || itemstack.func_77973_b().func_77651_p())
-        nbttagcompound = itemstack.func_77973_b().getNBTShareTag(itemstack); 
+      if (itemstack.getItem().isDamageable() || itemstack.getItem().getShareTag())
+        nbttagcompound = itemstack.getItem().getNBTShareTag(itemstack); 
       writeCompoundTag(dos, nbttagcompound);
     } 
   }
@@ -61,8 +61,8 @@ public class PacketHelper {
       return ItemStack.field_190927_a; 
     int j = data.readByte();
     int k = data.readShort();
-    ItemStack itemstack = new ItemStack(Item.func_150899_d(i), j, k);
-    itemstack.func_77973_b().readNBTShareTag(itemstack, readCompoundTag(data));
+    ItemStack itemstack = new ItemStack(Item.getItemById(i), j, k);
+    itemstack.getItem().readNBTShareTag(itemstack, readCompoundTag(data));
     return itemstack;
   }
   

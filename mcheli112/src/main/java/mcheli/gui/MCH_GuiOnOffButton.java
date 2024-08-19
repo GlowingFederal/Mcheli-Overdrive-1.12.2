@@ -16,7 +16,7 @@ public class MCH_GuiOnOffButton extends W_GuiButton {
   
   public void setOnOff(boolean b) {
     this.statOnOff = b;
-    this.field_146126_j = this.dispOnOffString + (getOnOff() ? "ON" : "OFF");
+    this.displayString = this.dispOnOffString + (getOnOff() ? "ON" : "OFF");
   }
   
   public boolean getOnOff() {
@@ -27,8 +27,8 @@ public class MCH_GuiOnOffButton extends W_GuiButton {
     setOnOff(!getOnOff());
   }
   
-  public boolean func_146116_c(Minecraft mc, int x, int y) {
-    if (super.func_146116_c(mc, x, y)) {
+  public boolean mousePressed(Minecraft mc, int x, int y) {
+    if (super.mousePressed(mc, x, y)) {
       switchOnOff();
       return true;
     } 

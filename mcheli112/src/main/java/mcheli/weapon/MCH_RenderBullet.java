@@ -21,8 +21,8 @@ public class MCH_RenderBullet extends MCH_RenderBulletBase<MCH_EntityBaseBullet>
     MCH_EntityBaseBullet blt = entity;
     GL11.glPushMatrix();
     GL11.glTranslated(posX, posY, posZ);
-    GL11.glRotatef(-entity.field_70177_z, 0.0F, 1.0F, 0.0F);
-    GL11.glRotatef(entity.field_70125_A, 1.0F, 0.0F, 0.0F);
+    GL11.glRotatef(-entity.rotationYaw, 0.0F, 1.0F, 0.0F);
+    GL11.glRotatef(entity.rotationPitch, 1.0F, 0.0F, 0.0F);
     renderModel(blt);
     GL11.glPopMatrix();
   }

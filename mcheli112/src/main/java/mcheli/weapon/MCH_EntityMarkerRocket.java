@@ -17,7 +17,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 public class MCH_EntityMarkerRocket extends MCH_EntityBaseBullet {
-  private static final DataParameter<Byte> MARKER_STATUS = EntityDataManager.func_187226_a(MCH_EntityMarkerRocket.class, DataSerializers.field_187191_a);
+  private static final DataParameter<Byte> MARKER_STATUS = EntityDataManager.createKey(MCH_EntityMarkerRocket.class, DataSerializers.BYTE);
   
   public int countDown;
   
@@ -33,78 +33,78 @@ public class MCH_EntityMarkerRocket extends MCH_EntityBaseBullet {
     this.countDown = 0;
   }
   
-  protected void func_70088_a() {
-    super.func_70088_a();
-    this.field_70180_af.func_187214_a(MARKER_STATUS, Byte.valueOf((byte)0));
+  protected void entityInit() {
+    super.entityInit();
+    this.dataManager.register(MARKER_STATUS, Byte.valueOf((byte)0));
   }
   
   public void setMarkerStatus(int n) {
-    if (!this.field_70170_p.field_72995_K)
-      this.field_70180_af.func_187227_b(MARKER_STATUS, Byte.valueOf((byte)n)); 
+    if (!this.world.isRemote)
+      this.dataManager.set(MARKER_STATUS, Byte.valueOf((byte)n)); 
   }
   
   public int getMarkerStatus() {
-    return ((Byte)this.field_70180_af.func_187225_a(MARKER_STATUS)).byteValue();
+    return ((Byte)this.dataManager.get(MARKER_STATUS)).byteValue();
   }
   
-  public boolean func_70097_a(DamageSource par1DamageSource, float par2) {
+  public boolean attackEntityFrom(DamageSource par1DamageSource, float par2) {
     return false;
   }
   
-  public void func_70071_h_() {
+  public void onUpdate() {
     int status = getMarkerStatus();
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       if (getInfo() == null)
-        super.func_70071_h_(); 
+        super.onUpdate(); 
       if (getInfo() != null && !(getInfo()).disableSmoke)
         if (status != 0)
           if (status == 1) {
-            super.func_70071_h_();
+            super.onUpdate();
             spawnParticle((getInfo()).trajectoryParticleName, 3, 5.0F * (getInfo()).smokeSize * 0.5F);
           } else {
-            float gb = this.field_70146_Z.nextFloat() * 0.3F;
-            spawnParticle("explode", 5, (10 + this.field_70146_Z.nextInt(4)), this.field_70146_Z.nextFloat() * 0.2F + 0.8F, gb, gb, (this.field_70146_Z
-                .nextFloat() - 0.5F) * 0.7F, 0.3F + this.field_70146_Z.nextFloat() * 0.3F, (this.field_70146_Z
+            float gb = this.rand.nextFloat() * 0.3F;
+            spawnParticle("explode", 5, (10 + this.rand.nextInt(4)), this.rand.nextFloat() * 0.2F + 0.8F, gb, gb, (this.rand
+                .nextFloat() - 0.5F) * 0.7F, 0.3F + this.rand.nextFloat() * 0.3F, (this.rand
                 .nextFloat() - 0.5F) * 0.7F);
           }   
-    } else if (status == 0 || func_70090_H()) {
-      func_70106_y();
+    } else if (status == 0 || isInWater()) {
+      setDead();
     } else if (status == 1) {
-      super.func_70071_h_();
+      super.onUpdate();
     } else if (this.countDown > 0) {
       this.countDown--;
       if (this.countDown == 40) {
-        int num = 6 + this.field_70146_Z.nextInt(2);
+        int num = 6 + this.rand.nextInt(2);
         for (int i = 0; i < num; i++) {
-          MCH_EntityBomb e = new MCH_EntityBomb(this.field_70170_p, this.field_70165_t + ((this.field_70146_Z.nextFloat() - 0.5F) * 15.0F), (260.0F + this.field_70146_Z.nextFloat() * 10.0F + (i * 30)), this.field_70161_v + ((this.field_70146_Z.nextFloat() - 0.5F) * 15.0F), 0.0D, -0.5D, 0.0D, 0.0F, 90.0F, 4.0D);
-          e.setName(func_70005_c_());
-          e.explosionPower = 3 + this.field_70146_Z.nextInt(2);
+          MCH_EntityBomb e = new MCH_EntityBomb(this.world, this.posX + ((this.rand.nextFloat() - 0.5F) * 15.0F), (260.0F + this.rand.nextFloat() * 10.0F + (i * 30)), this.posZ + ((this.rand.nextFloat() - 0.5F) * 15.0F), 0.0D, -0.5D, 0.0D, 0.0F, 90.0F, 4.0D);
+          e.setName(getName());
+          e.explosionPower = 3 + this.rand.nextInt(2);
           e.explosionPowerInWater = 0;
           e.setPower(30);
           e.piercing = 0;
           e.shootingAircraft = this.shootingAircraft;
           e.shootingEntity = this.shootingEntity;
-          this.field_70170_p.func_72838_d((Entity)e);
+          this.world.spawnEntityInWorld((Entity)e);
         } 
       } 
     } else {
-      func_70106_y();
+      setDead();
     } 
   }
   
   public void spawnParticle(String name, int num, float size, float r, float g, float b, float mx, float my, float mz) {
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       if (name.isEmpty() || num < 1 || num > 50)
         return; 
-      double x = (this.field_70165_t - this.field_70169_q) / num;
-      double y = (this.field_70163_u - this.field_70167_r) / num;
-      double z = (this.field_70161_v - this.field_70166_s) / num;
+      double x = (this.posX - this.prevPosX) / num;
+      double y = (this.posY - this.prevPosY) / num;
+      double z = (this.posZ - this.prevPosZ) / num;
       for (int i = 0; i < num; i++) {
-        MCH_ParticleParam prm = new MCH_ParticleParam(this.field_70170_p, "smoke", this.field_70169_q + x * i, this.field_70167_r + y * i, this.field_70166_s + z * i);
+        MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", this.prevPosX + x * i, this.prevPosY + y * i, this.prevPosZ + z * i);
         prm.motionX = mx;
         prm.motionY = my;
         prm.motionZ = mz;
-        prm.size = size + this.field_70146_Z.nextFloat();
+        prm.size = size + this.rand.nextFloat();
         prm.setColor(1.0F, r, g, b);
         prm.isEffectWind = true;
         MCH_ParticlesUtil.spawnParticle(prm);
@@ -113,18 +113,18 @@ public class MCH_EntityMarkerRocket extends MCH_EntityBaseBullet {
   }
   
   protected void onImpact(RayTraceResult m, float damageFactor) {
-    if (this.field_70170_p.field_72995_K)
+    if (this.world.isRemote)
       return; 
-    if (m.field_72308_g != null || W_MovingObjectPosition.isHitTypeEntity(m))
+    if (m.entityHit != null || W_MovingObjectPosition.isHitTypeEntity(m))
       return; 
-    BlockPos blockpos = m.func_178782_a();
-    blockpos = blockpos.func_177972_a(m.field_178784_b);
-    if (this.field_70170_p.func_175623_d(blockpos)) {
+    BlockPos blockpos = m.getBlockPos();
+    blockpos = blockpos.offset(m.sideHit);
+    if (this.world.isAirBlock(blockpos)) {
       if (MCH_Config.Explosion_FlamingBlock.prmBool)
-        W_WorldFunc.setBlock(this.field_70170_p, blockpos, (Block)W_Blocks.field_150480_ab); 
+        W_WorldFunc.setBlock(this.world, blockpos, (Block)W_Blocks.FIRE); 
       int noAirBlockCount = 0;
       for (int i = 1; i < 256; i++) {
-        if (!this.field_70170_p.func_175623_d(blockpos.func_177981_b(i))) {
+        if (!this.world.isAirBlock(blockpos.up(i))) {
           noAirBlockCount++;
           if (noAirBlockCount >= 5)
             break; 
@@ -132,16 +132,16 @@ public class MCH_EntityMarkerRocket extends MCH_EntityBaseBullet {
       } 
       if (noAirBlockCount < 5) {
         setMarkerStatus(2);
-        func_70107_b(blockpos.func_177958_n() + 0.5D, blockpos.func_177956_o() + 1.1D, blockpos.func_177952_p() + 0.5D);
-        this.field_70169_q = this.field_70165_t;
-        this.field_70167_r = this.field_70163_u;
-        this.field_70166_s = this.field_70161_v;
+        setPosition(blockpos.getX() + 0.5D, blockpos.getY() + 1.1D, blockpos.getZ() + 0.5D);
+        this.prevPosX = this.posX;
+        this.prevPosY = this.posY;
+        this.prevPosZ = this.posZ;
         this.countDown = 100;
       } else {
-        func_70106_y();
+        setDead();
       } 
     } else {
-      func_70106_y();
+      setDead();
     } 
   }
   

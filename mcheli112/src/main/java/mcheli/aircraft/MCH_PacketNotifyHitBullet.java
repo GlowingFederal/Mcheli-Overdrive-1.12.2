@@ -34,10 +34,10 @@ public class MCH_PacketNotifyHitBullet extends MCH_Packet {
   }
   
   public static void send(MCH_EntityAircraft ac, EntityPlayer rider) {
-    if (rider == null || rider.field_70128_L)
+    if (rider == null || rider.isDead)
       return; 
     MCH_PacketNotifyHitBullet s = new MCH_PacketNotifyHitBullet();
-    s.entityID_Ac = (ac != null && !ac.field_70128_L) ? W_Entity.getEntityId((Entity)ac) : -1;
+    s.entityID_Ac = (ac != null && !ac.isDead) ? W_Entity.getEntityId((Entity)ac) : -1;
     W_Network.sendToPlayer((W_PacketBase)s, rider);
   }
 }

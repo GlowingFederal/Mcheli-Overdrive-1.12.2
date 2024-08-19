@@ -50,7 +50,7 @@ public class MCH_ClientHeliTickHandler extends MCH_AircraftClientTickHandler {
       if (seatInfo != null)
         setRotLimitPitch(seatInfo.minPitch, seatInfo.maxPitch, (Entity)player); 
     } 
-    heli.updateCameraRotate(player.field_70177_z, player.field_70125_A);
+    heli.updateCameraRotate(player.rotationYaw, player.rotationPitch);
     heli.updateRadar(5);
   }
   
@@ -58,26 +58,26 @@ public class MCH_ClientHeliTickHandler extends MCH_AircraftClientTickHandler {
     for (MCH_Key k : this.Keys)
       k.update(); 
     this.isBeforeRiding = this.isRiding;
-    EntityPlayerSP entityPlayerSP = this.mc.field_71439_g;
+    EntityPlayerSP entityPlayerSP = this.mc.player;
     MCH_EntityHeli heli = null;
     boolean isPilot = true;
     if (entityPlayerSP != null)
-      if (entityPlayerSP.func_184187_bx() instanceof MCH_EntityHeli) {
-        heli = (MCH_EntityHeli)entityPlayerSP.func_184187_bx();
-      } else if (entityPlayerSP.func_184187_bx() instanceof MCH_EntitySeat) {
-        MCH_EntitySeat seat = (MCH_EntitySeat)entityPlayerSP.func_184187_bx();
+      if (entityPlayerSP.getRidingEntity() instanceof MCH_EntityHeli) {
+        heli = (MCH_EntityHeli)entityPlayerSP.getRidingEntity();
+      } else if (entityPlayerSP.getRidingEntity() instanceof MCH_EntitySeat) {
+        MCH_EntitySeat seat = (MCH_EntitySeat)entityPlayerSP.getRidingEntity();
         if (seat.getParent() instanceof MCH_EntityHeli) {
           isPilot = false;
           heli = (MCH_EntityHeli)seat.getParent();
         } 
-      } else if (entityPlayerSP.func_184187_bx() instanceof MCH_EntityUavStation) {
-        MCH_EntityUavStation uavStation = (MCH_EntityUavStation)entityPlayerSP.func_184187_bx();
+      } else if (entityPlayerSP.getRidingEntity() instanceof MCH_EntityUavStation) {
+        MCH_EntityUavStation uavStation = (MCH_EntityUavStation)entityPlayerSP.getRidingEntity();
         if (uavStation.getControlAircract() instanceof MCH_EntityHeli)
           heli = (MCH_EntityHeli)uavStation.getControlAircract(); 
       }  
     if (heli != null && heli.getAcInfo() != null) {
       update((EntityPlayer)entityPlayerSP, heli, isPilot);
-      MCH_ViewEntityDummy viewEntityDummy = MCH_ViewEntityDummy.getInstance((World)this.mc.field_71441_e);
+      MCH_ViewEntityDummy viewEntityDummy = MCH_ViewEntityDummy.getInstance((World)this.mc.world);
       viewEntityDummy.update(heli.camera);
       if (!inGUI) {
         if (!heli.isDestroyed())
@@ -94,7 +94,7 @@ public class MCH_ClientHeliTickHandler extends MCH_AircraftClientTickHandler {
           hideHand = false; 
       } 
       if (hideHand)
-        MCH_Lib.disableFirstPersonItemRender(entityPlayerSP.func_184614_ca()); 
+        MCH_Lib.disableFirstPersonItemRender(entityPlayerSP.getHeldItemMainhand()); 
       this.isRiding = true;
     } else {
       this.isRiding = false;

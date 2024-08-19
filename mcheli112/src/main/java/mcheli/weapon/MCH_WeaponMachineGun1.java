@@ -15,15 +15,15 @@ public class MCH_WeaponMachineGun1 extends MCH_WeaponBase {
   }
   
   public boolean shot(MCH_WeaponParam prm) {
-    if (!this.worldObj.field_72995_K) {
+    if (!this.worldObj.isRemote) {
       Vec3d v = MCH_Lib.RotVec3(0.0D, 0.0D, 1.0D, -prm.rotYaw, -prm.rotPitch, -prm.rotRoll);
-      MCH_EntityBullet e = new MCH_EntityBullet(this.worldObj, prm.posX, prm.posY, prm.posZ, v.field_72450_a, v.field_72448_b, v.field_72449_c, prm.rotYaw, prm.rotPitch, this.acceleration);
+      MCH_EntityBullet e = new MCH_EntityBullet(this.worldObj, prm.posX, prm.posY, prm.posZ, v.xCoord, v.yCoord, v.zCoord, prm.rotYaw, prm.rotPitch, this.acceleration);
       e.setName(this.name);
       e.setParameterFromWeapon(this, prm.entity, prm.user);
-      e.field_70165_t += e.field_70159_w * 0.5D;
-      e.field_70163_u += e.field_70181_x * 0.5D;
-      e.field_70161_v += e.field_70179_y * 0.5D;
-      this.worldObj.func_72838_d((Entity)e);
+      e.posX += e.motionX * 0.5D;
+      e.posY += e.motionY * 0.5D;
+      e.posZ += e.motionZ * 0.5D;
+      this.worldObj.spawnEntityInWorld((Entity)e);
       playSound(prm.entity);
     } 
     return true;

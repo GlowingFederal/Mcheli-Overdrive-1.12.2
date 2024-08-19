@@ -25,7 +25,7 @@ public class MCH_PacketHandler extends W_PacketHandler {
     IThreadListener handler = FMLCommonHandler.instance().getWorldThread(ctx.netHandler);
     switch (msgid) {
       default:
-        MCH_Lib.DbgLog(entityPlayer.field_70170_p, "MCH_PacketHandler.onPacket invalid MSGID=0x%X(%d)", new Object[] { Integer.valueOf(msgid), Integer.valueOf(msgid) });
+        MCH_Lib.DbgLog(entityPlayer.world, "MCH_PacketHandler.onPacket invalid MSGID=0x%X(%d)", new Object[] { Integer.valueOf(msgid), Integer.valueOf(msgid) });
         return;
       case 268437520:
         MCH_CommonPacketHandler.onPacketEffectExplosion(entityPlayer, data, handler);

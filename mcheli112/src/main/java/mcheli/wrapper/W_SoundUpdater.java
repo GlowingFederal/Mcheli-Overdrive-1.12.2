@@ -12,7 +12,7 @@ public class W_SoundUpdater {
   protected W_Sound es;
   
   public W_SoundUpdater(Minecraft minecraft, Entity entity) {
-    this.theSoundHnadler = minecraft.func_147118_V();
+    this.theSoundHnadler = minecraft.getSoundHandler();
   }
   
   public void initEntitySound(String name) {
@@ -27,17 +27,17 @@ public class W_SoundUpdater {
   public void playEntitySound(String name, Entity entity, float volume, float pitch, boolean par5) {
     if (isValidSound()) {
       this.es.setSoundParam(entity, volume, pitch);
-      this.theSoundHnadler.func_147682_a((ISound)this.es);
+      this.theSoundHnadler.playSound((ISound)this.es);
     } 
   }
   
   public void stopEntitySound(Entity entity) {
     if (isValidSound())
-      this.theSoundHnadler.func_147683_b((ISound)this.es); 
+      this.theSoundHnadler.stopSound((ISound)this.es); 
   }
   
   public boolean isEntitySoundPlaying(Entity entity) {
-    return isValidSound() ? this.theSoundHnadler.func_147692_c((ISound)this.es) : false;
+    return isValidSound() ? this.theSoundHnadler.isSoundPlaying((ISound)this.es) : false;
   }
   
   public void setEntitySoundPitch(Entity entity, float pitch) {

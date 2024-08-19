@@ -119,7 +119,7 @@ public class MCH_Math {
   
   public static void QuatNormalize(FQuat q) {
     float r = NORM(q.w, q.x, q.y, q.z);
-    if (MathHelper.func_76135_e(r) > 1.0E-4D) {
+    if (MathHelper.abs(r) > 1.0E-4D) {
       q.w /= r;
       q.x /= r;
       q.y /= r;

@@ -22,54 +22,54 @@ public class GuiMODConfigTop extends GuiScreen {
     this.parentScreen = parentScreen;
   }
   
-  public void func_73866_w_() {
-    String doneText = I18n.func_135052_a("gui.done", new Object[0]);
-    int doneWidth = Math.max(this.field_146297_k.field_71466_p.func_78256_a(doneText) + 20, 100);
-    func_189646_b((GuiButton)new GuiButtonExt(1, this.field_146294_l - 20 - doneWidth, this.field_146295_m - 29, doneWidth, 20, doneText));
-    GuiButtonExt configBtn = new GuiButtonExt(16, this.field_146294_l / 2 - 100, 32, 200, 20, "Game config (in progress...)");
-    configBtn.field_146124_l = false;
-    GuiButtonExt assistBtn = new GuiButtonExt(16, this.field_146294_l / 2 - 100, 64, 200, 20, I18n.func_135052_a("gui.mcheli.generateLegacyAsisst", new Object[0]));
-    func_189646_b((GuiButton)configBtn);
-    func_189646_b((GuiButton)assistBtn);
+  public void initGui() {
+    String doneText = I18n.format("gui.done", new Object[0]);
+    int doneWidth = Math.max(this.mc.fontRendererObj.getStringWidth(doneText) + 20, 100);
+    addButton((GuiButton)new GuiButtonExt(1, this.width - 20 - doneWidth, this.height - 29, doneWidth, 20, doneText));
+    GuiButtonExt configBtn = new GuiButtonExt(16, this.width / 2 - 100, 32, 200, 20, "Game config (in progress...)");
+    configBtn.enabled = false;
+    GuiButtonExt assistBtn = new GuiButtonExt(16, this.width / 2 - 100, 64, 200, 20, I18n.format("gui.mcheli.generateLegacyAsisst", new Object[0]));
+    addButton((GuiButton)configBtn);
+    addButton((GuiButton)assistBtn);
     this.assistHoverChecker = new HoverChecker((GuiButton)assistBtn, 800);
   }
   
-  public void func_73863_a(int mouseX, int mouseY, float partialTicks) {
-    func_146276_q_();
-    func_73732_a(this.field_146289_q, "MC Helicopter MOD Config", this.field_146294_l / 2, 8, 16777215);
+  public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+    drawDefaultBackground();
+    drawCenteredString(this.fontRendererObj, "MC Helicopter MOD Config", this.width / 2, 8, 16777215);
     if (this.genAnimationTicks > 0) {
       float f = (this.genAnimationTicks > 10) ? 1.0F : (this.genAnimationTicks / 10.0F);
-      func_73731_b(this.field_146289_q, "Generate Done!", this.field_146294_l / 2 - 100, 92, 0xFF2222 | (int)(255.0F * f) << 24);
+      drawString(this.fontRendererObj, "Generate Done!", this.width / 2 - 100, 92, 0xFF2222 | (int)(255.0F * f) << 24);
     } 
-    super.func_73863_a(mouseX, mouseY, partialTicks);
+    super.drawScreen(mouseX, mouseY, partialTicks);
     if (this.assistHoverChecker.checkHover(mouseX, mouseY))
-      drawToolTip(Arrays.asList(I18n.func_135052_a("gui.mcheli.generateLegacyAsisst.desc", new Object[0]).split("\n")), mouseX, mouseY); 
+      drawToolTip(Arrays.asList(I18n.format("gui.mcheli.generateLegacyAsisst.desc", new Object[0]).split("\n")), mouseX, mouseY); 
   }
   
-  public void func_73876_c() {
-    super.func_73876_c();
+  public void updateScreen() {
+    super.updateScreen();
     if (this.genAnimationTicks > 0)
       this.genAnimationTicks--; 
   }
   
-  protected void func_146284_a(GuiButton button) throws IOException {
-    if (button.field_146127_k == 1) {
-      this.field_146297_k.func_147108_a(this.parentScreen);
-    } else if (button.field_146127_k == 16) {
+  protected void actionPerformed(GuiButton button) throws IOException {
+    if (button.id == 1) {
+      this.mc.displayGuiScreen(this.parentScreen);
+    } else if (button.id == 16) {
       LegacyPackAssistant.generateDirectoryPack();
       this.genAnimationTicks = 60;
     } 
   }
   
-  protected void func_73869_a(char typedChar, int keyCode) throws IOException {
+  protected void keyTyped(char typedChar, int keyCode) throws IOException {
     if (keyCode == 1) {
-      this.field_146297_k.func_147108_a(this.parentScreen);
+      this.mc.displayGuiScreen(this.parentScreen);
     } else {
-      super.func_73869_a(typedChar, keyCode);
+      super.keyTyped(typedChar, keyCode);
     } 
   }
   
   private void drawToolTip(List<String> stringList, int x, int y) {
-    GuiUtils.drawHoveringText(stringList, x, y, this.field_146294_l, this.field_146295_m, 300, this.field_146289_q);
+    GuiUtils.drawHoveringText(stringList, x, y, this.width, this.height, 300, this.fontRendererObj);
   }
 }

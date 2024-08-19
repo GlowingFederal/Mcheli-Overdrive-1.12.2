@@ -29,14 +29,14 @@ public class MCH_ItemModelRenderers {
   
   @SubscribeEvent
   static void onModelRegistryEvent(ModelRegistryEvent event) {
-    registerModelLocation(Item.func_150898_a((Block)MCH_MOD.blockDraftingTable));
+    registerModelLocation(Item.getItemFromBlock((Block)MCH_MOD.blockDraftingTable));
     ModelLoader.setCustomStateMapper((Block)MCH_MOD.blockDraftingTable, new IStateMapper() {
-          public Map<IBlockState, ModelResourceLocation> func_178130_a(Block blockIn) {
+          public Map<IBlockState, ModelResourceLocation> putStateModelLocations(Block blockIn) {
             return Maps.newHashMap();
           }
         });
     ModelLoader.setCustomStateMapper((Block)MCH_MOD.blockDraftingTableLit, new IStateMapper() {
-          public Map<IBlockState, ModelResourceLocation> func_178130_a(Block blockIn) {
+          public Map<IBlockState, ModelResourceLocation> putStateModelLocations(Block blockIn) {
             return Maps.newHashMap();
           }
         });
@@ -66,9 +66,9 @@ public class MCH_ItemModelRenderers {
   @SubscribeEvent
   static void onBakedModelEvent(ModelBakeEvent event) {
     for (Map.Entry<ModelResourceLocation, IItemModelRenderer> entry : renderers.entrySet()) {
-      IBakedModel bakedmodel = (IBakedModel)event.getModelRegistry().func_82594_a(entry.getKey());
+      IBakedModel bakedmodel = (IBakedModel)event.getModelRegistry().getObject(entry.getKey());
       if (bakedmodel != null)
-        event.getModelRegistry().func_82595_a(entry.getKey(), new MCH_BakedModel(bakedmodel, entry.getValue())); 
+        event.getModelRegistry().putObject(entry.getKey(), new MCH_BakedModel(bakedmodel, entry.getValue())); 
     } 
   }
   

@@ -45,7 +45,7 @@ public class MCH_PacketNotifyOnMountEntity extends MCH_Packet {
     if (ac == null || rider == null)
       return; 
     Entity pilot = ac.getRiddenByEntity();
-    if (!(pilot instanceof EntityPlayer) || pilot.field_70128_L)
+    if (!(pilot instanceof EntityPlayer) || pilot.isDead)
       return; 
     MCH_PacketNotifyOnMountEntity s = new MCH_PacketNotifyOnMountEntity();
     s.entityID_Ac = W_Entity.getEntityId((Entity)ac);

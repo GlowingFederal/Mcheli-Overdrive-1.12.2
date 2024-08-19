@@ -19,7 +19,7 @@ import net.minecraftforge.fml.relauncher.Side;
 public class MCH_CameraManager {
   private static final float DEF_THIRD_CAMERA_DIST = 4.0F;
   
-  private static final Minecraft mc = Minecraft.func_71410_x();
+  private static final Minecraft mc = Minecraft.getMinecraft();
   
   private static float cameraRoll = 0.0F;
   
@@ -32,48 +32,48 @@ public class MCH_CameraManager {
   @SubscribeEvent
   static void onCameraSetupEvent(EntityViewRenderEvent.CameraSetup event) {
     Entity entity = event.getEntity();
-    float f = event.getEntity().func_70047_e();
-    if (mc.field_71474_y.field_74320_O > 0) {
-      if (mc.field_71474_y.field_74320_O == 2)
-        GlStateManager.func_179114_b(180.0F, 0.0F, 1.0F, 0.0F); 
-      GlStateManager.func_179109_b(0.0F, 0.0F, -(cameraDistance - 4.0F));
-      if (mc.field_71474_y.field_74320_O == 2)
-        GlStateManager.func_179114_b(-180.0F, 0.0F, 1.0F, 0.0F); 
+    float f = event.getEntity().getEyeHeight();
+    if (mc.gameSettings.thirdPersonView > 0) {
+      if (mc.gameSettings.thirdPersonView == 2)
+        GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F); 
+      GlStateManager.translate(0.0F, 0.0F, -(cameraDistance - 4.0F));
+      if (mc.gameSettings.thirdPersonView == 2)
+        GlStateManager.rotate(-180.0F, 0.0F, 1.0F, 0.0F); 
     } 
     MCH_EntityAircraft ridingEntity = ridingAircraft;
-    if (ridingEntity != null && ridingEntity.canSwitchFreeLook() && ridingEntity.isPilot((Entity)mc.field_71439_g)) {
+    if (ridingEntity != null && ridingEntity.canSwitchFreeLook() && ridingEntity.isPilot((Entity)mc.player)) {
       boolean flag = !(entity instanceof MCH_ViewEntityDummy);
-      GlStateManager.func_179109_b(0.0F, -f, 0.0F);
+      GlStateManager.translate(0.0F, -f, 0.0F);
       if (flag)
-        GlStateManager.func_179114_b(cameraRoll, 0.0F, 0.0F, 1.0F); 
+        GlStateManager.rotate(cameraRoll, 0.0F, 0.0F, 1.0F); 
       if (ridingEntity.isOverridePlayerPitch())
         if (flag) {
-          GlStateManager.func_179114_b(ridingEntity.field_70125_A, 1.0F, 0.0F, 0.0F);
-          event.setPitch(event.getPitch() - ridingEntity.field_70125_A);
+          GlStateManager.rotate(ridingEntity.rotationPitch, 1.0F, 0.0F, 0.0F);
+          event.setPitch(event.getPitch() - ridingEntity.rotationPitch);
         }  
       if (ridingEntity.isOverridePlayerYaw())
         if (!ridingEntity.isHovering() && flag) {
-          GlStateManager.func_179114_b(ridingEntity.field_70177_z, 0.0F, 1.0F, 0.0F);
-          event.setYaw(event.getYaw() - ridingEntity.field_70177_z);
+          GlStateManager.rotate(ridingEntity.rotationYaw, 0.0F, 1.0F, 0.0F);
+          event.setYaw(event.getYaw() - ridingEntity.rotationYaw);
         }  
-      GlStateManager.func_179109_b(0.0F, f, 0.0F);
+      GlStateManager.translate(0.0F, f, 0.0F);
     } 
   }
   
   @SubscribeEvent
   static void onFOVModifierEvent(EntityViewRenderEvent.FOVModifier event) {
-    MCH_ViewEntityDummy viewer = MCH_ViewEntityDummy.getInstance((World)mc.field_71441_e);
-    if (viewer == event.getEntity() || MCH_ItemRangeFinder.isUsingScope((EntityPlayer)mc.field_71439_g))
+    MCH_ViewEntityDummy viewer = MCH_ViewEntityDummy.getInstance((World)mc.world);
+    if (viewer == event.getEntity() || MCH_ItemRangeFinder.isUsingScope((EntityPlayer)mc.player))
       event.setFOV(event.getFOV() * 1.0F / cameraZoom); 
   }
   
   public static void setCameraRoll(float roll) {
-    roll = MathHelper.func_76142_g(roll);
+    roll = MathHelper.wrapDegrees(roll);
     cameraRoll = roll;
   }
   
   public static void setThirdPeasonCameraDistance(float distance) {
-    distance = MathHelper.func_76131_a(distance, 4.0F, 60.0F);
+    distance = MathHelper.clamp(distance, 4.0F, 60.0F);
     cameraDistance = distance;
   }
   

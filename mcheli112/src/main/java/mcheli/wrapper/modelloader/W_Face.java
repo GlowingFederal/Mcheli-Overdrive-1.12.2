@@ -28,7 +28,7 @@ public class W_Face {
   }
   
   public void addFaceForRender(Tessellator tessellator, float textureOffset) {
-    BufferBuilder builder = tessellator.func_178180_c();
+    BufferBuilder builder = tessellator.getBuffer();
     if (this.faceNormal == null)
       this.faceNormal = calculateFaceNormal(); 
     float averageU = 0.0F;
@@ -49,15 +49,15 @@ public class W_Face {
           offsetU = -offsetU; 
         if ((this.textureCoordinates[i]).v > averageV)
           offsetV = -offsetV; 
-        builder.func_181662_b((this.vertices[i]).x, (this.vertices[i]).y, (this.vertices[i]).z)
-          .func_187315_a(((this.textureCoordinates[i]).u + offsetU), ((this.textureCoordinates[i]).v + offsetV));
+        builder.pos((this.vertices[i]).x, (this.vertices[i]).y, (this.vertices[i]).z)
+          .tex(((this.textureCoordinates[i]).u + offsetU), ((this.textureCoordinates[i]).v + offsetV));
       } else {
-        builder.func_181662_b((this.vertices[i]).x, (this.vertices[i]).y, (this.vertices[i]).z).func_187315_a(0.0D, 0.0D);
+        builder.pos((this.vertices[i]).x, (this.vertices[i]).y, (this.vertices[i]).z).tex(0.0D, 0.0D);
       } 
       if (this.vertexNormals != null && i < this.vertexNormals.length) {
-        builder.func_181663_c((this.vertexNormals[i]).x, (this.vertexNormals[i]).y, (this.vertexNormals[i]).z).func_181675_d();
+        builder.normal((this.vertexNormals[i]).x, (this.vertexNormals[i]).y, (this.vertexNormals[i]).z).endVertex();
       } else {
-        builder.func_181663_c(this.faceNormal.x, this.faceNormal.y, this.faceNormal.z).func_181675_d();
+        builder.normal(this.faceNormal.x, this.faceNormal.y, this.faceNormal.z).endVertex();
       } 
     } 
   }
@@ -65,8 +65,8 @@ public class W_Face {
   public W_Vertex calculateFaceNormal() {
     Vec3d v1 = new Vec3d(((this.vertices[1]).x - (this.vertices[0]).x), ((this.vertices[1]).y - (this.vertices[0]).y), ((this.vertices[1]).z - (this.vertices[0]).z));
     Vec3d v2 = new Vec3d(((this.vertices[2]).x - (this.vertices[0]).x), ((this.vertices[2]).y - (this.vertices[0]).y), ((this.vertices[2]).z - (this.vertices[0]).z));
-    Vec3d normalVector = v1.func_72431_c(v2).func_72432_b();
-    return new W_Vertex((float)normalVector.field_72450_a, (float)normalVector.field_72448_b, (float)normalVector.field_72449_c);
+    Vec3d normalVector = v1.crossProduct(v2).normalize();
+    return new W_Vertex((float)normalVector.xCoord, (float)normalVector.yCoord, (float)normalVector.zCoord);
   }
   
   public String toString() {

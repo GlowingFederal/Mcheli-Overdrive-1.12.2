@@ -34,22 +34,22 @@ public class MCH_GuiTitle extends MCH_Gui {
     super(minecraft);
   }
   
-  public void func_73866_w_() {
-    super.func_73866_w_();
+  public void initGui() {
+    super.initGui();
   }
   
-  public boolean func_73868_f() {
+  public boolean doesGuiPauseGame() {
     return false;
   }
   
   public boolean isDrawGui(EntityPlayer player) {
     if (this.restShowTick > 0 && this.chatLines.size() > 0)
-      if (player != null && player.field_70170_p != null) {
-        if (this.prevPlayerTick != player.field_70173_aa) {
+      if (player != null && player.world != null) {
+        if (this.prevPlayerTick != player.ticksExisted) {
           this.showTick++;
           this.restShowTick--;
         } 
-        this.prevPlayerTick = player.field_70173_aa;
+        this.prevPlayerTick = player.ticksExisted;
       }  
     return (this.restShowTick > 0);
   }
@@ -68,13 +68,13 @@ public class MCH_GuiTitle extends MCH_Gui {
   }
   
   private String formatColors(String s) {
-    return (Minecraft.func_71410_x()).field_71474_y.field_74344_o ? s : TextFormatting.func_110646_a(s);
+    return (Minecraft.getMinecraft()).gameSettings.chatColours ? s : TextFormatting.getTextWithoutFormattingCodes(s);
   }
   
   private int calculateChatboxWidth() {
     short short1 = 320;
     byte b0 = 40;
-    return MathHelper.func_76141_d(this.field_146297_k.field_71474_y.field_96692_F * (short1 - b0) + b0);
+    return MathHelper.floor(this.mc.gameSettings.chatWidth * (short1 - b0) + b0);
   }
   
   public void setupTitle(ITextComponent chatComponent, int showTime, int pos) {
@@ -84,42 +84,42 @@ public class MCH_GuiTitle extends MCH_Gui {
     this.position = pos;
     this.showTick = 0;
     this.restShowTick = showTime;
-    int k = MathHelper.func_76141_d(calculateChatboxWidth() / this.field_146297_k.field_71474_y.field_96691_E);
+    int k = MathHelper.floor(calculateChatboxWidth() / this.mc.gameSettings.chatScale);
     int l = 0;
     TextComponentString chatcomponenttext = new TextComponentString("");
     ArrayList<ITextComponent> arraylist = Lists.newArrayList();
     ArrayList<ITextComponent> arraylist1 = Lists.newArrayList((Iterable)chatComponent);
     for (int i1 = 0; i1 < arraylist1.size(); i1++) {
       ITextComponent ichatcomponent1 = arraylist1.get(i1);
-      String[] splitLine = (ichatcomponent1.func_150261_e() + "").split("\n");
+      String[] splitLine = (ichatcomponent1.getUnformattedComponentText() + "").split("\n");
       int lineCnt = 0;
       for (String sLine : splitLine) {
-        String s = formatColors(ichatcomponent1.func_150256_b().func_150218_j() + sLine);
-        int j1 = this.field_146297_k.field_71466_p.func_78256_a(s);
+        String s = formatColors(ichatcomponent1.getStyle().getFormattingCode() + sLine);
+        int j1 = this.mc.fontRendererObj.getStringWidth(s);
         TextComponentString chatcomponenttext1 = new TextComponentString(s);
-        chatcomponenttext1.func_150255_a(ichatcomponent1.func_150256_b().func_150232_l());
+        chatcomponenttext1.setStyle(ichatcomponent1.getStyle().createShallowCopy());
         boolean flag1 = false;
         if (l + j1 > k) {
-          String s1 = this.field_146297_k.field_71466_p.func_78262_a(s, k - l, false);
+          String s1 = this.mc.fontRendererObj.trimStringToWidth(s, k - l, false);
           String s2 = (s1.length() < s.length()) ? s.substring(s1.length()) : null;
           if (s2 != null && s2.length() > 0) {
             int k1 = s1.lastIndexOf(" ");
-            if (k1 >= 0 && this.field_146297_k.field_71466_p.func_78256_a(s.substring(0, k1)) > 0) {
+            if (k1 >= 0 && this.mc.fontRendererObj.getStringWidth(s.substring(0, k1)) > 0) {
               s1 = s.substring(0, k1);
               s2 = s.substring(k1);
             } 
             TextComponentString chatcomponenttext2 = new TextComponentString(s2);
-            chatcomponenttext2.func_150255_a(ichatcomponent1.func_150256_b().func_150232_l());
+            chatcomponenttext2.setStyle(ichatcomponent1.getStyle().createShallowCopy());
             arraylist1.add(i1 + 1, chatcomponenttext2);
           } 
-          j1 = this.field_146297_k.field_71466_p.func_78256_a(s1);
+          j1 = this.mc.fontRendererObj.getStringWidth(s1);
           chatcomponenttext1 = new TextComponentString(s1);
-          chatcomponenttext1.func_150255_a(ichatcomponent1.func_150256_b().func_150232_l());
+          chatcomponenttext1.setStyle(ichatcomponent1.getStyle().createShallowCopy());
           flag1 = true;
         } 
         if (l + j1 <= k) {
           l += j1;
-          chatcomponenttext.func_150257_a((ITextComponent)chatcomponenttext1);
+          chatcomponenttext.appendSibling((ITextComponent)chatcomponenttext1);
         } else {
           flag1 = true;
         } 
@@ -147,29 +147,29 @@ public class MCH_GuiTitle extends MCH_Gui {
   private int calculateChatboxHeight() {
     short short1 = 180;
     byte b0 = 20;
-    return MathHelper.func_76141_d(this.field_146297_k.field_71474_y.field_96694_H * (short1 - b0) + b0);
+    return MathHelper.floor(this.mc.gameSettings.chatHeightFocused * (short1 - b0) + b0);
   }
   
   private void drawChat() {
-    float charAlpha = this.field_146297_k.field_71474_y.field_74357_r * 0.9F + 0.1F;
-    float scale = this.field_146297_k.field_71474_y.field_96691_E * 2.0F;
+    float charAlpha = this.mc.gameSettings.chatOpacity * 0.9F + 0.1F;
+    float scale = this.mc.gameSettings.chatScale * 2.0F;
     GL11.glPushMatrix();
     float posY = 0.0F;
     switch (this.position) {
       default:
-        posY = (this.field_146297_k.field_71440_d / 2 / scaleFactor) - this.chatLines.size() / 2.0F * 9.0F * scale;
+        posY = (this.mc.displayHeight / 2 / scaleFactor) - this.chatLines.size() / 2.0F * 9.0F * scale;
         break;
       case 1:
         posY = 0.0F;
         break;
       case 2:
-        posY = (this.field_146297_k.field_71440_d / scaleFactor) - this.chatLines.size() * 9.0F * scale;
+        posY = (this.mc.displayHeight / scaleFactor) - this.chatLines.size() * 9.0F * scale;
         break;
       case 3:
-        posY = (this.field_146297_k.field_71440_d / 3 / scaleFactor) - this.chatLines.size() / 2.0F * 9.0F * scale;
+        posY = (this.mc.displayHeight / 3 / scaleFactor) - this.chatLines.size() / 2.0F * 9.0F * scale;
         break;
       case 4:
-        posY = (this.field_146297_k.field_71440_d * 2 / 3 / scaleFactor) - this.chatLines.size() / 2.0F * 9.0F * scale;
+        posY = (this.mc.displayHeight * 2 / 3 / scaleFactor) - this.chatLines.size() / 2.0F * 9.0F * scale;
         break;
     } 
     GL11.glTranslatef(0.0F, posY, 0.0F);
@@ -179,12 +179,12 @@ public class MCH_GuiTitle extends MCH_Gui {
       if (chatline != null) {
         int alpha = (int)(255.0F * charAlpha * this.colorAlpha);
         int y = i * 9;
-        func_73734_a(0, y + 9, this.field_146297_k.field_71443_c, y, alpha / 2 << 24);
+        drawRect(0, y + 9, this.mc.displayWidth, y, alpha / 2 << 24);
         GL11.glEnable(3042);
-        String s = chatline.func_151461_a().func_150254_d();
-        int sw = this.field_146297_k.field_71443_c / 2 / scaleFactor - this.field_146297_k.field_71466_p.func_78256_a(s);
+        String s = chatline.getChatComponent().getFormattedText();
+        int sw = this.mc.displayWidth / 2 / scaleFactor - this.mc.fontRendererObj.getStringWidth(s);
         sw = (int)(sw / scale);
-        this.field_146297_k.field_71466_p.func_175063_a(s, sw, (y + 1), 16777215 + (alpha << 24));
+        this.mc.fontRendererObj.drawStringWithShadow(s, sw, (y + 1), 16777215 + (alpha << 24));
         GL11.glDisable(3008);
       } 
     } 

@@ -138,7 +138,7 @@ public abstract class ContentLoader {
         String msg = "An error occurred while file loading ";
         if (e instanceof ContentParseException)
           msg = msg + "at line:" + ((ContentParseException)e).getLineNo() + "."; 
-        MCH_Logger.get().error(msg + " file:{}, domain:{}", location.func_110623_a(), this.domain, e);
+        MCH_Logger.get().error(msg + " file:{}, domain:{}", location.getResourcePath(), this.domain, e);
         return null;
       } finally {
         MCH_MOD.proxy.onParseFinishFile(location);

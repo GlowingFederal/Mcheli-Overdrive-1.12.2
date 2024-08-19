@@ -293,8 +293,8 @@ public class MCH_MOD {
   
   @EventHandler
   public void registerCommand(FMLServerStartedEvent e) {
-    CommandHandler handler = (CommandHandler)FMLCommonHandler.instance().getSidedDelegate().getServer().func_71187_D();
-    handler.func_71560_a((ICommand)new MCH_Command());
+    CommandHandler handler = (CommandHandler)FMLCommonHandler.instance().getSidedDelegate().getServer().getCommandManager();
+    handler.registerCommand((ICommand)new MCH_Command());
   }
   
   private void registerItemSpawnGunner() {
@@ -430,9 +430,9 @@ public class MCH_MOD {
   }
   
   public static void registerItem(W_Item item, String name, MCH_CreativeTabs ct) {
-    item.func_77655_b("mcheli:" + name);
+    item.setUnlocalizedName("mcheli:" + name);
     if (ct != null) {
-      item.func_77637_a(ct);
+      item.setCreativeTab(ct);
       ct.addIconItem((Item)item);
     } 
     MCH_Items.register((Item)item, name);
@@ -442,7 +442,7 @@ public class MCH_MOD {
     for (Map.Entry<String, MCH_ThrowableInfo> entry : (Iterable<Map.Entry<String, MCH_ThrowableInfo>>)ContentRegistries.throwable().entries()) {
       MCH_ThrowableInfo info = entry.getValue();
       info.item = (W_Item)new MCH_ItemThrowable(info.itemID);
-      info.item.func_77625_d(info.stackSize);
+      info.item.setMaxStackSize(info.stackSize);
       registerItem(info.item, entry.getKey(), creativeTabs);
       MCH_ItemThrowable.registerDispenseBehavior((Item)info.item);
       info.itemID = W_Item.getIdFromItem((Item)info.item) - 256;
@@ -456,7 +456,7 @@ public class MCH_MOD {
     for (Map.Entry<String, MCH_HeliInfo> entry : (Iterable<Map.Entry<String, MCH_HeliInfo>>)ContentRegistries.heli().entries()) {
       MCH_HeliInfo info = entry.getValue();
       info.item = new MCH_ItemHeli(info.itemID);
-      info.item.func_77656_e(info.maxHp);
+      info.item.setMaxDamage(info.maxHp);
       if (!info.canRide && (info.ammoSupplyRange > 0.0F || info.fuelSupplyRange > 0.0F)) {
         registerItem((W_Item)info.item, entry.getKey(), creativeTabs);
       } else {
@@ -471,7 +471,7 @@ public class MCH_MOD {
     for (Map.Entry<String, MCP_PlaneInfo> entry : (Iterable<Map.Entry<String, MCP_PlaneInfo>>)ContentRegistries.plane().entries()) {
       MCP_PlaneInfo info = entry.getValue();
       info.item = new MCP_ItemPlane(info.itemID);
-      info.item.func_77656_e(info.maxHp);
+      info.item.setMaxDamage(info.maxHp);
       if (!info.canRide && (info.ammoSupplyRange > 0.0F || info.fuelSupplyRange > 0.0F)) {
         registerItem((W_Item)info.item, entry.getKey(), creativeTabs);
       } else {
@@ -486,7 +486,7 @@ public class MCH_MOD {
     for (Map.Entry<String, MCH_TankInfo> entry : (Iterable<Map.Entry<String, MCH_TankInfo>>)ContentRegistries.tank().entries()) {
       MCH_TankInfo info = entry.getValue();
       info.item = new MCH_ItemTank(info.itemID);
-      info.item.func_77656_e(info.maxHp);
+      info.item.setMaxDamage(info.maxHp);
       if (!info.canRide && (info.ammoSupplyRange > 0.0F || info.fuelSupplyRange > 0.0F)) {
         registerItem((W_Item)info.item, entry.getKey(), creativeTabs);
       } else {
@@ -501,7 +501,7 @@ public class MCH_MOD {
     for (Map.Entry<String, MCH_VehicleInfo> entry : (Iterable<Map.Entry<String, MCH_VehicleInfo>>)ContentRegistries.vehicle().entries()) {
       MCH_VehicleInfo info = entry.getValue();
       info.item = new MCH_ItemVehicle(info.itemID);
-      info.item.func_77656_e(info.maxHp);
+      info.item.setMaxDamage(info.maxHp);
       if (!info.canRide && (info.ammoSupplyRange > 0.0F || info.fuelSupplyRange > 0.0F)) {
         registerItem((W_Item)info.item, entry.getKey(), creativeTabs);
       } else {

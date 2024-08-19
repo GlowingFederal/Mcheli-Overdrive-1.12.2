@@ -31,7 +31,7 @@ public class MCH_Hud extends MCH_BaseInfo {
   
   public MCH_Hud(AddonResourceLocation location, String filePath) {
     super(location, filePath);
-    this.name = location.func_110623_a();
+    this.name = location.getResourcePath();
     this.fileName = filePath;
     this.list = new ArrayList<>();
     this.isDrawing = false;
@@ -130,16 +130,16 @@ public class MCH_Hud extends MCH_BaseInfo {
   
   public void draw(MCH_EntityAircraft ac, EntityPlayer player, float partialTicks) {
     if (MCH_HudItem.mc == null)
-      MCH_HudItem.mc = Minecraft.func_71410_x(); 
+      MCH_HudItem.mc = Minecraft.getMinecraft(); 
     MCH_HudItem.ac = ac;
     MCH_HudItem.player = player;
     MCH_HudItem.partialTicks = partialTicks;
-    W_ScaledResolution w_ScaledResolution = new W_ScaledResolution(MCH_HudItem.mc, MCH_HudItem.mc.field_71443_c, MCH_HudItem.mc.field_71440_d);
-    MCH_HudItem.scaleFactor = w_ScaledResolution.func_78325_e();
+    W_ScaledResolution w_ScaledResolution = new W_ScaledResolution(MCH_HudItem.mc, MCH_HudItem.mc.displayWidth, MCH_HudItem.mc.displayHeight);
+    MCH_HudItem.scaleFactor = w_ScaledResolution.getScaleFactor();
     if (MCH_HudItem.scaleFactor <= 0)
       MCH_HudItem.scaleFactor = 1; 
-    MCH_HudItem.width = (MCH_HudItem.mc.field_71443_c / MCH_HudItem.scaleFactor);
-    MCH_HudItem.height = (MCH_HudItem.mc.field_71440_d / MCH_HudItem.scaleFactor);
+    MCH_HudItem.width = (MCH_HudItem.mc.displayWidth / MCH_HudItem.scaleFactor);
+    MCH_HudItem.height = (MCH_HudItem.mc.displayHeight / MCH_HudItem.scaleFactor);
     MCH_HudItem.centerX = MCH_HudItem.width / 2.0D;
     MCH_HudItem.centerY = MCH_HudItem.height / 2.0D;
     this.isIfFalse = false;

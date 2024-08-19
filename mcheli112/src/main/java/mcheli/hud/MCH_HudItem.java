@@ -110,7 +110,7 @@ public abstract class MCH_HudItem extends Gui {
   
   public MCH_HudItem(int fileLine) {
     this.fileLine = fileLine;
-    this.field_73735_i = -110.0F;
+    this.zLevel = -110.0F;
   }
   
   public abstract void execute();
@@ -147,11 +147,11 @@ public abstract class MCH_HudItem extends Gui {
   }
   
   public void drawCenteredString(String s, int x, int y, int color) {
-    func_73732_a(mc.field_71466_p, s, x, y, color);
+    drawCenteredString(mc.fontRendererObj, s, x, y, color);
   }
   
   public void drawString(String s, int x, int y, int color) {
-    func_73731_b(mc.field_71466_p, s, x, y, color);
+    drawString(mc.fontRendererObj, s, x, y, color);
   }
   
   public void drawTexture(String name, double left, double top, double width, double height, double uLeft, double vTop, double uWidth, double vHeight, float rot, int textureWidth, int textureHeight) {
@@ -161,15 +161,15 @@ public abstract class MCH_HudItem extends Gui {
     GL11.glRotatef(rot, 0.0F, 0.0F, 1.0F);
     float fx = (float)(1.0D / textureWidth);
     float fy = (float)(1.0D / textureHeight);
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder builder = tessellator.func_178180_c();
-    builder.func_181668_a(7, DefaultVertexFormats.field_181707_g);
-    builder.func_181662_b(-width / 2.0D, height / 2.0D, this.field_73735_i).func_187315_a(uLeft * fx, (vTop + vHeight) * fy).func_181675_d();
-    builder.func_181662_b(width / 2.0D, height / 2.0D, this.field_73735_i).func_187315_a((uLeft + uWidth) * fx, (vTop + vHeight) * fy)
-      .func_181675_d();
-    builder.func_181662_b(width / 2.0D, -height / 2.0D, this.field_73735_i).func_187315_a((uLeft + uWidth) * fx, vTop * fy).func_181675_d();
-    builder.func_181662_b(-width / 2.0D, -height / 2.0D, this.field_73735_i).func_187315_a(uLeft * fx, vTop * fy).func_181675_d();
-    tessellator.func_78381_a();
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder builder = tessellator.getBuffer();
+    builder.begin(7, DefaultVertexFormats.POSITION_TEX);
+    builder.pos(-width / 2.0D, height / 2.0D, this.zLevel).tex(uLeft * fx, (vTop + vHeight) * fy).endVertex();
+    builder.pos(width / 2.0D, height / 2.0D, this.zLevel).tex((uLeft + uWidth) * fx, (vTop + vHeight) * fy)
+      .endVertex();
+    builder.pos(width / 2.0D, -height / 2.0D, this.zLevel).tex((uLeft + uWidth) * fx, vTop * fy).endVertex();
+    builder.pos(-width / 2.0D, -height / 2.0D, this.zLevel).tex(uLeft * fx, vTop * fy).endVertex();
+    tessellator.draw();
     GL11.glPopMatrix();
   }
   
@@ -188,18 +188,18 @@ public abstract class MCH_HudItem extends Gui {
     float f = (par4 >> 16 & 0xFF) / 255.0F;
     float f1 = (par4 >> 8 & 0xFF) / 255.0F;
     float f2 = (par4 & 0xFF) / 255.0F;
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder builder = tessellator.func_178180_c();
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder builder = tessellator.getBuffer();
     GL11.glEnable(3042);
     GL11.glDisable(3553);
     W_OpenGlHelper.glBlendFunc(770, 771, 1, 0);
     GL11.glColor4f(f, f1, f2, f3);
-    builder.func_181668_a(7, DefaultVertexFormats.field_181705_e);
-    builder.func_181662_b(par0, par3, 0.0D).func_181675_d();
-    builder.func_181662_b(par2, par3, 0.0D).func_181675_d();
-    builder.func_181662_b(par2, par1, 0.0D).func_181675_d();
-    builder.func_181662_b(par0, par1, 0.0D).func_181675_d();
-    tessellator.func_78381_a();
+    builder.begin(7, DefaultVertexFormats.POSITION);
+    builder.pos(par0, par3, 0.0D).endVertex();
+    builder.pos(par2, par3, 0.0D).endVertex();
+    builder.pos(par2, par1, 0.0D).endVertex();
+    builder.pos(par0, par1, 0.0D).endVertex();
+    tessellator.draw();
     GL11.glEnable(3553);
     GL11.glDisable(3042);
   }
@@ -214,12 +214,12 @@ public abstract class MCH_HudItem extends Gui {
     GL11.glDisable(3553);
     GL11.glBlendFunc(770, 771);
     GL11.glColor4ub((byte)(color >> 16 & 0xFF), (byte)(color >> 8 & 0xFF), (byte)(color >> 0 & 0xFF), (byte)(color >> 24 & 0xFF));
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder builder = tessellator.func_178180_c();
-    builder.func_181668_a(mode, DefaultVertexFormats.field_181705_e);
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder builder = tessellator.getBuffer();
+    builder.begin(mode, DefaultVertexFormats.POSITION);
     for (int i = 0; i < line.length; i += 2)
-      builder.func_181662_b(line[i + 0], line[i + 1], this.field_73735_i).func_181675_d(); 
-    tessellator.func_78381_a();
+      builder.pos(line[i + 0], line[i + 1], this.zLevel).endVertex(); 
+    tessellator.draw();
     GL11.glEnable(3553);
     GL11.glDisable(3042);
     GL11.glColor4b((byte)-1, (byte)-1, (byte)-1, (byte)-1);
@@ -241,12 +241,12 @@ public abstract class MCH_HudItem extends Gui {
     GL11.glBlendFunc(770, 771);
     GL11.glColor4ub((byte)(color >> 16 & 0xFF), (byte)(color >> 8 & 0xFF), (byte)(color >> 0 & 0xFF), (byte)(color >> 24 & 0xFF));
     GL11.glPointSize(pointWidth);
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder builder = tessellator.func_178180_c();
-    builder.func_181668_a(0, DefaultVertexFormats.field_181705_e);
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder builder = tessellator.getBuffer();
+    builder.begin(0, DefaultVertexFormats.POSITION);
     for (int i = 0; i < points.size(); i += 2)
-      builder.func_181662_b(((Double)points.get(i)).doubleValue(), ((Double)points.get(i + 1)).doubleValue(), 0.0D).func_181675_d(); 
-    tessellator.func_78381_a();
+      builder.pos(((Double)points.get(i)).doubleValue(), ((Double)points.get(i + 1)).doubleValue(), 0.0D).endVertex(); 
+    tessellator.draw();
     GL11.glEnable(3553);
     GL11.glDisable(3042);
     GL11.glPopMatrix();
@@ -262,13 +262,13 @@ public abstract class MCH_HudItem extends Gui {
     updateVarMapItem("center_y", centerY);
     updateVarMapItem("width", width);
     updateVarMapItem("height", height);
-    updateVarMapItem("time", (player.field_70170_p.func_72820_D() % 24000L));
+    updateVarMapItem("time", (player.world.getWorldTime() % 24000L));
     updateVarMapItem("test_mode", MCH_Config.TestMode.prmBool ? 1.0D : 0.0D);
-    updateVarMapItem("plyr_yaw", MathHelper.func_76142_g(player.field_70177_z));
-    updateVarMapItem("plyr_pitch", player.field_70125_A);
-    updateVarMapItem("yaw", MathHelper.func_76142_g(ac.getRotYaw()));
+    updateVarMapItem("plyr_yaw", MathHelper.wrapDegrees(player.rotationYaw));
+    updateVarMapItem("plyr_pitch", player.rotationPitch);
+    updateVarMapItem("yaw", MathHelper.wrapDegrees(ac.getRotYaw()));
     updateVarMapItem("pitch", ac.getRotPitch());
-    updateVarMapItem("roll", MathHelper.func_76142_g(ac.getRotRoll()));
+    updateVarMapItem("roll", MathHelper.wrapDegrees(ac.getRotRoll()));
     updateVarMapItem("altitude", Altitude);
     updateVarMapItem("sea_alt", getSeaAltitude(ac));
     updateVarMapItem("have_radar", ac.isEntityRadarMounted() ? 1.0D : 0.0D);
@@ -277,14 +277,14 @@ public abstract class MCH_HudItem extends Gui {
     updateVarMapItem("max_hp", ac.getMaxHP());
     updateVarMapItem("hp_rto", (ac.getMaxHP() > 0) ? (ac.getHP() / ac.getMaxHP()) : 0.0D);
     updateVarMapItem("throttle", ac.getCurrentThrottle());
-    updateVarMapItem("pos_x", ac.field_70165_t);
-    updateVarMapItem("pos_y", ac.field_70163_u);
-    updateVarMapItem("pos_z", ac.field_70161_v);
-    updateVarMapItem("motion_x", ac.field_70159_w);
-    updateVarMapItem("motion_y", ac.field_70181_x);
-    updateVarMapItem("motion_z", ac.field_70179_y);
+    updateVarMapItem("pos_x", ac.posX);
+    updateVarMapItem("pos_y", ac.posY);
+    updateVarMapItem("pos_z", ac.posZ);
+    updateVarMapItem("motion_x", ac.motionX);
+    updateVarMapItem("motion_y", ac.motionY);
+    updateVarMapItem("motion_z", ac.motionZ);
     updateVarMapItem("speed", 
-        Math.sqrt(ac.field_70159_w * ac.field_70159_w + ac.field_70181_x * ac.field_70181_x + ac.field_70179_y * ac.field_70179_y));
+        Math.sqrt(ac.motionX * ac.motionX + ac.motionY * ac.motionY + ac.motionZ * ac.motionZ));
     updateVarMapItem("fuel", ac.getFuelP());
     updateVarMapItem("low_fuel", isLowFuel(ac));
     updateVarMapItem("stick_x", StickX);
@@ -298,7 +298,7 @@ public abstract class MCH_HudItem extends Gui {
     updateVarMapItem("auto_pilot", getAutoPilot(ac, player));
     updateVarMapItem("have_flare", ac.haveFlare() ? 1.0D : 0.0D);
     updateVarMapItem("can_flare", ac.canUseFlare() ? 1.0D : 0.0D);
-    updateVarMapItem("inventory", ac.func_70302_i_());
+    updateVarMapItem("inventory", ac.getSizeInventory());
     updateVarMapItem("hovering", (ac instanceof mcheli.helicopter.MCH_EntityHeli && ac.isHoveringMode()) ? 1.0D : 0.0D);
     updateVarMapItem("is_uav", ac.isUAV() ? 1.0D : 0.0D);
     updateVarMapItem("uav_fs", getUAV_Fs(ac));
@@ -332,8 +332,8 @@ public abstract class MCH_HudItem extends Gui {
   private static double getUAV_Fs(MCH_EntityAircraft ac) {
     double uav_fs = 0.0D;
     if (ac.isUAV() && ac.getUavStation() != null) {
-      double dx = ac.field_70165_t - (ac.getUavStation()).field_70165_t;
-      double dz = ac.field_70161_v - (ac.getUavStation()).field_70161_v;
+      double dx = ac.posX - (ac.getUavStation()).posX;
+      double dz = ac.posZ - (ac.getUavStation()).posZ;
       float dist = (float)Math.sqrt(dx * dx + dz * dz);
       if (dist > 120.0F)
         dist = 120.0F; 
@@ -402,7 +402,7 @@ public abstract class MCH_HudItem extends Gui {
   }
   
   public static double getSeaAltitude(MCH_EntityAircraft ac) {
-    double a = ac.field_70163_u - ac.field_70170_p.func_72919_O();
+    double a = ac.posY - ac.world.getHorizon();
     return (a >= 0.0D) ? a : 0.0D;
   }
   
@@ -456,18 +456,18 @@ public abstract class MCH_HudItem extends Gui {
   
   private static void updateAltitude(MCH_EntityAircraft ac) {
     if (altitudeUpdateCount <= 0) {
-      int heliY = (int)ac.field_70163_u;
+      int heliY = (int)ac.posY;
       if (heliY > 256)
         heliY = 256; 
       for (int i = 0; i < 256; i++) {
         if (heliY - i <= 0)
           break; 
-        int id = W_WorldFunc.getBlockId(ac.field_70170_p, (int)ac.field_70165_t, heliY - i, (int)ac.field_70161_v);
+        int id = W_WorldFunc.getBlockId(ac.world, (int)ac.posX, heliY - i, (int)ac.posZ);
         if (id != 0) {
           Altitude = i;
-          if (ac.field_70163_u <= 256.0D)
+          if (ac.posY <= 256.0D)
             break; 
-          Altitude = (int)(Altitude + ac.field_70163_u - 256.0D);
+          Altitude = (int)(Altitude + ac.posY - 256.0D);
           break;
         } 
       } 
@@ -514,8 +514,8 @@ public abstract class MCH_HudItem extends Gui {
   
   public static void updateUAV(MCH_EntityAircraft ac) {
     if (ac.isUAV() && ac.getUavStation() != null) {
-      double dx = ac.field_70165_t - (ac.getUavStation()).field_70165_t;
-      double dz = ac.field_70161_v - (ac.getUavStation()).field_70161_v;
+      double dx = ac.posX - (ac.getUavStation()).posX;
+      double dz = ac.posZ - (ac.getUavStation()).posZ;
       UAV_Dist = (float)Math.sqrt(dx * dx + dz * dz);
     } else {
       UAV_Dist = 0.0D;
@@ -525,12 +525,12 @@ public abstract class MCH_HudItem extends Gui {
   private static void updateTvMissile(MCH_EntityAircraft ac) {
     MCH_EntityTvMissile mCH_EntityTvMissile = ac.getTVMissile();
     if (mCH_EntityTvMissile != null) {
-      TVM_PosX = ((Entity)mCH_EntityTvMissile).field_70165_t;
-      TVM_PosY = ((Entity)mCH_EntityTvMissile).field_70163_u;
-      TVM_PosZ = ((Entity)mCH_EntityTvMissile).field_70161_v;
-      double dx = ((Entity)mCH_EntityTvMissile).field_70165_t - ac.field_70165_t;
-      double dy = ((Entity)mCH_EntityTvMissile).field_70163_u - ac.field_70163_u;
-      double dz = ((Entity)mCH_EntityTvMissile).field_70161_v - ac.field_70161_v;
+      TVM_PosX = ((Entity)mCH_EntityTvMissile).posX;
+      TVM_PosY = ((Entity)mCH_EntityTvMissile).posY;
+      TVM_PosZ = ((Entity)mCH_EntityTvMissile).posZ;
+      double dx = ((Entity)mCH_EntityTvMissile).posX - ac.posX;
+      double dy = ((Entity)mCH_EntityTvMissile).posY - ac.posY;
+      double dz = ((Entity)mCH_EntityTvMissile).posZ - ac.posZ;
       TVM_Diff = Math.sqrt(dx * dx + dy * dy + dz * dz);
     } else {
       TVM_PosX = 0.0D;

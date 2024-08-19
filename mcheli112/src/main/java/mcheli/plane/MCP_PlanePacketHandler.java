@@ -14,19 +14,19 @@ import net.minecraftforge.fml.relauncher.Side;
 public class MCP_PlanePacketHandler {
   @HandleSide({Side.SERVER})
   public static void onPacket_PlayerControl(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCP_PlanePacketPlayerControl pc = new MCP_PlanePacketPlayerControl();
     pc.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           MCP_EntityPlane plane = null;
-          if (player.func_184187_bx() instanceof MCP_EntityPlane) {
-            plane = (MCP_EntityPlane)player.func_184187_bx();
-          } else if (player.func_184187_bx() instanceof MCH_EntitySeat) {
-            if (((MCH_EntitySeat)player.func_184187_bx()).getParent() instanceof MCP_EntityPlane)
-              plane = (MCP_EntityPlane)((MCH_EntitySeat)player.func_184187_bx()).getParent(); 
-          } else if (player.func_184187_bx() instanceof MCH_EntityUavStation) {
-            MCH_EntityUavStation uavStation = (MCH_EntityUavStation)player.func_184187_bx();
+          if (player.getRidingEntity() instanceof MCP_EntityPlane) {
+            plane = (MCP_EntityPlane)player.getRidingEntity();
+          } else if (player.getRidingEntity() instanceof MCH_EntitySeat) {
+            if (((MCH_EntitySeat)player.getRidingEntity()).getParent() instanceof MCP_EntityPlane)
+              plane = (MCP_EntityPlane)((MCH_EntitySeat)player.getRidingEntity()).getParent(); 
+          } else if (player.getRidingEntity() instanceof MCH_EntityUavStation) {
+            MCH_EntityUavStation uavStation = (MCH_EntityUavStation)player.getRidingEntity();
             if (uavStation.getControlAircract() instanceof MCP_EntityPlane)
               plane = (MCP_EntityPlane)uavStation.getControlAircract(); 
           } 

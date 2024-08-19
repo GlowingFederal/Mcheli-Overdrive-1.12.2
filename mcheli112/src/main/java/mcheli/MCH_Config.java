@@ -624,8 +624,8 @@ public class MCH_Config {
     } else {
       list = DamageOtherByExternal.list;
     } 
-    Entity attacker = ds.func_76346_g();
-    Entity attackerSource = ds.func_76364_f();
+    Entity attacker = ds.getEntity();
+    Entity attackerSource = ds.getSourceOfDamage();
     for (DamageEntity de : list) {
       if (de.name.isEmpty() || (attacker != null && attacker.getClass().toString().indexOf(de.name) > 0) || (attackerSource != null && attackerSource
         .getClass().toString().indexOf(de.name) > 0))

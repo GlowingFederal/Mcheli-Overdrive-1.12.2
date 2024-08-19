@@ -36,7 +36,7 @@ public class MCH_ClientEventHook extends W_ClientEventHook {
   
   public void renderLivingEventSpecialsPre(RenderLivingEvent.Specials.Pre<EntityLivingBase> event) {
     if (MCH_Config.DisableRenderLivingSpecials.prmBool) {
-      MCH_EntityAircraft ac = MCH_EntityAircraft.getAircraft_RiddenOrControl((Entity)(Minecraft.func_71410_x()).field_71439_g);
+      MCH_EntityAircraft ac = MCH_EntityAircraft.getAircraft_RiddenOrControl((Entity)(Minecraft.getMinecraft()).player);
       if (ac != null && ac.isMountedEntity((Entity)event.getEntity())) {
         event.setCanceled(true);
         return;
@@ -52,41 +52,41 @@ public class MCH_ClientEventHook extends W_ClientEventHook {
     int cm = MCH_ClientCommonTickHandler.cameraMode;
     if (cm == 0)
       return; 
-    int ticks = entity.field_70173_aa % 20;
+    int ticks = entity.ticksExisted % 20;
     if (ticks >= 4)
       return; 
     float alpha = (ticks == 2 || ticks == 1) ? 1.0F : 0.5F;
-    EntityPlayerSP entityPlayerSP = (Minecraft.func_71410_x()).field_71439_g;
+    EntityPlayerSP entityPlayerSP = (Minecraft.getMinecraft()).player;
     if (entityPlayerSP == null)
       return; 
-    if (!entityPlayerSP.func_184191_r((Entity)entity))
+    if (!entityPlayerSP.isOnSameTeam((Entity)entity))
       return; 
     int j = 240;
     int k = 240;
-    OpenGlHelper.func_77475_a(OpenGlHelper.field_77476_b, j / 1.0F, k / 1.0F);
-    RenderManager rm = event.getRenderer().func_177068_d();
+    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j / 1.0F, k / 1.0F);
+    RenderManager rm = event.getRenderer().getRenderManager();
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     float f1 = 0.080000006F;
     GL11.glPushMatrix();
-    GL11.glTranslated(event.getX(), event.getY() + (float)(entity.field_70131_O * 0.75D), event.getZ());
+    GL11.glTranslated(event.getX(), event.getY() + (float)(entity.height * 0.75D), event.getZ());
     GL11.glNormal3f(0.0F, 1.0F, 0.0F);
-    GL11.glRotatef(-rm.field_78735_i, 0.0F, 1.0F, 0.0F);
-    GL11.glRotatef(rm.field_78732_j, 1.0F, 0.0F, 0.0F);
+    GL11.glRotatef(-rm.playerViewY, 0.0F, 1.0F, 0.0F);
+    GL11.glRotatef(rm.playerViewX, 1.0F, 0.0F, 0.0F);
     GL11.glScalef(-f1, -f1, f1);
     GL11.glEnable(3042);
-    OpenGlHelper.func_148821_a(770, 771, 1, 0);
+    OpenGlHelper.glBlendFunc(770, 771, 1, 0);
     GL11.glEnable(3553);
-    rm.field_78724_e.func_110577_a(ir_strobe);
+    rm.renderEngine.bindTexture(ir_strobe);
     GL11.glAlphaFunc(516, 0.003921569F);
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder builder = tessellator.func_178180_c();
-    builder.func_181668_a(7, DefaultVertexFormats.field_181709_i);
-    int i = (int)Math.max(entity.field_70130_N, entity.field_70131_O) * 20;
-    builder.func_181662_b(-i, -i, 0.1D).func_187315_a(0.0D, 0.0D).func_181666_a(1.0F, 1.0F, 1.0F, alpha * ((cm == 1) ? 0.9F : 0.5F)).func_181675_d();
-    builder.func_181662_b(-i, i, 0.1D).func_187315_a(0.0D, 1.0D).func_181666_a(1.0F, 1.0F, 1.0F, alpha * ((cm == 1) ? 0.9F : 0.5F)).func_181675_d();
-    builder.func_181662_b(i, i, 0.1D).func_187315_a(1.0D, 1.0D).func_181666_a(1.0F, 1.0F, 1.0F, alpha * ((cm == 1) ? 0.9F : 0.5F)).func_181675_d();
-    builder.func_181662_b(i, -i, 0.1D).func_187315_a(1.0D, 0.0D).func_181666_a(1.0F, 1.0F, 1.0F, alpha * ((cm == 1) ? 0.9F : 0.5F)).func_181675_d();
-    tessellator.func_78381_a();
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder builder = tessellator.getBuffer();
+    builder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+    int i = (int)Math.max(entity.width, entity.height) * 20;
+    builder.pos(-i, -i, 0.1D).tex(0.0D, 0.0D).color(1.0F, 1.0F, 1.0F, alpha * ((cm == 1) ? 0.9F : 0.5F)).endVertex();
+    builder.pos(-i, i, 0.1D).tex(0.0D, 1.0D).color(1.0F, 1.0F, 1.0F, alpha * ((cm == 1) ? 0.9F : 0.5F)).endVertex();
+    builder.pos(i, i, 0.1D).tex(1.0D, 1.0D).color(1.0F, 1.0F, 1.0F, alpha * ((cm == 1) ? 0.9F : 0.5F)).endVertex();
+    builder.pos(i, -i, 0.1D).tex(1.0D, 0.0D).color(1.0F, 1.0F, 1.0F, alpha * ((cm == 1) ? 0.9F : 0.5F)).endVertex();
+    tessellator.draw();
     GL11.glEnable(2896);
     GL11.glPopMatrix();
   }
@@ -104,21 +104,21 @@ public class MCH_ClientEventHook extends W_ClientEventHook {
   
   public void renderLivingEventPre(RenderLivingEvent.Pre<EntityLivingBase> event) {
     for (MCH_EntityAircraft ac : haveSearchLightAircraft)
-      OpenGlHelper.func_77475_a(OpenGlHelper.field_77476_b, ac
+      OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, ac
           .getSearchLightValue((Entity)event.getEntity()), 240.0F); 
     if (MCH_Config.EnableModEntityRender.prmBool)
       if (cancelRender)
-        if (event.getEntity().func_184187_bx() instanceof MCH_EntityAircraft || event
-          .getEntity().func_184187_bx() instanceof mcheli.aircraft.MCH_EntitySeat) {
+        if (event.getEntity().getRidingEntity() instanceof MCH_EntityAircraft || event
+          .getEntity().getRidingEntity() instanceof mcheli.aircraft.MCH_EntitySeat) {
           event.setCanceled(true);
           return;
         }   
     if (MCH_Config.EnableReplaceTextureManager.prmBool) {
       RenderManager rm = W_Reflection.getRenderManager((Render)event.getRenderer());
-      if (rm != null && !(rm.field_78724_e instanceof MCH_TextureManagerDummy)) {
+      if (rm != null && !(rm.renderEngine instanceof MCH_TextureManagerDummy)) {
         if (this.dummyTextureManager == null)
-          this.dummyTextureManager = new MCH_TextureManagerDummy(rm.field_78724_e); 
-        rm.field_78724_e = this.dummyTextureManager;
+          this.dummyTextureManager = new MCH_TextureManagerDummy(rm.renderEngine); 
+        rm.renderEngine = this.dummyTextureManager;
       } 
     } 
   }
@@ -127,20 +127,20 @@ public class MCH_ClientEventHook extends W_ClientEventHook {
     MCH_RenderAircraft.renderEntityMarker((Entity)event.getEntity());
     if (event.getEntity() instanceof ITargetMarkerObject) {
       MCH_GuiTargetMarker.addMarkEntityPos(2, (ITargetMarkerObject)event.getEntity(), event.getX(), event
-          .getY() + (event.getEntity()).field_70131_O + 0.5D, event.getZ());
+          .getY() + (event.getEntity()).height + 0.5D, event.getZ());
     } else {
       MCH_GuiTargetMarker.addMarkEntityPos(2, ITargetMarkerObject.fromEntity((Entity)event.getEntity()), event.getX(), event
-          .getY() + (event.getEntity()).field_70131_O + 0.5D, event.getZ());
+          .getY() + (event.getEntity()).height + 0.5D, event.getZ());
     } 
     MCH_ClientLightWeaponTickHandler.markEntity((Entity)event.getEntity(), event.getX(), event
-        .getY() + ((event.getEntity()).field_70131_O / 2.0F), event.getZ());
+        .getY() + ((event.getEntity()).height / 2.0F), event.getZ());
   }
   
   public void renderPlayerPre(RenderPlayerEvent.Pre event) {
     if (event.getEntity() == null)
       return; 
-    if (event.getEntity().func_184187_bx() instanceof MCH_EntityAircraft) {
-      MCH_EntityAircraft v = (MCH_EntityAircraft)event.getEntity().func_184187_bx();
+    if (event.getEntity().getRidingEntity() instanceof MCH_EntityAircraft) {
+      MCH_EntityAircraft v = (MCH_EntityAircraft)event.getEntity().getRidingEntity();
       if (v.getAcInfo() != null && (v.getAcInfo()).hideEntity) {
         event.setCanceled(true);
         return;
@@ -153,9 +153,9 @@ public class MCH_ClientEventHook extends W_ClientEventHook {
   public void worldEventUnload(WorldEvent.Unload event) {}
   
   public void entityJoinWorldEvent(EntityJoinWorldEvent event) {
-    if (event.getEntity().func_70028_i(MCH_Lib.getClientPlayer())) {
+    if (event.getEntity().isEntityEqual(MCH_Lib.getClientPlayer())) {
       MCH_Lib.DbgLog(true, "MCH_ClientEventHook.entityJoinWorldEvent : " + event.getEntity(), new Object[0]);
-      MCH_ItemRangeFinder.mode = Minecraft.func_71410_x().func_71356_B() ? 1 : 0;
+      MCH_ItemRangeFinder.mode = Minecraft.getMinecraft().isSingleplayer() ? 1 : 0;
       MCH_ParticlesUtil.clearMarkPoint();
     } 
   }

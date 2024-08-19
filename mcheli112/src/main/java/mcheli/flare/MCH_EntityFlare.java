@@ -27,50 +27,50 @@ public class MCH_EntityFlare extends W_Entity implements IEntityAdditionalSpawnD
   
   public MCH_EntityFlare(World par1World) {
     super(par1World);
-    func_70105_a(1.0F, 1.0F);
-    this.field_70126_B = this.field_70177_z;
-    this.field_70127_C = this.field_70125_A;
+    setSize(1.0F, 1.0F);
+    this.prevRotationYaw = this.rotationYaw;
+    this.prevRotationPitch = this.rotationPitch;
     this.size = 6.0F;
     this.fuseCount = 0;
   }
   
   public MCH_EntityFlare(World par1World, double pX, double pY, double pZ, double mX, double mY, double mZ, float size, int fuseCount) {
     this(par1World);
-    func_70012_b(pX, pY, pZ, 0.0F, 0.0F);
-    this.field_70159_w = mX;
-    this.field_70181_x = mY;
-    this.field_70179_y = mZ;
+    setLocationAndAngles(pX, pY, pZ, 0.0F, 0.0F);
+    this.motionX = mX;
+    this.motionY = mY;
+    this.motionZ = mZ;
     this.size = size;
     this.fuseCount = fuseCount;
   }
   
-  public boolean func_180431_b(DamageSource source) {
+  public boolean isEntityInvulnerable(DamageSource source) {
     return true;
   }
   
   @SideOnly(Side.CLIENT)
-  public boolean func_70112_a(double par1) {
-    double d1 = func_174813_aQ().func_72320_b() * 4.0D;
+  public boolean isInRangeToRenderDist(double par1) {
+    double d1 = getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
     d1 *= 64.0D;
     return (par1 < d1 * d1);
   }
   
-  public void func_70106_y() {
-    super.func_70106_y();
-    if (this.fuseCount > 0 && this.field_70170_p.field_72995_K) {
+  public void setDead() {
+    super.setDead();
+    if (this.fuseCount > 0 && this.world.isRemote) {
       this.fuseCount = 0;
       for (int i = 0; i < 20; i++) {
-        double x = (this.field_70146_Z.nextDouble() - 0.5D) * 10.0D;
-        double y = (this.field_70146_Z.nextDouble() - 0.5D) * 10.0D;
-        double z = (this.field_70146_Z.nextDouble() - 0.5D) * 10.0D;
-        MCH_ParticleParam prm = new MCH_ParticleParam(this.field_70170_p, "smoke", this.field_70165_t + x, this.field_70163_u + y, this.field_70161_v + z);
-        prm.age = 200 + this.field_70146_Z.nextInt(100);
-        prm.size = (20 + this.field_70146_Z.nextInt(25));
-        prm.motionX = (this.field_70146_Z.nextDouble() - 0.5D) * 0.45D;
-        prm.motionY = (this.field_70146_Z.nextDouble() - 0.5D) * 0.01D;
-        prm.motionZ = (this.field_70146_Z.nextDouble() - 0.5D) * 0.45D;
-        prm.a = this.field_70146_Z.nextFloat() * 0.1F + 0.85F;
-        prm.b = this.field_70146_Z.nextFloat() * 0.2F + 0.5F;
+        double x = (this.rand.nextDouble() - 0.5D) * 10.0D;
+        double y = (this.rand.nextDouble() - 0.5D) * 10.0D;
+        double z = (this.rand.nextDouble() - 0.5D) * 10.0D;
+        MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", this.posX + x, this.posY + y, this.posZ + z);
+        prm.age = 200 + this.rand.nextInt(100);
+        prm.size = (20 + this.rand.nextInt(25));
+        prm.motionX = (this.rand.nextDouble() - 0.5D) * 0.45D;
+        prm.motionY = (this.rand.nextDouble() - 0.5D) * 0.01D;
+        prm.motionZ = (this.rand.nextDouble() - 0.5D) * 0.45D;
+        prm.a = this.rand.nextFloat() * 0.1F + 0.85F;
+        prm.b = this.rand.nextFloat() * 0.2F + 0.5F;
         prm.g = prm.b + 0.05F;
         prm.r = prm.b + 0.1F;
         MCH_ParticlesUtil.spawnParticle(prm);
@@ -94,86 +94,86 @@ public class MCH_EntityFlare extends W_Entity implements IEntityAdditionalSpawnD
     } 
   }
   
-  public void func_70071_h_() {
-    if (this.fuseCount > 0 && this.field_70173_aa >= this.fuseCount) {
-      func_70106_y();
-    } else if (!this.field_70170_p.field_72995_K && !this.field_70170_p.func_175667_e(new BlockPos(this.field_70165_t, this.field_70163_u, this.field_70161_v))) {
-      func_70106_y();
-    } else if (this.field_70173_aa > 300 && !this.field_70170_p.field_72995_K) {
-      func_70106_y();
+  public void onUpdate() {
+    if (this.fuseCount > 0 && this.ticksExisted >= this.fuseCount) {
+      setDead();
+    } else if (!this.world.isRemote && !this.world.isBlockLoaded(new BlockPos(this.posX, this.posY, this.posZ))) {
+      setDead();
+    } else if (this.ticksExisted > 300 && !this.world.isRemote) {
+      setDead();
     } else {
-      super.func_70071_h_();
-      if (!this.field_70170_p.field_72995_K)
+      super.onUpdate();
+      if (!this.world.isRemote)
         onUpdateCollided(); 
-      this.field_70165_t += this.field_70159_w;
-      this.field_70163_u += this.field_70181_x;
-      this.field_70161_v += this.field_70179_y;
-      if (this.field_70170_p.field_72995_K) {
-        double x = (this.field_70165_t - this.field_70169_q) / 2.0D;
-        double y = (this.field_70163_u - this.field_70167_r) / 2.0D;
-        double z = (this.field_70161_v - this.field_70166_s) / 2.0D;
+      this.posX += this.motionX;
+      this.posY += this.motionY;
+      this.posZ += this.motionZ;
+      if (this.world.isRemote) {
+        double x = (this.posX - this.prevPosX) / 2.0D;
+        double y = (this.posY - this.prevPosY) / 2.0D;
+        double z = (this.posZ - this.prevPosZ) / 2.0D;
         for (int i = 0; i < 2; i++) {
-          MCH_ParticleParam prm = new MCH_ParticleParam(this.field_70170_p, "smoke", this.field_70169_q + x * i, this.field_70167_r + y * i, this.field_70166_s + z * i);
-          prm.size = 6.0F + this.field_70146_Z.nextFloat();
+          MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", this.prevPosX + x * i, this.prevPosY + y * i, this.prevPosZ + z * i);
+          prm.size = 6.0F + this.rand.nextFloat();
           if (this.size < 5.0F) {
             MCH_ParticleParam tmp290_288 = prm;
             tmp290_288.a = (float)(tmp290_288.a * 0.75D);
-            if (this.field_70146_Z.nextInt(2) == 0);
+            if (this.rand.nextInt(2) == 0);
           } 
           if (this.fuseCount > 0) {
-            prm.a = this.field_70146_Z.nextFloat() * 0.1F + 0.85F;
-            prm.b = this.field_70146_Z.nextFloat() * 0.1F + 0.5F;
+            prm.a = this.rand.nextFloat() * 0.1F + 0.85F;
+            prm.b = this.rand.nextFloat() * 0.1F + 0.5F;
             prm.g = prm.b + 0.05F;
             prm.r = prm.b + 0.1F;
           } 
           MCH_ParticlesUtil.spawnParticle(prm);
         } 
       } 
-      this.field_70181_x += this.gravity;
-      this.field_70159_w *= this.airResistance;
-      this.field_70179_y *= this.airResistance;
-      if (func_70090_H() && !this.field_70170_p.field_72995_K)
-        func_70106_y(); 
-      if (this.field_70122_E && !this.field_70170_p.field_72995_K)
-        func_70106_y(); 
-      func_70107_b(this.field_70165_t, this.field_70163_u, this.field_70161_v);
+      this.motionY += this.gravity;
+      this.motionX *= this.airResistance;
+      this.motionZ *= this.airResistance;
+      if (isInWater() && !this.world.isRemote)
+        setDead(); 
+      if (this.onGround && !this.world.isRemote)
+        setDead(); 
+      setPosition(this.posX, this.posY, this.posZ);
     } 
   }
   
   protected void onUpdateCollided() {
-    Vec3d vec3 = W_WorldFunc.getWorldVec3(this.field_70170_p, this.field_70165_t, this.field_70163_u, this.field_70161_v);
-    Vec3d vec31 = W_WorldFunc.getWorldVec3(this.field_70170_p, this.field_70165_t + this.field_70159_w, this.field_70163_u + this.field_70181_x, this.field_70161_v + this.field_70179_y);
-    RayTraceResult mop = W_WorldFunc.clip(this.field_70170_p, vec3, vec31);
-    vec3 = W_WorldFunc.getWorldVec3(this.field_70170_p, this.field_70165_t, this.field_70163_u, this.field_70161_v);
-    vec31 = W_WorldFunc.getWorldVec3(this.field_70170_p, this.field_70165_t + this.field_70159_w, this.field_70163_u + this.field_70181_x, this.field_70161_v + this.field_70179_y);
+    Vec3d vec3 = W_WorldFunc.getWorldVec3(this.world, this.posX, this.posY, this.posZ);
+    Vec3d vec31 = W_WorldFunc.getWorldVec3(this.world, this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+    RayTraceResult mop = W_WorldFunc.clip(this.world, vec3, vec31);
+    vec3 = W_WorldFunc.getWorldVec3(this.world, this.posX, this.posY, this.posZ);
+    vec31 = W_WorldFunc.getWorldVec3(this.world, this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
     if (mop != null) {
-      vec31 = W_WorldFunc.getWorldVec3(this.field_70170_p, mop.field_72307_f.field_72450_a, mop.field_72307_f.field_72448_b, mop.field_72307_f.field_72449_c);
+      vec31 = W_WorldFunc.getWorldVec3(this.world, mop.hitVec.xCoord, mop.hitVec.yCoord, mop.hitVec.zCoord);
       onImpact(mop);
     } 
   }
   
   protected void onImpact(RayTraceResult par1MovingObjectPosition) {
-    if (!this.field_70170_p.field_72995_K)
-      func_70106_y(); 
+    if (!this.world.isRemote)
+      setDead(); 
   }
   
-  public void func_70014_b(NBTTagCompound par1NBTTagCompound) {
-    par1NBTTagCompound.func_74782_a("direction", (NBTBase)func_70087_a(new double[] { this.field_70159_w, this.field_70181_x, this.field_70179_y }));
+  public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {
+    par1NBTTagCompound.setTag("direction", (NBTBase)newDoubleNBTList(new double[] { this.motionX, this.motionY, this.motionZ }));
   }
   
-  public void func_70037_a(NBTTagCompound par1NBTTagCompound) {
-    func_70106_y();
+  public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
+    setDead();
   }
   
-  public boolean func_70067_L() {
+  public boolean canBeCollidedWith() {
     return true;
   }
   
-  public float func_70111_Y() {
+  public float getCollisionBorderSize() {
     return 1.0F;
   }
   
-  public boolean func_70097_a(DamageSource par1DamageSource, float par2) {
+  public boolean attackEntityFrom(DamageSource par1DamageSource, float par2) {
     return false;
   }
   

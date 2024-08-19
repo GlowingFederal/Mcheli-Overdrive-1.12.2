@@ -28,7 +28,7 @@ public class MCH_CommonProxy {
   public String lastConfigFileName;
   
   public String getDataDir() {
-    return MCH_Utils.getServer().func_71270_I();
+    return MCH_Utils.getServer().getFolderName();
   }
   
   public void registerRenderer() {}
@@ -134,7 +134,7 @@ public class MCH_CommonProxy {
   }
   
   public boolean isSinglePlayer() {
-    return MCH_Utils.getServer().func_71264_H();
+    return MCH_Utils.getServer().isSinglePlayer();
   }
   
   public void readClientModList() {}

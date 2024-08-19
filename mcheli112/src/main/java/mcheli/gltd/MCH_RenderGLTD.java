@@ -26,30 +26,30 @@ public class MCH_RenderGLTD extends W_Render<MCH_EntityGLTD> {
   
   public MCH_RenderGLTD(RenderManager renderManager) {
     super(renderManager);
-    this.field_76989_e = 0.5F;
+    this.shadowSize = 0.5F;
   }
   
   public void doRender(MCH_EntityGLTD entity, double posX, double posY, double posZ, float par8, float tickTime) {
     MCH_EntityGLTD gltd = entity;
     GL11.glPushMatrix();
     GL11.glTranslated(posX, posY + 0.25D, posZ);
-    setCommonRenderParam(true, entity.func_70070_b());
+    setCommonRenderParam(true, entity.getBrightnessForRender());
     bindTexture("textures/gltd.png");
-    Minecraft mc = Minecraft.func_71410_x();
+    Minecraft mc = Minecraft.getMinecraft();
     boolean isNotRenderHead = false;
     if (gltd.getRiddenByEntity() != null) {
       gltd.isUsedPlayer = true;
-      gltd.renderRotaionYaw = (gltd.getRiddenByEntity()).field_70177_z;
-      gltd.renderRotaionPitch = (gltd.getRiddenByEntity()).field_70125_A;
-      isNotRenderHead = (mc.field_71474_y.field_74320_O == 0 && W_Lib.isClientPlayer(gltd.getRiddenByEntity()));
+      gltd.renderRotaionYaw = (gltd.getRiddenByEntity()).rotationYaw;
+      gltd.renderRotaionPitch = (gltd.getRiddenByEntity()).rotationPitch;
+      isNotRenderHead = (mc.gameSettings.thirdPersonView == 0 && W_Lib.isClientPlayer(gltd.getRiddenByEntity()));
     } 
     if (gltd.isUsedPlayer) {
       GL11.glPushMatrix();
-      GL11.glRotatef(-gltd.field_70177_z, 0.0F, 1.0F, 0.0F);
+      GL11.glRotatef(-gltd.rotationYaw, 0.0F, 1.0F, 0.0F);
       model.renderPart("$body");
       GL11.glPopMatrix();
     } else {
-      GL11.glRotatef(-gltd.field_70177_z, 0.0F, 1.0F, 0.0F);
+      GL11.glRotatef(-gltd.rotationYaw, 0.0F, 1.0F, 0.0F);
       model.renderPart("$body");
     } 
     GL11.glTranslatef(0.0F, 0.45F, 0.0F);

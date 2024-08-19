@@ -40,11 +40,11 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
     super(world);
     this.vehicleInfo = null;
     this.currentSpeed = 0.07D;
-    this.field_70156_m = true;
-    func_70105_a(2.0F, 0.7F);
-    this.field_70159_w = 0.0D;
-    this.field_70181_x = 0.0D;
-    this.field_70179_y = 0.0D;
+    this.preventEntitySpawning = true;
+    setSize(2.0F, 0.7F);
+    this.motionX = 0.0D;
+    this.motionY = 0.0D;
+    this.motionZ = 0.0D;
     this.isUsedPlayer = false;
     this.lastRiderYaw = 0.0F;
     this.lastRiderPitch = 0.0F;
@@ -65,17 +65,17 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
   }
   
   public void changeType(String type) {
-    MCH_Lib.DbgLog(this.field_70170_p, "MCH_EntityVehicle.changeType " + type + " : " + toString(), new Object[0]);
+    MCH_Lib.DbgLog(this.world, "MCH_EntityVehicle.changeType " + type + " : " + toString(), new Object[0]);
     if (!type.isEmpty())
       this.vehicleInfo = MCH_VehicleInfoManager.get(type); 
     if (this.vehicleInfo == null) {
       MCH_Lib.Log((Entity)this, "##### MCH_EntityVehicle changeVehicleType() Vehicle info null %d, %s, %s", new Object[] { Integer.valueOf(W_Entity.getEntityId((Entity)this)), type, getEntityName() });
-      func_70106_y();
+      setDead();
     } else {
       setAcInfo(this.vehicleInfo);
       newSeats(getAcInfo().getNumSeatAndRack());
       this.weapons = createWeapon(1 + getSeatNum());
-      initPartRotation(this.field_70177_z, this.field_70125_A);
+      initPartRotation(this.rotationYaw, this.rotationPitch);
     } 
   }
   
@@ -83,21 +83,21 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
     return MCH_Config.MountMinecartVehicle.prmBool;
   }
   
-  protected void func_70088_a() {
-    super.func_70088_a();
+  protected void entityInit() {
+    super.entityInit();
   }
   
-  protected void func_70014_b(NBTTagCompound par1NBTTagCompound) {
-    super.func_70014_b(par1NBTTagCompound);
+  protected void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {
+    super.writeEntityToNBT(par1NBTTagCompound);
   }
   
-  protected void func_70037_a(NBTTagCompound par1NBTTagCompound) {
-    super.func_70037_a(par1NBTTagCompound);
+  protected void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
+    super.readEntityFromNBT(par1NBTTagCompound);
     if (this.vehicleInfo == null) {
       this.vehicleInfo = MCH_VehicleInfoManager.get(getTypeName());
       if (this.vehicleInfo == null) {
         MCH_Lib.Log((Entity)this, "##### MCH_EntityVehicle readEntityFromNBT() Vehicle info null %d, %s", new Object[] { Integer.valueOf(W_Entity.getEntityId((Entity)this)), getEntityName() });
-        func_70106_y();
+        setDead();
       } else {
         setAcInfo(this.vehicleInfo);
       } 
@@ -108,8 +108,8 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
     return (getVehicleInfo() != null) ? (Item)(getVehicleInfo()).item : null;
   }
   
-  public void func_70106_y() {
-    super.func_70106_y();
+  public void setDead() {
+    super.setDead();
   }
   
   public float getSoundVolume() {
@@ -158,13 +158,13 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
             return super.useCurrentWeapon(prm);  
       } 
     } 
-    float breforeUseWeaponPitch = this.field_70125_A;
-    float breforeUseWeaponYaw = this.field_70177_z;
-    this.field_70125_A = prm.user.field_70125_A;
-    this.field_70177_z = prm.user.field_70177_z;
+    float breforeUseWeaponPitch = this.rotationPitch;
+    float breforeUseWeaponYaw = this.rotationYaw;
+    this.rotationPitch = prm.user.rotationPitch;
+    this.rotationYaw = prm.user.rotationYaw;
     boolean result = super.useCurrentWeapon(prm);
-    this.field_70125_A = breforeUseWeaponPitch;
-    this.field_70177_z = breforeUseWeaponYaw;
+    this.rotationPitch = breforeUseWeaponPitch;
+    this.rotationYaw = breforeUseWeaponYaw;
     return result;
   }
   
@@ -176,43 +176,43 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
   public void onUpdateAircraft() {
     if (this.vehicleInfo == null) {
       changeType(getTypeName());
-      this.field_70169_q = this.field_70165_t;
-      this.field_70167_r = this.field_70163_u;
-      this.field_70166_s = this.field_70161_v;
+      this.prevPosX = this.posX;
+      this.prevPosY = this.posY;
+      this.prevPosZ = this.posZ;
       return;
     } 
-    if (this.field_70173_aa < 200 || !MCH_Config.FixVehicleAtPlacedPoint.prmBool) {
-      this.fixPosX = this.field_70165_t;
-      this.fixPosY = this.field_70163_u;
-      this.fixPosZ = this.field_70161_v;
+    if (this.ticksExisted < 200 || !MCH_Config.FixVehicleAtPlacedPoint.prmBool) {
+      this.fixPosX = this.posX;
+      this.fixPosY = this.posY;
+      this.fixPosZ = this.posZ;
     } else {
-      func_184210_p();
-      this.field_70159_w = 0.0D;
-      this.field_70181_x = 0.0D;
-      this.field_70179_y = 0.0D;
-      if (this.field_70170_p.field_72995_K && this.field_70173_aa % 4 == 0)
-        this.fixPosY = this.field_70163_u; 
-      func_70107_b((this.field_70165_t + this.fixPosX) / 2.0D, (this.field_70163_u + this.fixPosY) / 2.0D, (this.field_70161_v + this.fixPosZ) / 2.0D);
+      dismountRidingEntity();
+      this.motionX = 0.0D;
+      this.motionY = 0.0D;
+      this.motionZ = 0.0D;
+      if (this.world.isRemote && this.ticksExisted % 4 == 0)
+        this.fixPosY = this.posY; 
+      setPosition((this.posX + this.fixPosX) / 2.0D, (this.posY + this.fixPosY) / 2.0D, (this.posZ + this.fixPosZ) / 2.0D);
     } 
     if (!this.isRequestedSyncStatus) {
       this.isRequestedSyncStatus = true;
-      if (this.field_70170_p.field_72995_K)
+      if (this.world.isRemote)
         MCH_PacketStatusRequest.requestStatus(this); 
     } 
     if (this.lastRiddenByEntity == null && getRiddenByEntity() != null) {
-      (getRiddenByEntity()).field_70125_A = 0.0F;
-      (getRiddenByEntity()).field_70127_C = 0.0F;
+      (getRiddenByEntity()).rotationPitch = 0.0F;
+      (getRiddenByEntity()).prevRotationPitch = 0.0F;
       initCurrentWeapon(getRiddenByEntity());
     } 
     updateWeapons();
     onUpdate_Seats();
     onUpdate_Control();
-    this.field_70169_q = this.field_70165_t;
-    this.field_70167_r = this.field_70163_u;
-    this.field_70166_s = this.field_70161_v;
-    if (func_70090_H())
-      this.field_70125_A *= 0.9F; 
-    if (this.field_70170_p.field_72995_K) {
+    this.prevPosX = this.posX;
+    this.prevPosY = this.posY;
+    this.prevPosZ = this.posZ;
+    if (isInWater())
+      this.rotationPitch *= 0.9F; 
+    if (this.world.isRemote) {
       onUpdate_Client();
     } else {
       onUpdate_Server();
@@ -220,7 +220,7 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
   }
   
   protected void onUpdate_Control() {
-    if (getRiddenByEntity() != null && !(getRiddenByEntity()).field_70128_L) {
+    if (getRiddenByEntity() != null && !(getRiddenByEntity()).isDead) {
       if ((getVehicleInfo()).isEnableMove || (getVehicleInfo()).isEnableRot)
         onUpdate_ControlOnGround(); 
     } else if (getCurrentThrottle() > 0.0D) {
@@ -230,7 +230,7 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
     } 
     if (getCurrentThrottle() < 0.0D)
       setCurrentThrottle(0.0D); 
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       if (!W_Lib.isClientPlayer(getRiddenByEntity())) {
         double ct = getThrottle();
         if (getCurrentThrottle() > ct)
@@ -244,20 +244,20 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
   }
   
   protected void onUpdate_ControlOnGround() {
-    if (!this.field_70170_p.field_72995_K) {
+    if (!this.world.isRemote) {
       boolean move = false;
-      float yaw = this.field_70177_z;
+      float yaw = this.rotationYaw;
       double x = 0.0D;
       double z = 0.0D;
       if ((getVehicleInfo()).isEnableMove) {
         if (this.throttleUp) {
-          yaw = this.field_70177_z;
+          yaw = this.rotationYaw;
           x += Math.sin(yaw * Math.PI / 180.0D);
           z += Math.cos(yaw * Math.PI / 180.0D);
           move = true;
         } 
         if (this.throttleDown) {
-          yaw = this.field_70177_z - 180.0F;
+          yaw = this.rotationYaw - 180.0F;
           x += Math.sin(yaw * Math.PI / 180.0D);
           z += Math.cos(yaw * Math.PI / 180.0D);
           move = true;
@@ -265,42 +265,42 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
       } 
       if ((getVehicleInfo()).isEnableMove) {
         if (this.moveLeft && !this.moveRight)
-          this.field_70177_z = (float)(this.field_70177_z - 0.5D); 
+          this.rotationYaw = (float)(this.rotationYaw - 0.5D); 
         if (this.moveRight && !this.moveLeft)
-          this.field_70177_z = (float)(this.field_70177_z + 0.5D); 
+          this.rotationYaw = (float)(this.rotationYaw + 0.5D); 
       } 
       if (move) {
         double d = Math.sqrt(x * x + z * z);
-        this.field_70159_w -= x / d * 0.029999999329447746D;
-        this.field_70179_y += z / d * 0.029999999329447746D;
+        this.motionX -= x / d * 0.029999999329447746D;
+        this.motionZ += z / d * 0.029999999329447746D;
       } 
     } 
   }
   
   protected void onUpdate_Particle() {
-    double particlePosY = this.field_70163_u;
+    double particlePosY = this.posY;
     boolean b = false;
     int y;
     for (y = 0; y < 5 && !b; y++) {
       int x;
       for (x = -1; x <= 1; x++) {
         for (int z = -1; z <= 1; z++) {
-          int block = W_WorldFunc.getBlockId(this.field_70170_p, (int)(this.field_70165_t + 0.5D) + x, (int)(this.field_70163_u + 0.5D) - y, (int)(this.field_70161_v + 0.5D) + z);
+          int block = W_WorldFunc.getBlockId(this.world, (int)(this.posX + 0.5D) + x, (int)(this.posY + 0.5D) - y, (int)(this.posZ + 0.5D) + z);
           if (block != 0 && !b) {
-            particlePosY = ((int)(this.field_70163_u + 1.0D) - y);
+            particlePosY = ((int)(this.posY + 1.0D) - y);
             b = true;
           } 
         } 
       } 
       for (x = -3; b && x <= 3; x++) {
         for (int z = -3; z <= 3; z++) {
-          if (W_WorldFunc.isBlockWater(this.field_70170_p, (int)(this.field_70165_t + 0.5D) + x, (int)(this.field_70163_u + 0.5D) - y, (int)(this.field_70161_v + 0.5D) + z))
+          if (W_WorldFunc.isBlockWater(this.world, (int)(this.posX + 0.5D) + x, (int)(this.posY + 0.5D) - y, (int)(this.posZ + 0.5D) + z))
             for (int i = 0; i < 7.0D * getCurrentThrottle(); i++)
-              this.field_70170_p.func_175688_a(EnumParticleTypes.WATER_SPLASH, this.field_70165_t + 0.5D + x + (this.field_70146_Z
-                  .nextDouble() - 0.5D) * 2.0D, particlePosY + this.field_70146_Z
-                  .nextDouble(), this.field_70161_v + 0.5D + z + (this.field_70146_Z
-                  .nextDouble() - 0.5D) * 2.0D, x + (this.field_70146_Z
-                  .nextDouble() - 0.5D) * 2.0D, -0.3D, z + (this.field_70146_Z
+              this.world.spawnParticle(EnumParticleTypes.WATER_SPLASH, this.posX + 0.5D + x + (this.rand
+                  .nextDouble() - 0.5D) * 2.0D, particlePosY + this.rand
+                  .nextDouble(), this.posZ + 0.5D + z + (this.rand
+                  .nextDouble() - 0.5D) * 2.0D, x + (this.rand
+                  .nextDouble() - 0.5D) * 2.0D, -0.3D, z + (this.rand
                   .nextDouble() - 0.5D) * 2.0D, new int[0]);  
         } 
       } 
@@ -308,9 +308,9 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
     double pn = (5 - y + 1) / 5.0D;
     if (b)
       for (int k = 0; k < (int)(getCurrentThrottle() * 6.0D * pn); k++)
-        this.field_70170_p.func_175688_a(EnumParticleTypes.EXPLOSION_NORMAL, this.field_70165_t + this.field_70146_Z
-            .nextDouble() - 0.5D, particlePosY + this.field_70146_Z.nextDouble() - 0.5D, this.field_70161_v + this.field_70146_Z
-            .nextDouble() - 0.5D, (this.field_70146_Z.nextDouble() - 0.5D) * 2.0D, -0.4D, (this.field_70146_Z
+        this.world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, this.posX + this.rand
+            .nextDouble() - 0.5D, particlePosY + this.rand.nextDouble() - 0.5D, this.posZ + this.rand
+            .nextDouble() - 0.5D, (this.rand.nextDouble() - 0.5D) * 2.0D, -0.4D, (this.rand
             .nextDouble() - 0.5D) * 2.0D, new int[0]);  
   }
   
@@ -318,51 +318,51 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
     updateCameraViewers();
     if (getRiddenByEntity() != null)
       if (W_Lib.isClientPlayer(getRiddenByEntity()))
-        (getRiddenByEntity()).field_70125_A = (getRiddenByEntity()).field_70127_C;  
+        (getRiddenByEntity()).rotationPitch = (getRiddenByEntity()).prevRotationPitch;  
     if (this.aircraftPosRotInc > 0) {
       double rpinc = this.aircraftPosRotInc;
-      double yaw = MathHelper.func_76138_g(this.aircraftYaw - this.field_70177_z);
-      this.field_70177_z = (float)(this.field_70177_z + yaw / rpinc);
-      this.field_70125_A = (float)(this.field_70125_A + (this.aircraftPitch - this.field_70125_A) / rpinc);
-      func_70107_b(this.field_70165_t + (this.aircraftX - this.field_70165_t) / rpinc, this.field_70163_u + (this.aircraftY - this.field_70163_u) / rpinc, this.field_70161_v + (this.aircraftZ - this.field_70161_v) / rpinc);
-      func_70101_b(this.field_70177_z, this.field_70125_A);
+      double yaw = MathHelper.wrapDegrees(this.aircraftYaw - this.rotationYaw);
+      this.rotationYaw = (float)(this.rotationYaw + yaw / rpinc);
+      this.rotationPitch = (float)(this.rotationPitch + (this.aircraftPitch - this.rotationPitch) / rpinc);
+      setPosition(this.posX + (this.aircraftX - this.posX) / rpinc, this.posY + (this.aircraftY - this.posY) / rpinc, this.posZ + (this.aircraftZ - this.posZ) / rpinc);
+      setRotation(this.rotationYaw, this.rotationPitch);
       this.aircraftPosRotInc--;
     } else {
-      func_70107_b(this.field_70165_t + this.field_70159_w, this.field_70163_u + this.field_70181_x, this.field_70161_v + this.field_70179_y);
-      if (this.field_70122_E) {
-        this.field_70159_w *= 0.95D;
-        this.field_70179_y *= 0.95D;
+      setPosition(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+      if (this.onGround) {
+        this.motionX *= 0.95D;
+        this.motionZ *= 0.95D;
       } 
-      if (func_70090_H()) {
-        this.field_70159_w *= 0.99D;
-        this.field_70179_y *= 0.99D;
+      if (isInWater()) {
+        this.motionX *= 0.99D;
+        this.motionZ *= 0.99D;
       } 
     } 
     if (getRiddenByEntity() != null);
-    updateCamera(this.field_70165_t, this.field_70163_u, this.field_70161_v);
+    updateCamera(this.posX, this.posY, this.posZ);
   }
   
   private void onUpdate_Server() {
-    double prevMotion = Math.sqrt(this.field_70159_w * this.field_70159_w + this.field_70179_y * this.field_70179_y);
+    double prevMotion = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
     updateCameraViewers();
     double dp = 0.0D;
     if (canFloatWater())
       dp = getWaterDepth(); 
     if (dp == 0.0D) {
-      this.field_70181_x += (!func_70090_H() ? (getAcInfo()).gravity : (getAcInfo()).gravityInWater);
+      this.motionY += (!isInWater() ? (getAcInfo()).gravity : (getAcInfo()).gravityInWater);
     } else if (dp < 1.0D) {
-      this.field_70181_x -= 1.0E-4D;
-      this.field_70181_x += 0.007D * getCurrentThrottle();
+      this.motionY -= 1.0E-4D;
+      this.motionY += 0.007D * getCurrentThrottle();
     } else {
-      if (this.field_70181_x < 0.0D)
-        this.field_70181_x /= 2.0D; 
-      this.field_70181_x += 0.007D;
+      if (this.motionY < 0.0D)
+        this.motionY /= 2.0D; 
+      this.motionY += 0.007D;
     } 
-    double motion = Math.sqrt(this.field_70159_w * this.field_70159_w + this.field_70179_y * this.field_70179_y);
+    double motion = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
     float speedLimit = (getAcInfo()).speed;
     if (motion > speedLimit) {
-      this.field_70159_w *= speedLimit / motion;
-      this.field_70179_y *= speedLimit / motion;
+      this.motionX *= speedLimit / motion;
+      this.motionZ *= speedLimit / motion;
       motion = speedLimit;
     } 
     if (motion > prevMotion && this.currentSpeed < speedLimit) {
@@ -374,16 +374,16 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
       if (this.currentSpeed < 0.07D)
         this.currentSpeed = 0.07D; 
     } 
-    if (this.field_70122_E) {
-      this.field_70159_w *= 0.5D;
-      this.field_70179_y *= 0.5D;
+    if (this.onGround) {
+      this.motionX *= 0.5D;
+      this.motionZ *= 0.5D;
     } 
-    func_70091_d(MoverType.SELF, this.field_70159_w, this.field_70181_x, this.field_70179_y);
-    this.field_70181_x *= 0.95D;
-    this.field_70159_w *= 0.99D;
-    this.field_70179_y *= 0.99D;
+    moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+    this.motionY *= 0.95D;
+    this.motionX *= 0.99D;
+    this.motionZ *= 0.99D;
     onUpdate_updateBlock();
-    if (getRiddenByEntity() != null && (getRiddenByEntity()).field_70128_L)
+    if (getRiddenByEntity() != null && (getRiddenByEntity()).isDead)
       unmountEntity(); 
   }
   

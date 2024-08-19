@@ -78,15 +78,15 @@ public class MCH_Command extends CommandBase {
     return (player instanceof EntityPlayer) ? instance.canCommandSenderUseCommand((ICommandSender)player) : false;
   }
   
-  public String func_71517_b() {
+  public String getCommandName() {
     return "mcheli";
   }
   
   public static boolean checkCommandPermission(MinecraftServer server, ICommandSender sender, String cmd) {
-    if ((new CommandGameMode()).func_184882_a(server, sender))
+    if ((new CommandGameMode()).checkPermission(server, sender))
       return true; 
     if (sender instanceof EntityPlayer && cmd.length() > 0) {
-      String playerName = ((EntityPlayer)sender).func_146103_bH().getName();
+      String playerName = ((EntityPlayer)sender).getGameProfile().getName();
       for (MCH_Config.CommandPermission c : MCH_Config.CommandPermissionList) {
         if (c.name.equals(cmd))
           for (String s : c.players) {
@@ -108,8 +108,8 @@ public class MCH_Command extends CommandBase {
     if (!checkCommandPermission(MCH_Utils.getServer(), event.getSender(), event.getParameters()[0])) {
       event.setCanceled(true);
       TextComponentTranslation c = new TextComponentTranslation("commands.generic.permission", new Object[0]);
-      c.func_150256_b().func_150238_a(TextFormatting.RED);
-      event.getSender().func_145747_a((ITextComponent)c);
+      c.getStyle().setColor(TextFormatting.RED);
+      event.getSender().addChatMessage((ITextComponent)c);
     } 
   }
   
@@ -117,22 +117,22 @@ public class MCH_Command extends CommandBase {
     return true;
   }
   
-  public String func_71518_a(ICommandSender sender) {
+  public String getCommandUsage(ICommandSender sender) {
     return "commands.mcheli.usage";
   }
   
-  public void func_184881_a(MinecraftServer server, ICommandSender sender, String[] prm) throws CommandException {
+  public void execute(MinecraftServer server, ICommandSender sender, String[] prm) throws CommandException {
     if (!MCH_Config.EnableCommand.prmBool)
       return; 
     if (!checkCommandPermission(server, sender, prm[0])) {
       TextComponentTranslation c = new TextComponentTranslation("commands.generic.permission", new Object[0]);
-      c.func_150256_b().func_150238_a(TextFormatting.RED);
-      sender.func_145747_a((ITextComponent)c);
+      c.getStyle().setColor(TextFormatting.RED);
+      sender.addChatMessage((ITextComponent)c);
       return;
     } 
     if (prm[0].equalsIgnoreCase("sendss")) {
       if (prm.length == 2) {
-        EntityPlayerMP player = func_184888_a(server, sender, prm[1]);
+        EntityPlayerMP player = getPlayer(server, sender, prm[1]);
         if (player != null)
           MCH_PacketIndClient.send((EntityPlayer)player, 1, prm[1]); 
       } else {
@@ -142,7 +142,7 @@ public class MCH_Command extends CommandBase {
       if (prm.length >= 2) {
         EntityPlayerMP reqPlayer = (sender instanceof EntityPlayerMP) ? (EntityPlayerMP)sender : null;
         for (int i = 1; i < prm.length; i++) {
-          EntityPlayerMP player = func_184888_a(server, sender, prm[i]);
+          EntityPlayerMP player = getPlayer(server, sender, prm[i]);
           if (player != null)
             MCH_PacketIndClient.send((EntityPlayer)player, 2, "" + MCH_MultiplayPacketHandler.getPlayerInfoId((EntityPlayer)reqPlayer)); 
         } 
@@ -152,13 +152,13 @@ public class MCH_Command extends CommandBase {
     } else if (prm[0].equalsIgnoreCase("reconfig")) {
       if (prm.length == 1) {
         MCH_MOD.proxy.reconfig();
-        if (sender.func_130014_f_() != null)
-          if (!(sender.func_130014_f_()).field_72995_K)
+        if (sender.getEntityWorld() != null)
+          if (!(sender.getEntityWorld()).isRemote)
             MCH_PacketNotifyServerSettings.sendAll();  
         if (MCH_MOD.proxy.isSinglePlayer()) {
-          sender.func_145747_a((ITextComponent)new TextComponentString("Reload mcheli.cfg"));
+          sender.addChatMessage((ITextComponent)new TextComponentString("Reload mcheli.cfg"));
         } else {
-          sender.func_145747_a((ITextComponent)new TextComponentString("Reload server side mcheli.cfg"));
+          sender.addChatMessage((ITextComponent)new TextComponentString("Reload server side mcheli.cfg"));
         } 
       } else {
         throw new CommandException("Parameter error! : /mcheli reconfig", new Object[0]);
@@ -166,7 +166,7 @@ public class MCH_Command extends CommandBase {
     } else if (prm[0].equalsIgnoreCase("title")) {
       if (prm.length < 4)
         throw new WrongUsageException("Parameter error! : /mcheli title time[1~180] position[0~4] messege[JSON format]", new Object[0]); 
-      String s = func_180529_a(prm, 3);
+      String s = buildString(prm, 3);
       int showTime = Integer.valueOf(prm[1]).intValue();
       if (showTime < 1)
         showTime = 1; 
@@ -178,7 +178,7 @@ public class MCH_Command extends CommandBase {
       if (pos > 5)
         pos = 5; 
       try {
-        ITextComponent ichatcomponent = ITextComponent.Serializer.func_150699_a(s);
+        ITextComponent ichatcomponent = ITextComponent.Serializer.jsonToComponent(s);
         MCH_PacketTitle.send(ichatcomponent, 20 * showTime, pos);
       } catch (JsonParseException jsonparseexception) {
         Throwable throwable = ExceptionUtils.getRootCause((Throwable)jsonparseexception);
@@ -199,30 +199,30 @@ public class MCH_Command extends CommandBase {
     } else if (prm[0].equalsIgnoreCase("showboundingbox")) {
       if (prm.length != 2)
         throw new CommandException("Parameter error! : /mcheli showboundingbox true or false", new Object[0]); 
-      if (!func_180527_d(prm[1])) {
+      if (!parseBoolean(prm[1])) {
         MCH_Config.EnableDebugBoundingBox.prmBool = false;
         MCH_PacketNotifyServerSettings.sendAll();
-        sender.func_145747_a((ITextComponent)new TextComponentString("Disabled bounding box"));
+        sender.addChatMessage((ITextComponent)new TextComponentString("Disabled bounding box"));
       } else {
         MCH_Config.EnableDebugBoundingBox.prmBool = true;
         MCH_PacketNotifyServerSettings.sendAll();
-        sender.func_145747_a((ITextComponent)new TextComponentString("Enabled bounding box [F3 + b]"));
+        sender.addChatMessage((ITextComponent)new TextComponentString("Enabled bounding box [F3 + b]"));
       } 
       MCH_MOD.proxy.save();
     } else if (prm[0].equalsIgnoreCase("list")) {
       String msg = "";
       for (String s : ALL_COMMAND)
         msg = msg + s + ", "; 
-      sender.func_145747_a((ITextComponent)new TextComponentString("/mcheli command list : " + msg));
+      sender.addChatMessage((ITextComponent)new TextComponentString("/mcheli command list : " + msg));
     } else if (prm[0].equalsIgnoreCase("delayhitbox")) {
       if (prm.length == 1) {
-        sender.func_145747_a((ITextComponent)new TextComponentString("Current delay of hitbox = " + MCH_Config.HitBoxDelayTick.prmInt + " [0 ~ 50]"));
+        sender.addChatMessage((ITextComponent)new TextComponentString("Current delay of hitbox = " + MCH_Config.HitBoxDelayTick.prmInt + " [0 ~ 50]"));
       } else if (prm.length == 2) {
-        MCH_Config.HitBoxDelayTick.prmInt = func_175755_a(prm[1]);
+        MCH_Config.HitBoxDelayTick.prmInt = parseInt(prm[1]);
         if (MCH_Config.HitBoxDelayTick.prmInt > 50)
           MCH_Config.HitBoxDelayTick.prmInt = 50; 
         MCH_MOD.proxy.save();
-        sender.func_145747_a((ITextComponent)new TextComponentString("Current delay of hitbox = " + MCH_Config.HitBoxDelayTick.prmInt + " [0 ~ 50]"));
+        sender.addChatMessage((ITextComponent)new TextComponentString("Current delay of hitbox = " + MCH_Config.HitBoxDelayTick.prmInt + " [0 ~ 50]"));
       } else {
         throw new CommandException("Parameter error! : /mcheli delayhitbox 0 ~ 50", new Object[0]);
       } 
@@ -237,48 +237,48 @@ public class MCH_Command extends CommandBase {
     String className = args[1].toLowerCase();
     float damage = Float.valueOf(args[2]).floatValue();
     String damageName = (args.length >= 4) ? args[3].toLowerCase() : "";
-    DamageSource ds = DamageSource.field_76377_j;
+    DamageSource ds = DamageSource.generic;
     if (!damageName.isEmpty())
       if (damageName.equals("player")) {
         if (sender instanceof EntityPlayer)
-          ds = DamageSource.func_76365_a((EntityPlayer)sender); 
+          ds = DamageSource.causePlayerDamage((EntityPlayer)sender); 
       } else if (damageName.equals("anvil")) {
-        ds = DamageSource.field_82728_o;
+        ds = DamageSource.anvil;
       } else if (damageName.equals("cactus")) {
-        ds = DamageSource.field_76367_g;
+        ds = DamageSource.cactus;
       } else if (damageName.equals("drown")) {
-        ds = DamageSource.field_76369_e;
+        ds = DamageSource.drown;
       } else if (damageName.equals("fall")) {
-        ds = DamageSource.field_76379_h;
+        ds = DamageSource.fall;
       } else if (damageName.equals("fallingblock")) {
-        ds = DamageSource.field_82729_p;
+        ds = DamageSource.fallingBlock;
       } else if (damageName.equals("generic")) {
-        ds = DamageSource.field_76377_j;
+        ds = DamageSource.generic;
       } else if (damageName.equals("infire")) {
-        ds = DamageSource.field_76372_a;
+        ds = DamageSource.inFire;
       } else if (damageName.equals("inwall")) {
-        ds = DamageSource.field_76368_d;
+        ds = DamageSource.inWall;
       } else if (damageName.equals("lava")) {
-        ds = DamageSource.field_76371_c;
+        ds = DamageSource.lava;
       } else if (damageName.equals("magic")) {
-        ds = DamageSource.field_76376_m;
+        ds = DamageSource.magic;
       } else if (damageName.equals("onfire")) {
-        ds = DamageSource.field_76370_b;
+        ds = DamageSource.onFire;
       } else if (damageName.equals("starve")) {
-        ds = DamageSource.field_76366_f;
+        ds = DamageSource.starve;
       } else if (damageName.equals("wither")) {
-        ds = DamageSource.field_82727_n;
+        ds = DamageSource.wither;
       }  
     int attacked = 0;
-    List<Entity> list = (sender.func_130014_f_()).field_72996_f;
+    List<Entity> list = (sender.getEntityWorld()).loadedEntityList;
     for (int i = 0; i < list.size(); i++) {
       if (list.get(i) != null && !(list.get(i) instanceof EntityPlayer))
         if (((Entity)list.get(i)).getClass().getName().toLowerCase().indexOf(className) >= 0) {
-          ((Entity)list.get(i)).func_70097_a(ds, damage);
+          ((Entity)list.get(i)).attackEntityFrom(ds, damage);
           attacked++;
         }  
     } 
-    sender.func_145747_a((ITextComponent)new TextComponentString(attacked + " entity attacked(" + args[1] + ", damage=" + damage + ")."));
+    sender.addChatMessage((ITextComponent)new TextComponentString(attacked + " entity attacked(" + args[1] + ", damage=" + damage + ")."));
   }
   
   private void executeKillEntity(ICommandSender sender, String[] args) throws WrongUsageException {
@@ -286,41 +286,41 @@ public class MCH_Command extends CommandBase {
       throw new WrongUsageException("/mcheli killentity <entity class name : example1 EntityBat , example2 minecraft.entity.passive>", new Object[0]); 
     String className = args[1].toLowerCase();
     int killed = 0;
-    List<Entity> list = (sender.func_130014_f_()).field_72996_f;
+    List<Entity> list = (sender.getEntityWorld()).loadedEntityList;
     for (int i = 0; i < list.size(); i++) {
       if (list.get(i) != null && !(list.get(i) instanceof EntityPlayer))
         if (((Entity)list.get(i)).getClass().getName().toLowerCase().indexOf(className) >= 0) {
-          ((Entity)list.get(i)).func_70106_y();
+          ((Entity)list.get(i)).setDead();
           killed++;
         }  
     } 
-    sender.func_145747_a((ITextComponent)new TextComponentString(killed + " entity killed(" + args[1] + ")."));
+    sender.addChatMessage((ITextComponent)new TextComponentString(killed + " entity killed(" + args[1] + ")."));
   }
   
   private void executeRemoveEntity(ICommandSender sender, String[] args) throws WrongUsageException {
     if (args.length < 2)
       throw new WrongUsageException("/mcheli removeentity <entity class name : example1 EntityBat , example2 minecraft.entity.passive>", new Object[0]); 
     String className = args[1].toLowerCase();
-    List<Entity> list = (sender.func_130014_f_()).field_72996_f;
+    List<Entity> list = (sender.getEntityWorld()).loadedEntityList;
     int removed = 0;
     for (int i = 0; i < list.size(); i++) {
       if (list.get(i) != null && !(list.get(i) instanceof EntityPlayer))
         if (((Entity)list.get(i)).getClass().getName().toLowerCase().indexOf(className) >= 0) {
-          ((Entity)list.get(i)).field_70128_L = true;
+          ((Entity)list.get(i)).isDead = true;
           removed++;
         }  
     } 
-    sender.func_145747_a((ITextComponent)new TextComponentString(removed + " entity removed(" + args[1] + ")."));
+    sender.addChatMessage((ITextComponent)new TextComponentString(removed + " entity removed(" + args[1] + ")."));
   }
   
   private void executeStatus(ICommandSender sender, String[] args) throws WrongUsageException {
     if (args.length < 2)
       throw new WrongUsageException("/mcheli status <entity or tile> [min num]", new Object[0]); 
     if (args[1].equalsIgnoreCase("entity")) {
-      executeStatusSub(sender, args, "Server loaded Entity List", (sender.func_130014_f_()).field_72996_f);
+      executeStatusSub(sender, args, "Server loaded Entity List", (sender.getEntityWorld()).loadedEntityList);
     } else if (args[1].equalsIgnoreCase("tile")) {
       executeStatusSub(sender, args, "Server loaded Tile Entity List", 
-          (sender.func_130014_f_()).field_147482_g);
+          (sender.getEntityWorld()).loadedTileEntityList);
     } 
   }
   
@@ -342,41 +342,41 @@ public class MCH_Command extends CommandBase {
           }
         });
     boolean send = false;
-    sender.func_145747_a((ITextComponent)new TextComponentString("--- " + title + " ---"));
+    sender.addChatMessage((ITextComponent)new TextComponentString("--- " + title + " ---"));
     for (Map.Entry<String, Integer> s : entries) {
       if (((Integer)s.getValue()).intValue() >= minNum) {
         String msg = " " + (String)s.getKey() + " : " + s.getValue();
         System.out.println(msg);
-        sender.func_145747_a((ITextComponent)new TextComponentString(msg));
+        sender.addChatMessage((ITextComponent)new TextComponentString(msg));
         send = true;
       } 
     } 
     if (!send) {
       System.out.println("none");
-      sender.func_145747_a((ITextComponent)new TextComponentString("none"));
+      sender.addChatMessage((ITextComponent)new TextComponentString("none"));
     } 
   }
   
   public void executeFill(ICommandSender sender, String[] args) throws CommandException {
     if (args.length < 8)
       throw new WrongUsageException("/mcheli fill <x1> <y1> <z1> <x2> <y2> <z2> <block name> [meta data] [oldBlockHandling] [data tag]", new Object[0]); 
-    int x1 = sender.func_180425_c().func_177958_n();
-    int y1 = sender.func_180425_c().func_177956_o();
-    int z1 = sender.func_180425_c().func_177952_p();
-    int x2 = sender.func_180425_c().func_177958_n();
-    int y2 = sender.func_180425_c().func_177956_o();
-    int z2 = sender.func_180425_c().func_177952_p();
-    x1 = MathHelper.func_76128_c(func_175770_a(x1, args[1], true).func_179628_a());
-    y1 = MathHelper.func_76128_c(func_175770_a(y1, args[2], true).func_179628_a());
-    z1 = MathHelper.func_76128_c(func_175770_a(z1, args[3], true).func_179628_a());
-    x2 = MathHelper.func_76128_c(func_175770_a(x2, args[4], true).func_179628_a());
-    y2 = MathHelper.func_76128_c(func_175770_a(y2, args[5], true).func_179628_a());
-    z2 = MathHelper.func_76128_c(func_175770_a(z2, args[6], true).func_179628_a());
-    Block block = CommandBase.func_147180_g(sender, args[7]);
-    IBlockState iblockstate = block.func_176223_P();
+    int x1 = sender.getPosition().getX();
+    int y1 = sender.getPosition().getY();
+    int z1 = sender.getPosition().getZ();
+    int x2 = sender.getPosition().getX();
+    int y2 = sender.getPosition().getY();
+    int z2 = sender.getPosition().getZ();
+    x1 = MathHelper.floor(parseCoordinate(x1, args[1], true).getResult());
+    y1 = MathHelper.floor(parseCoordinate(y1, args[2], true).getResult());
+    z1 = MathHelper.floor(parseCoordinate(z1, args[3], true).getResult());
+    x2 = MathHelper.floor(parseCoordinate(x2, args[4], true).getResult());
+    y2 = MathHelper.floor(parseCoordinate(y2, args[5], true).getResult());
+    z2 = MathHelper.floor(parseCoordinate(z2, args[6], true).getResult());
+    Block block = CommandBase.getBlockByText(sender, args[7]);
+    IBlockState iblockstate = block.getDefaultState();
     if (args.length >= 9)
       iblockstate = func_190794_a(block, args[8]); 
-    World world = sender.func_130014_f_();
+    World world = sender.getEntityWorld();
     if (x1 > x2) {
       int t = x1;
       x1 = x2;
@@ -404,9 +404,9 @@ public class MCH_Command extends CommandBase {
     NBTTagCompound nbttagcompound = new NBTTagCompound();
     boolean flag = false;
     if (args.length >= 11 && block.hasTileEntity(iblockstate)) {
-      String s = func_147178_a(sender, args, 10).func_150260_c();
+      String s = getChatComponentFromNthArg(sender, args, 10).getUnformattedText();
       try {
-        NBTTagCompound nbtbase = JsonToNBT.func_180713_a(s);
+        NBTTagCompound nbtbase = JsonToNBT.getTagFromJson(s);
         if (!(nbtbase instanceof NBTTagCompound))
           throw new CommandException("commands.setblock.tagError", new Object[] { "Not a valid tag" }); 
         nbttagcompound = nbtbase;
@@ -421,27 +421,27 @@ public class MCH_Command extends CommandBase {
       for (int y = y1; y <= y2; y++) {
         for (int z = z1; z <= z2; z++) {
           BlockPos blockpos = new BlockPos(x, y, z);
-          if (world.func_175667_e(blockpos))
-            if (world.func_175623_d(blockpos) ? !override : !keep) {
+          if (world.isBlockLoaded(blockpos))
+            if (world.isAirBlock(blockpos) ? !override : !keep) {
               if (destroy)
-                world.func_175655_b(blockpos, false); 
-              TileEntity block2 = world.func_175625_s(blockpos);
+                world.destroyBlock(blockpos, false); 
+              TileEntity block2 = world.getTileEntity(blockpos);
               if (block2 instanceof IInventory) {
                 IInventory ii = (IInventory)block2;
-                for (int i = 0; i < ii.func_70302_i_(); i++) {
-                  ItemStack is = ii.func_70304_b(i);
+                for (int i = 0; i < ii.getSizeInventory(); i++) {
+                  ItemStack is = ii.removeStackFromSlot(i);
                   if (!is.func_190926_b())
                     is.func_190920_e(0); 
                 } 
               } 
-              if (world.func_180501_a(blockpos, iblockstate, 3)) {
+              if (world.setBlockState(blockpos, iblockstate, 3)) {
                 if (flag) {
-                  TileEntity tileentity = world.func_175625_s(blockpos);
+                  TileEntity tileentity = world.getTileEntity(blockpos);
                   if (tileentity != null) {
-                    nbttagcompound.func_74768_a("x", x);
-                    nbttagcompound.func_74768_a("y", y);
-                    nbttagcompound.func_74768_a("z", z);
-                    tileentity.func_145839_a(nbttagcompound);
+                    nbttagcompound.setInteger("x", x);
+                    nbttagcompound.setInteger("y", y);
+                    nbttagcompound.setInteger("z", z);
+                    tileentity.readFromNBT(nbttagcompound);
                   } 
                 } 
                 result = true;
@@ -451,50 +451,50 @@ public class MCH_Command extends CommandBase {
       } 
     } 
     if (result) {
-      func_152373_a(sender, (ICommand)this, "commands.setblock.success", new Object[0]);
+      notifyCommandListener(sender, (ICommand)this, "commands.setblock.success", new Object[0]);
     } else {
       throw new CommandException("commands.setblock.noChange", new Object[0]);
     } 
   }
   
-  public List<String> func_184883_a(MinecraftServer server, ICommandSender sender, String[] prm, BlockPos targetPos) {
+  public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] prm, BlockPos targetPos) {
     if (!MCH_Config.EnableCommand.prmBool)
-      return super.func_184883_a(server, sender, prm, targetPos); 
+      return super.getTabCompletionOptions(server, sender, prm, targetPos); 
     if (prm.length <= 1)
-      return func_71530_a(prm, ALL_COMMAND); 
+      return getListOfStringsMatchingLastWord(prm, ALL_COMMAND); 
     if (prm[0].equalsIgnoreCase("sendss")) {
       if (prm.length == 2)
-        return func_71530_a(prm, server.func_71213_z()); 
+        return getListOfStringsMatchingLastWord(prm, server.getAllUsernames()); 
     } else if (prm[0].equalsIgnoreCase("modlist")) {
       if (prm.length >= 2)
-        return func_71530_a(prm, server.func_71213_z()); 
+        return getListOfStringsMatchingLastWord(prm, server.getAllUsernames()); 
     } else {
       if (prm[0].equalsIgnoreCase("fill")) {
         if ((prm.length == 2 || prm.length == 5) && sender instanceof Entity) {
           Entity entity = (Entity)sender;
           List<String> a = new ArrayList<>();
-          int x = (entity.field_70165_t < 0.0D) ? (int)(entity.field_70165_t - 1.0D) : (int)entity.field_70165_t;
-          int z = (entity.field_70161_v < 0.0D) ? (int)(entity.field_70161_v - 1.0D) : (int)entity.field_70161_v;
-          a.add("" + x + " " + (int)(entity.field_70163_u + 0.5D) + " " + z);
+          int x = (entity.posX < 0.0D) ? (int)(entity.posX - 1.0D) : (int)entity.posX;
+          int z = (entity.posZ < 0.0D) ? (int)(entity.posZ - 1.0D) : (int)entity.posZ;
+          a.add("" + x + " " + (int)(entity.posY + 0.5D) + " " + z);
           return a;
         } 
-        return (prm.length == 10) ? func_71530_a(prm, new String[] { "replace", "destroy", "keep", "override" }) : ((prm.length == 8) ? 
+        return (prm.length == 10) ? getListOfStringsMatchingLastWord(prm, new String[] { "replace", "destroy", "keep", "override" }) : ((prm.length == 8) ? 
           
-          func_175762_a(prm, Block.field_149771_c.func_148742_b()) : null);
+          getListOfStringsMatchingLastWord(prm, Block.REGISTRY.getKeys()) : null);
       } 
       if (prm[0].equalsIgnoreCase("status")) {
         if (prm.length == 2)
-          return func_71530_a(prm, new String[] { "entity", "tile" }); 
+          return getListOfStringsMatchingLastWord(prm, new String[] { "entity", "tile" }); 
       } else if (prm[0].equalsIgnoreCase("attackentity")) {
         if (prm.length == 4)
-          return func_71530_a(prm, new String[] { 
+          return getListOfStringsMatchingLastWord(prm, new String[] { 
                 "player", "inFire", "onFire", "lava", "inWall", "drown", "starve", "cactus", "fall", "outOfWorld", 
                 "generic", "magic", "wither", "anvil", "fallingBlock" }); 
       } else if (prm[0].equalsIgnoreCase("showboundingbox")) {
         if (prm.length == 2)
-          return func_71530_a(prm, new String[] { "true", "false" }); 
+          return getListOfStringsMatchingLastWord(prm, new String[] { "true", "false" }); 
       } 
     } 
-    return super.func_184883_a(server, sender, prm, targetPos);
+    return super.getTabCompletionOptions(server, sender, prm, targetPos);
   }
 }

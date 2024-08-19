@@ -33,30 +33,30 @@ public class MCH_EventHook extends W_EventHook {
       MCH_MOD.proxy.setRenderEntityDistanceWeight(MCH_Config.MobRenderDistanceWeight.prmDouble);
     } else if (event.getEntity() instanceof MCH_EntityAircraft) {
       MCH_EntityAircraft aircraft = (MCH_EntityAircraft)event.getEntity();
-      if (!aircraft.field_70170_p.field_72995_K)
+      if (!aircraft.world.isRemote)
         if (!aircraft.isCreatedSeats())
           aircraft.createSeats(UUID.randomUUID().toString());  
     } else if (W_EntityPlayer.isPlayer(event.getEntity())) {
       Entity e = event.getEntity();
-      boolean b = Float.isNaN(e.field_70125_A);
-      b |= Float.isNaN(e.field_70127_C);
-      b |= Float.isInfinite(e.field_70125_A);
-      b |= Float.isInfinite(e.field_70127_C);
+      boolean b = Float.isNaN(e.rotationPitch);
+      b |= Float.isNaN(e.prevRotationPitch);
+      b |= Float.isInfinite(e.rotationPitch);
+      b |= Float.isInfinite(e.prevRotationPitch);
       if (b) {
-        MCH_Lib.Log(event.getEntity(), "### EntityJoinWorldEvent Error:Player invalid rotation pitch(" + e.field_70125_A + ")", new Object[0]);
-        e.field_70125_A = 0.0F;
-        e.field_70127_C = 0.0F;
+        MCH_Lib.Log(event.getEntity(), "### EntityJoinWorldEvent Error:Player invalid rotation pitch(" + e.rotationPitch + ")", new Object[0]);
+        e.rotationPitch = 0.0F;
+        e.prevRotationPitch = 0.0F;
       } 
-      b = Float.isInfinite(e.field_70177_z);
-      b |= Float.isInfinite(e.field_70126_B);
-      b |= Float.isNaN(e.field_70177_z);
-      b |= Float.isNaN(e.field_70126_B);
+      b = Float.isInfinite(e.rotationYaw);
+      b |= Float.isInfinite(e.prevRotationYaw);
+      b |= Float.isNaN(e.rotationYaw);
+      b |= Float.isNaN(e.prevRotationYaw);
       if (b) {
-        MCH_Lib.Log(event.getEntity(), "### EntityJoinWorldEvent Error:Player invalid rotation yaw(" + e.field_70177_z + ")", new Object[0]);
-        e.field_70177_z = 0.0F;
-        e.field_70126_B = 0.0F;
+        MCH_Lib.Log(event.getEntity(), "### EntityJoinWorldEvent Error:Player invalid rotation yaw(" + e.rotationYaw + ")", new Object[0]);
+        e.rotationYaw = 0.0F;
+        e.prevRotationYaw = 0.0F;
       } 
-      if (!e.field_70170_p.field_72995_K && event.getEntity() instanceof EntityPlayerMP) {
+      if (!e.world.isRemote && event.getEntity() instanceof EntityPlayerMP) {
         MCH_Lib.DbgLog(false, "EntityJoinWorldEvent:" + event.getEntity(), new Object[0]);
         MCH_PacketNotifyServerSettings.send((EntityPlayerMP)event.getEntity());
       } 
@@ -73,7 +73,7 @@ public class MCH_EventHook extends W_EventHook {
       return; 
     if ((ac.getAcInfo()).damageFactor > 0.0F)
       return; 
-    Entity attackEntity = event.getSource().func_76346_g();
+    Entity attackEntity = event.getSource().getEntity();
     if (attackEntity == null) {
       event.setCanceled(true);
     } else if (W_Entity.isEqual(attackEntity, event.getEntity())) {
@@ -95,13 +95,13 @@ public class MCH_EventHook extends W_EventHook {
       return; 
     if (ac.isDestroyed())
       return; 
-    Entity attackEntity = event.getSource().func_76346_g();
+    Entity attackEntity = event.getSource().getEntity();
     float f = event.getAmount();
     if (attackEntity == null) {
-      ac.func_70097_a(event.getSource(), f * 2.0F);
+      ac.attackEntityFrom(event.getSource(), f * 2.0F);
       f *= (ac.getAcInfo()).damageFactor;
     } else if (W_Entity.isEqual(attackEntity, event.getEntity())) {
-      ac.func_70097_a(event.getSource(), f * 2.0F);
+      ac.attackEntityFrom(event.getSource(), f * 2.0F);
       f *= (ac.getAcInfo()).damageFactor;
     } else if (ac.isMountedEntity(attackEntity)) {
       f = 0.0F;
@@ -112,7 +112,7 @@ public class MCH_EventHook extends W_EventHook {
         f = 0.0F;
         event.setCanceled(true);
       } else {
-        ac.func_70097_a(event.getSource(), f * 2.0F);
+        ac.attackEntityFrom(event.getSource(), f * 2.0F);
         f *= (ac.getAcInfo()).damageFactor;
       } 
     } 
@@ -121,15 +121,15 @@ public class MCH_EventHook extends W_EventHook {
   
   public MCH_EntityAircraft getRiddenAircraft(Entity entity) {
     MCH_EntityAircraft ac = null;
-    Entity ridden = entity.func_184187_bx();
+    Entity ridden = entity.getRidingEntity();
     if (ridden instanceof MCH_EntityAircraft) {
       ac = (MCH_EntityAircraft)ridden;
     } else if (ridden instanceof MCH_EntitySeat) {
       ac = ((MCH_EntitySeat)ridden).getParent();
     } 
     if (ac == null) {
-      List<MCH_EntityAircraft> list = entity.field_70170_p.func_72872_a(MCH_EntityAircraft.class, entity
-          .func_174813_aQ().func_72314_b(50.0D, 50.0D, 50.0D));
+      List<MCH_EntityAircraft> list = entity.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, entity
+          .getEntityBoundingBox().expand(50.0D, 50.0D, 50.0D));
       if (list != null)
         for (int i = 0; i < list.size(); i++) {
           MCH_EntityAircraft tmp = list.get(i);
@@ -141,23 +141,23 @@ public class MCH_EventHook extends W_EventHook {
   }
   
   public void entityInteractEvent(PlayerInteractEvent.EntityInteract event) {
-    ItemStack item = event.getEntityPlayer().func_184586_b(event.getHand());
+    ItemStack item = event.getEntityPlayer().getHeldItem(event.getHand());
     if (item.func_190926_b())
       return; 
-    if (item.func_77973_b() instanceof MCH_ItemChain) {
+    if (item.getItem() instanceof MCH_ItemChain) {
       MCH_ItemChain.interactEntity(item, event.getTarget(), event.getEntityPlayer(), 
-          (event.getEntityPlayer()).field_70170_p);
+          (event.getEntityPlayer()).world);
       event.setCanceled(true);
       event.setCancellationResult(EnumActionResult.SUCCESS);
-    } else if (item.func_77973_b() instanceof MCH_ItemAircraft) {
-      ((MCH_ItemAircraft)item.func_77973_b()).rideEntity(item, event.getTarget(), event.getEntityPlayer());
+    } else if (item.getItem() instanceof MCH_ItemAircraft) {
+      ((MCH_ItemAircraft)item.getItem()).rideEntity(item, event.getTarget(), event.getEntityPlayer());
     } 
   }
   
   public void entityCanUpdate(EntityEvent.CanUpdate event) {
     if (event.getEntity() instanceof MCH_EntityBaseBullet) {
       MCH_EntityBaseBullet bullet = (MCH_EntityBaseBullet)event.getEntity();
-      bullet.func_70106_y();
+      bullet.setDead();
     } 
   }
 }

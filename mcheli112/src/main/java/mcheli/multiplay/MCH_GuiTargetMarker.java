@@ -46,22 +46,22 @@ public class MCH_GuiTargetMarker extends MCH_Gui {
     s_minecraft = minecraft;
   }
   
-  public void func_73866_w_() {
-    super.func_73866_w_();
+  public void initGui() {
+    super.initGui();
   }
   
-  public boolean func_73868_f() {
+  public boolean doesGuiPauseGame() {
     return false;
   }
   
   public boolean isDrawGui(EntityPlayer player) {
-    return (player != null && player.field_70170_p != null);
+    return (player != null && player.world != null);
   }
   
   private static int spotedEntityCountdown = 0;
   
   public static void onClientTick() {
-    if (!Minecraft.func_71410_x().func_147113_T())
+    if (!Minecraft.getMinecraft().isGamePaused())
       spotedEntityCountdown++; 
     if (spotedEntityCountdown >= 20) {
       spotedEntityCountdown = 0;
@@ -80,7 +80,7 @@ public class MCH_GuiTargetMarker extends MCH_Gui {
   public static boolean isSpotedEntity(@Nullable Entity entity) {
     if (entity == null)
       return false; 
-    int entityId = entity.func_145782_y();
+    int entityId = entity.getEntityId();
     for (Iterator<Integer> i$ = spotedEntity.keySet().iterator(); i$.hasNext(); ) {
       int key = ((Integer)i$.next()).intValue();
       if (key == entityId)
@@ -107,7 +107,7 @@ public class MCH_GuiTargetMarker extends MCH_Gui {
     if (!isEnableEntityMarker())
       return; 
     MCH_TargetType spotType = MCH_TargetType.NONE;
-    EntityPlayerSP entityPlayerSP = s_minecraft.field_71439_g;
+    EntityPlayerSP entityPlayerSP = s_minecraft.player;
     Entity entity = target.getEntity();
     if (entity instanceof MCH_EntityAircraft) {
       MCH_EntityAircraft ac = (MCH_EntityAircraft)entity;
@@ -116,15 +116,15 @@ public class MCH_GuiTargetMarker extends MCH_Gui {
       if (ac.isMountedSameTeamEntity((EntityLivingBase)entityPlayerSP))
         spotType = MCH_TargetType.SAME_TEAM_PLAYER; 
     } else if (entity instanceof EntityPlayer) {
-      if (entity == entityPlayerSP || entity.func_184187_bx() instanceof mcheli.aircraft.MCH_EntitySeat || entity
-        .func_184187_bx() instanceof MCH_EntityAircraft)
+      if (entity == entityPlayerSP || entity.getRidingEntity() instanceof mcheli.aircraft.MCH_EntitySeat || entity
+        .getRidingEntity() instanceof MCH_EntityAircraft)
         return; 
-      if (entityPlayerSP.func_96124_cp() != null && entityPlayerSP.func_184191_r(entity))
+      if (entityPlayerSP.getTeam() != null && entityPlayerSP.isOnSameTeam(entity))
         spotType = MCH_TargetType.SAME_TEAM_PLAYER; 
     } 
     if (spotType == MCH_TargetType.NONE && isSpotedEntity(entity))
-      spotType = MCH_Multiplay.canSpotEntity((Entity)entityPlayerSP, ((EntityPlayer)entityPlayerSP).field_70165_t, ((EntityPlayer)entityPlayerSP).field_70163_u + entityPlayerSP
-          .func_70047_e(), ((EntityPlayer)entityPlayerSP).field_70161_v, entity, false); 
+      spotType = MCH_Multiplay.canSpotEntity((Entity)entityPlayerSP, ((EntityPlayer)entityPlayerSP).posX, ((EntityPlayer)entityPlayerSP).posY + entityPlayerSP
+          .getEyeHeight(), ((EntityPlayer)entityPlayerSP).posZ, entity, false); 
     if (reserve == 100)
       spotType = MCH_TargetType.POINT; 
     if (spotType != MCH_TargetType.NONE) {
@@ -150,7 +150,7 @@ public class MCH_GuiTargetMarker extends MCH_Gui {
   
   public static boolean isEnableEntityMarker() {
     return (MCH_Config.DisplayEntityMarker.prmBool && (
-      Minecraft.func_71410_x().func_71356_B() || MCH_ServerSettings.enableEntityMarker) && MCH_Config.EntityMarkerSize.prmDouble > 0.0D);
+      Minecraft.getMinecraft().isSingleplayer() || MCH_ServerSettings.enableEntityMarker) && MCH_Config.EntityMarkerSize.prmDouble > 0.0D);
   }
   
   public void drawGui(EntityPlayer player, boolean isThirdPersonView) {
@@ -170,17 +170,17 @@ public class MCH_GuiTargetMarker extends MCH_Gui {
     GL11.glBlendFunc(770, 771);
     GL11.glColor4b((byte)-1, (byte)-1, (byte)-1, (byte)-1);
     GL11.glDepthMask(false);
-    int DW = this.field_146297_k.field_71443_c;
-    int DSW = this.field_146297_k.field_71443_c / scale;
-    int DSH = this.field_146297_k.field_71440_d / scale;
+    int DW = this.mc.displayWidth;
+    int DSW = this.mc.displayWidth / scale;
+    int DSH = this.mc.displayHeight / scale;
     double x = 9999.0D;
     double z = 9999.0D;
     double y = 9999.0D;
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder builder = tessellator.func_178180_c();
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder builder = tessellator.getBuffer();
     for (int i = 0; i < 2; i++) {
       if (i == 0)
-        builder.func_181668_a((i == 0) ? 4 : 1, DefaultVertexFormats.field_181706_f); 
+        builder.begin((i == 0) ? 4 : 1, DefaultVertexFormats.POSITION_COLOR); 
       for (MCH_MarkEntityPos e : entityPos) {
         int color = COLOR_TABLE[e.type];
         x = (e.pos.get(0) / scale);
@@ -203,7 +203,7 @@ public class MCH_GuiTargetMarker extends MCH_Gui {
           ITargetMarkerObject target = e.getTarget();
           double MARK_SIZE = MCH_Config.BlockMarkerSize.prmDouble;
           if (z < 1.0D && x >= 0.0D && x <= (DSW - 20) && y >= 0.0D && y <= (DSH - 40)) {
-            double dist = this.field_146297_k.field_71439_g.func_70011_f(target.getX(), target.getY(), target.getZ());
+            double dist = this.mc.player.getDistance(target.getX(), target.getY(), target.getZ());
             GL11.glEnable(3553);
             drawCenteredString(String.format("%.0fm", new Object[] { Double.valueOf(dist) }), (int)x, (int)(y + MARK_SIZE * 1.1D + 16.0D), color);
             if (x >= (DSW / 2 - 20) && x <= (DSW / 2 + 20) && y >= (DSH / 2 - 20) && y <= (DSH / 2 + 20)) {
@@ -212,27 +212,27 @@ public class MCH_GuiTargetMarker extends MCH_Gui {
               drawString(String.format("z : %.0f", new Object[] { Double.valueOf(target.getZ()) }), (int)(x + MARK_SIZE + 18.0D), (int)y + 4, color);
             } 
             GL11.glDisable(3553);
-            builder.func_181668_a(1, DefaultVertexFormats.field_181706_f);
-            drawRhombus(builder, 15, x, y, this.field_73735_i, MARK_SIZE, color);
+            builder.begin(1, DefaultVertexFormats.POSITION_COLOR);
+            drawRhombus(builder, 15, x, y, this.zLevel, MARK_SIZE, color);
           } else {
-            builder.func_181668_a(1, DefaultVertexFormats.field_181706_f);
+            builder.begin(1, DefaultVertexFormats.POSITION_COLOR);
             double S = 30.0D;
             if (x < S) {
-              drawRhombus(builder, 1, S, (DSH / 2), this.field_73735_i, MARK_SIZE, color);
+              drawRhombus(builder, 1, S, (DSH / 2), this.zLevel, MARK_SIZE, color);
             } else if (x > DSW - S) {
-              drawRhombus(builder, 4, DSW - S, (DSH / 2), this.field_73735_i, MARK_SIZE, color);
+              drawRhombus(builder, 4, DSW - S, (DSH / 2), this.zLevel, MARK_SIZE, color);
             } 
             if (y < S) {
-              drawRhombus(builder, 8, (DSW / 2), S, this.field_73735_i, MARK_SIZE, color);
+              drawRhombus(builder, 8, (DSW / 2), S, this.zLevel, MARK_SIZE, color);
             } else if (y > DSH - S * 2.0D) {
-              drawRhombus(builder, 2, (DSW / 2), DSH - S * 2.0D, this.field_73735_i, MARK_SIZE, color);
+              drawRhombus(builder, 2, (DSW / 2), DSH - S * 2.0D, this.zLevel, MARK_SIZE, color);
             } 
           } 
-          tessellator.func_78381_a();
+          tessellator.draw();
         } 
       } 
       if (i == 0)
-        tessellator.func_78381_a(); 
+        tessellator.draw(); 
     } 
     GL11.glDepthMask(true);
     GL11.glEnable(3553);
@@ -247,28 +247,28 @@ public class MCH_GuiTargetMarker extends MCH_Gui {
     int alpha = color >> 24 & 0xFF;
     double M = size / 3.0D;
     if ((dir & 0x1) != 0) {
-      builder.func_181662_b(x - size, y, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x - size + M, y - M, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x - size, y, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x - size + M, y + M, z).func_181669_b(red, green, blue, alpha).func_181675_d();
+      builder.pos(x - size, y, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x - size + M, y - M, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x - size, y, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x - size + M, y + M, z).color(red, green, blue, alpha).endVertex();
     } 
     if ((dir & 0x4) != 0) {
-      builder.func_181662_b(x + size, y, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x + size - M, y - M, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x + size, y, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x + size - M, y + M, z).func_181669_b(red, green, blue, alpha).func_181675_d();
+      builder.pos(x + size, y, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x + size - M, y - M, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x + size, y, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x + size - M, y + M, z).color(red, green, blue, alpha).endVertex();
     } 
     if ((dir & 0x8) != 0) {
-      builder.func_181662_b(x, y - size, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x + M, y - size + M, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x, y - size, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x - M, y - size + M, z).func_181669_b(red, green, blue, alpha).func_181675_d();
+      builder.pos(x, y - size, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x + M, y - size + M, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x, y - size, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x - M, y - size + M, z).color(red, green, blue, alpha).endVertex();
     } 
     if ((dir & 0x2) != 0) {
-      builder.func_181662_b(x, y + size, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x + M, y + size - M, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x, y + size, z).func_181669_b(red, green, blue, alpha).func_181675_d();
-      builder.func_181662_b(x - M, y + size - M, z).func_181669_b(red, green, blue, alpha).func_181675_d();
+      builder.pos(x, y + size, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x + M, y + size - M, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x, y + size, z).color(red, green, blue, alpha).endVertex();
+      builder.pos(x - M, y + size - M, z).color(red, green, blue, alpha).endVertex();
     } 
   }
   
@@ -277,14 +277,14 @@ public class MCH_GuiTargetMarker extends MCH_Gui {
     int green = color >> 8 & 0xFF;
     int blue = color >> 0 & 0xFF;
     int alpha = color >> 24 & 0xFF;
-    builder.func_181662_b(x + size / 2.0D, y - 10.0D - size, this.field_73735_i).func_181669_b(red, green, blue, alpha).func_181675_d();
-    builder.func_181662_b(x - size / 2.0D, y - 10.0D - size, this.field_73735_i).func_181669_b(red, green, blue, alpha).func_181675_d();
-    builder.func_181662_b(x + 0.0D, y - 10.0D, this.field_73735_i).func_181669_b(red, green, blue, alpha).func_181675_d();
+    builder.pos(x + size / 2.0D, y - 10.0D - size, this.zLevel).color(red, green, blue, alpha).endVertex();
+    builder.pos(x - size / 2.0D, y - 10.0D - size, this.zLevel).color(red, green, blue, alpha).endVertex();
+    builder.pos(x + 0.0D, y - 10.0D, this.zLevel).color(red, green, blue, alpha).endVertex();
   }
   
   public static void markPoint(int px, int py, int pz) {
-    EntityPlayerSP entityPlayerSP = (Minecraft.func_71410_x()).field_71439_g;
-    if (entityPlayerSP != null && ((EntityPlayer)entityPlayerSP).field_70170_p != null)
+    EntityPlayerSP entityPlayerSP = (Minecraft.getMinecraft()).player;
+    if (entityPlayerSP != null && ((EntityPlayer)entityPlayerSP).world != null)
       if (py < 1000) {
         MCH_ParticlesUtil.spawnMarkPoint((EntityPlayer)entityPlayerSP, 0.5D + px, 1.0D + py, 0.5D + pz);
       } else {

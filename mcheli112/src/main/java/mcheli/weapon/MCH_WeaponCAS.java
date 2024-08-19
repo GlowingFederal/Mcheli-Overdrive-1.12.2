@@ -32,7 +32,7 @@ public class MCH_WeaponCAS extends MCH_WeaponBase {
     this.explosionPower = 2;
     this.power = 32;
     this.interval = 65236;
-    if (w.field_72995_K)
+    if (w.isRemote)
       this.interval -= 10; 
     this.targetPosX = 0.0D;
     this.targetPosY = 0.0D;
@@ -46,7 +46,7 @@ public class MCH_WeaponCAS extends MCH_WeaponBase {
   
   public void update(int countWait) {
     super.update(countWait);
-    if (!this.worldObj.field_72995_K && this.cntAtk < 3 && countWait != 0)
+    if (!this.worldObj.isRemote && this.cntAtk < 3 && countWait != 0)
       if (this.tick == this.startTick) {
         double x = 0.0D;
         double z = 0.0D;
@@ -100,28 +100,28 @@ public class MCH_WeaponCAS extends MCH_WeaponBase {
     } 
     MCH_EntityA10 a10 = new MCH_EntityA10(this.worldObj, x, y, z);
     a10.setWeaponName(this.name);
-    a10.field_70126_B = a10.field_70177_z = (90 * this.direction);
-    a10.field_70159_w = mX;
-    a10.field_70181_x = mY;
-    a10.field_70179_y = mZ;
+    a10.prevRotationYaw = a10.rotationYaw = (90 * this.direction);
+    a10.motionX = mX;
+    a10.motionY = mY;
+    a10.motionZ = mZ;
     a10.direction = this.direction;
     a10.shootingEntity = this.user;
     a10.shootingAircraft = this.shooter;
     a10.explosionPower = this.explosionPower;
     a10.power = this.power;
     a10.acceleration = this.acceleration;
-    this.worldObj.func_72838_d((Entity)a10);
+    this.worldObj.spawnEntityInWorld((Entity)a10);
     W_WorldFunc.MOD_playSoundEffect(this.worldObj, x, y, z, "a-10_snd", 150.0F, 1.0F);
   }
   
   public boolean shot(MCH_WeaponParam prm) {
-    float yaw = prm.user.field_70177_z;
-    float pitch = prm.user.field_70125_A;
-    double tX = (-MathHelper.func_76126_a(yaw / 180.0F * 3.1415927F) * MathHelper.func_76134_b(pitch / 180.0F * 3.1415927F));
-    double tZ = (MathHelper.func_76134_b(yaw / 180.0F * 3.1415927F) * MathHelper.func_76134_b(pitch / 180.0F * 3.1415927F));
-    double tY = -MathHelper.func_76126_a(pitch / 180.0F * 3.1415927F);
-    double dist = MathHelper.func_76133_a(tX * tX + tY * tY + tZ * tZ);
-    if (this.worldObj.field_72995_K) {
+    float yaw = prm.user.rotationYaw;
+    float pitch = prm.user.rotationPitch;
+    double tX = (-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
+    double tZ = (MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
+    double tY = -MathHelper.sin(pitch / 180.0F * 3.1415927F);
+    double dist = MathHelper.sqrt(tX * tX + tY * tY + tZ * tZ);
+    if (this.worldObj.isRemote) {
       tX = tX * 80.0D / dist;
       tY = tY * 80.0D / dist;
       tZ = tZ * 80.0D / dist;
@@ -130,13 +130,13 @@ public class MCH_WeaponCAS extends MCH_WeaponBase {
       tY = tY * 150.0D / dist;
       tZ = tZ * 150.0D / dist;
     } 
-    Vec3d src = W_WorldFunc.getWorldVec3(this.worldObj, prm.entity.field_70165_t, prm.entity.field_70163_u + 2.0D, prm.entity.field_70161_v);
-    Vec3d dst = W_WorldFunc.getWorldVec3(this.worldObj, prm.entity.field_70165_t + tX, prm.entity.field_70163_u + tY + 2.0D, prm.entity.field_70161_v + tZ);
+    Vec3d src = W_WorldFunc.getWorldVec3(this.worldObj, prm.entity.posX, prm.entity.posY + 2.0D, prm.entity.posZ);
+    Vec3d dst = W_WorldFunc.getWorldVec3(this.worldObj, prm.entity.posX + tX, prm.entity.posY + tY + 2.0D, prm.entity.posZ + tZ);
     RayTraceResult m = W_WorldFunc.clip(this.worldObj, src, dst);
     if (m != null && W_MovingObjectPosition.isHitTypeTile(m)) {
-      this.targetPosX = m.field_72307_f.field_72450_a;
-      this.targetPosY = m.field_72307_f.field_72448_b;
-      this.targetPosZ = m.field_72307_f.field_72449_c;
+      this.targetPosX = m.hitVec.xCoord;
+      this.targetPosY = m.hitVec.yCoord;
+      this.targetPosZ = m.hitVec.zCoord;
       this.direction = (int)MCH_Lib.getRotate360((yaw + 45.0F)) / 90;
       this.direction += rand.nextBoolean() ? -1 : 1;
       this.direction %= 4;
@@ -154,13 +154,13 @@ public class MCH_WeaponCAS extends MCH_WeaponBase {
   }
   
   public boolean shot(Entity user, double px, double py, double pz, int option1, int option2) {
-    float yaw = user.field_70177_z;
-    float pitch = user.field_70125_A;
-    double tX = (-MathHelper.func_76126_a(yaw / 180.0F * 3.1415927F) * MathHelper.func_76134_b(pitch / 180.0F * 3.1415927F));
-    double tZ = (MathHelper.func_76134_b(yaw / 180.0F * 3.1415927F) * MathHelper.func_76134_b(pitch / 180.0F * 3.1415927F));
-    double tY = -MathHelper.func_76126_a(pitch / 180.0F * 3.1415927F);
-    double dist = MathHelper.func_76133_a(tX * tX + tY * tY + tZ * tZ);
-    if (this.worldObj.field_72995_K) {
+    float yaw = user.rotationYaw;
+    float pitch = user.rotationPitch;
+    double tX = (-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
+    double tZ = (MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
+    double tY = -MathHelper.sin(pitch / 180.0F * 3.1415927F);
+    double dist = MathHelper.sqrt(tX * tX + tY * tY + tZ * tZ);
+    if (this.worldObj.isRemote) {
       tX = tX * 80.0D / dist;
       tY = tY * 80.0D / dist;
       tZ = tZ * 80.0D / dist;
@@ -173,15 +173,15 @@ public class MCH_WeaponCAS extends MCH_WeaponBase {
     Vec3d dst = W_WorldFunc.getWorldVec3(this.worldObj, px + tX, py + tY, pz + tZ);
     RayTraceResult m = W_WorldFunc.clip(this.worldObj, src, dst);
     if (W_MovingObjectPosition.isHitTypeTile(m)) {
-      if (this.worldObj.field_72995_K) {
-        double dx = m.field_72307_f.field_72450_a - px;
-        double dz = m.field_72307_f.field_72449_c - pz;
+      if (this.worldObj.isRemote) {
+        double dx = m.hitVec.xCoord - px;
+        double dz = m.hitVec.zCoord - pz;
         if (Math.sqrt(dx * dx + dz * dz) < 20.0D)
           return false; 
       } 
-      this.targetPosX = m.field_72307_f.field_72450_a;
-      this.targetPosY = m.field_72307_f.field_72448_b;
-      this.targetPosZ = m.field_72307_f.field_72449_c;
+      this.targetPosX = m.hitVec.xCoord;
+      this.targetPosY = m.hitVec.yCoord;
+      this.targetPosZ = m.hitVec.zCoord;
       this.direction = (int)MCH_Lib.getRotate360((yaw + 45.0F)) / 90;
       this.direction += rand.nextBoolean() ? -1 : 1;
       this.direction %= 4;

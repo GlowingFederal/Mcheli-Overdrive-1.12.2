@@ -54,30 +54,30 @@ public class MCH_ClientGLTDTickHandler extends MCH_ClientTickHandlerBase {
   }
   
   protected void updateGLTD(EntityPlayer player, MCH_EntityGLTD gltd) {
-    if (player.field_70125_A < -70.0F)
-      player.field_70125_A = -70.0F; 
-    if (player.field_70125_A > 70.0F)
-      player.field_70125_A = 70.0F; 
-    float yaw = gltd.field_70177_z;
-    if (player.field_70177_z < yaw - 70.0F)
-      player.field_70177_z = yaw - 70.0F; 
-    if (player.field_70177_z > yaw + 70.0F)
-      player.field_70177_z = yaw + 70.0F; 
-    gltd.camera.rotationYaw = player.field_70177_z;
-    gltd.camera.rotationPitch = player.field_70125_A;
+    if (player.rotationPitch < -70.0F)
+      player.rotationPitch = -70.0F; 
+    if (player.rotationPitch > 70.0F)
+      player.rotationPitch = 70.0F; 
+    float yaw = gltd.rotationYaw;
+    if (player.rotationYaw < yaw - 70.0F)
+      player.rotationYaw = yaw - 70.0F; 
+    if (player.rotationYaw > yaw + 70.0F)
+      player.rotationYaw = yaw + 70.0F; 
+    gltd.camera.rotationYaw = player.rotationYaw;
+    gltd.camera.rotationPitch = player.rotationPitch;
   }
   
   protected void onTick(boolean inGUI) {
     for (MCH_Key k : this.Keys)
       k.update(); 
     this.isBeforeRiding = this.isRiding;
-    EntityPlayerSP entityPlayerSP = this.mc.field_71439_g;
+    EntityPlayerSP entityPlayerSP = this.mc.player;
     MCH_ViewEntityDummy viewEntityDummy = null;
-    if (entityPlayerSP != null && entityPlayerSP.func_184187_bx() instanceof MCH_EntityGLTD) {
-      MCH_EntityGLTD gltd = (MCH_EntityGLTD)entityPlayerSP.func_184187_bx();
+    if (entityPlayerSP != null && entityPlayerSP.getRidingEntity() instanceof MCH_EntityGLTD) {
+      MCH_EntityGLTD gltd = (MCH_EntityGLTD)entityPlayerSP.getRidingEntity();
       updateGLTD((EntityPlayer)entityPlayerSP, gltd);
-      MCH_Lib.disableFirstPersonItemRender(entityPlayerSP.func_184614_ca());
-      viewEntityDummy = MCH_ViewEntityDummy.getInstance((World)this.mc.field_71441_e);
+      MCH_Lib.disableFirstPersonItemRender(entityPlayerSP.getHeldItemMainhand());
+      viewEntityDummy = MCH_ViewEntityDummy.getInstance((World)this.mc.world);
       viewEntityDummy.update(gltd.camera);
       if (!inGUI)
         playerControl((EntityPlayer)entityPlayerSP, gltd); 
@@ -89,9 +89,9 @@ public class MCH_ClientGLTDTickHandler extends MCH_ClientTickHandlerBase {
     if (this.isBeforeRiding != this.isRiding)
       if (this.isRiding) {
         if (viewEntityDummy != null) {
-          viewEntityDummy.field_70169_q = viewEntityDummy.field_70165_t;
-          viewEntityDummy.field_70167_r = viewEntityDummy.field_70163_u;
-          viewEntityDummy.field_70166_s = viewEntityDummy.field_70161_v;
+          viewEntityDummy.prevPosX = viewEntityDummy.posX;
+          viewEntityDummy.prevPosY = viewEntityDummy.posY;
+          viewEntityDummy.prevPosZ = viewEntityDummy.posZ;
         } 
       } else {
         MCH_Lib.enableFirstPersonItemRender();

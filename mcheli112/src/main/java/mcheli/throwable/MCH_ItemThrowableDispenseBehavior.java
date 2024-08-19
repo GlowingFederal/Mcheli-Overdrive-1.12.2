@@ -12,25 +12,25 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 
 public class MCH_ItemThrowableDispenseBehavior extends BehaviorDefaultDispenseItem {
-  public ItemStack func_82487_b(IBlockSource bs, ItemStack itemStack) {
-    EnumFacing enumfacing = (EnumFacing)bs.func_189992_e().func_177229_b((IProperty)BlockDispenser.field_176441_a);
-    double x = bs.func_82615_a() + enumfacing.func_82601_c() * 2.0D;
-    double y = bs.func_82617_b() + enumfacing.func_96559_d() * 2.0D;
-    double z = bs.func_82616_c() + enumfacing.func_82599_e() * 2.0D;
-    if (itemStack.func_77973_b() instanceof MCH_ItemThrowable) {
-      MCH_ThrowableInfo info = MCH_ThrowableInfoManager.get(itemStack.func_77973_b());
+  public ItemStack dispenseStack(IBlockSource bs, ItemStack itemStack) {
+    EnumFacing enumfacing = (EnumFacing)bs.getBlockState().getValue((IProperty)BlockDispenser.FACING);
+    double x = bs.getX() + enumfacing.getFrontOffsetX() * 2.0D;
+    double y = bs.getY() + enumfacing.getFrontOffsetY() * 2.0D;
+    double z = bs.getZ() + enumfacing.getFrontOffsetZ() * 2.0D;
+    if (itemStack.getItem() instanceof MCH_ItemThrowable) {
+      MCH_ThrowableInfo info = MCH_ThrowableInfoManager.get(itemStack.getItem());
       if (info != null) {
-        bs.func_82618_k().func_184134_a(x, y, z, SoundEvents.field_187737_v, SoundCategory.BLOCKS, 0.5F, 0.4F / (
-            (bs.func_82618_k()).field_73012_v.nextFloat() * 0.4F + 0.8F), false);
-        if (!(bs.func_82618_k()).field_72995_K) {
-          MCH_Lib.DbgLog(bs.func_82618_k(), "MCH_ItemThrowableDispenseBehavior.dispenseStack(%s)", new Object[] { info.name });
-          MCH_EntityThrowable entity = new MCH_EntityThrowable(bs.func_82618_k(), x, y, z);
-          entity.field_70159_w = (enumfacing.func_82601_c() * info.dispenseAcceleration);
-          entity.field_70181_x = (enumfacing.func_96559_d() * info.dispenseAcceleration);
-          entity.field_70179_y = (enumfacing.func_82599_e() * info.dispenseAcceleration);
+        bs.getWorld().playSound(x, y, z, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.BLOCKS, 0.5F, 0.4F / (
+            (bs.getWorld()).rand.nextFloat() * 0.4F + 0.8F), false);
+        if (!(bs.getWorld()).isRemote) {
+          MCH_Lib.DbgLog(bs.getWorld(), "MCH_ItemThrowableDispenseBehavior.dispenseStack(%s)", new Object[] { info.name });
+          MCH_EntityThrowable entity = new MCH_EntityThrowable(bs.getWorld(), x, y, z);
+          entity.motionX = (enumfacing.getFrontOffsetX() * info.dispenseAcceleration);
+          entity.motionY = (enumfacing.getFrontOffsetY() * info.dispenseAcceleration);
+          entity.motionZ = (enumfacing.getFrontOffsetZ() * info.dispenseAcceleration);
           entity.setInfo(info);
-          bs.func_82618_k().func_72838_d((Entity)entity);
-          itemStack.func_77979_a(1);
+          bs.getWorld().spawnEntityInWorld((Entity)entity);
+          itemStack.splitStack(1);
         } 
       } 
     } 

@@ -20,7 +20,7 @@ public class MCH_RenderVehicle extends MCH_RenderAircraft<MCH_EntityVehicle> {
   
   public MCH_RenderVehicle(RenderManager renderManager) {
     super(renderManager);
-    this.field_76989_e = 2.0F;
+    this.shadowSize = 2.0F;
   }
   
   public void renderAircraft(MCH_EntityAircraft entity, double posX, double posY, double posZ, float yaw, float pitch, float roll, float tickTime) {
@@ -36,11 +36,11 @@ public class MCH_RenderVehicle extends MCH_RenderAircraft<MCH_EntityVehicle> {
     } 
     if (vehicle.getRiddenByEntity() != null && !vehicle.isDestroyed()) {
       vehicle.isUsedPlayer = true;
-      vehicle.lastRiderYaw = (vehicle.getRiddenByEntity()).field_70177_z;
-      vehicle.lastRiderPitch = (vehicle.getRiddenByEntity()).field_70125_A;
+      vehicle.lastRiderYaw = (vehicle.getRiddenByEntity()).rotationYaw;
+      vehicle.lastRiderPitch = (vehicle.getRiddenByEntity()).rotationPitch;
     } else if (!vehicle.isUsedPlayer) {
-      vehicle.lastRiderYaw = vehicle.field_70177_z;
-      vehicle.lastRiderPitch = vehicle.field_70125_A;
+      vehicle.lastRiderYaw = vehicle.rotationYaw;
+      vehicle.lastRiderPitch = vehicle.rotationPitch;
     } 
     posY += 0.3499999940395355D;
     renderDebugHitBox(vehicle, posX, posY, posZ, yaw, pitch);
@@ -70,7 +70,7 @@ public class MCH_RenderVehicle extends MCH_RenderAircraft<MCH_EntityVehicle> {
     } 
     int bkIndex = index;
     if (vp.rotPitch || vp.rotYaw || vp.type == 1) {
-      GL11.glTranslated(vp.pos.field_72450_a, vp.pos.field_72448_b, vp.pos.field_72449_c);
+      GL11.glTranslated(vp.pos.xCoord, vp.pos.yCoord, vp.pos.zCoord);
       if (vp.rotYaw)
         GL11.glRotatef(-vehicle.lastRiderYaw + yaw, 0.0F, 1.0F, 0.0F); 
       if (vp.rotPitch) {
@@ -79,7 +79,7 @@ public class MCH_RenderVehicle extends MCH_RenderAircraft<MCH_EntityVehicle> {
       } 
       if (vp.type == 1)
         GL11.glRotatef(rotBrl, 0.0F, 0.0F, -1.0F); 
-      GL11.glTranslated(-vp.pos.field_72450_a, -vp.pos.field_72448_b, -vp.pos.field_72449_c);
+      GL11.glTranslated(-vp.pos.xCoord, -vp.pos.yCoord, -vp.pos.zCoord);
     } 
     if (vp.type == 2)
       GL11.glTranslated(0.0D, 0.0D, (-vp.recoilBuf * recoilBuf)); 

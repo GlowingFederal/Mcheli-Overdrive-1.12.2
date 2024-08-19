@@ -175,7 +175,7 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
   
   public MCH_WeaponInfo(AddonResourceLocation location, String path) {
     super(location, path);
-    this.name = location.func_110623_a();
+    this.name = location.getResourcePath();
     this.displayName = this.name;
     this.type = "";
     this.power = 0;

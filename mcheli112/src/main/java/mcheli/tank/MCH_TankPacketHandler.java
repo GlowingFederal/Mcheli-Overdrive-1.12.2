@@ -14,19 +14,19 @@ import net.minecraftforge.fml.relauncher.Side;
 public class MCH_TankPacketHandler {
   @HandleSide({Side.SERVER})
   public static void onPacket_PlayerControl(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_TankPacketPlayerControl pc = new MCH_TankPacketPlayerControl();
     pc.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           MCH_EntityTank tank = null;
-          if (player.func_184187_bx() instanceof MCH_EntityTank) {
-            tank = (MCH_EntityTank)player.func_184187_bx();
-          } else if (player.func_184187_bx() instanceof MCH_EntitySeat) {
-            if (((MCH_EntitySeat)player.func_184187_bx()).getParent() instanceof MCH_EntityTank)
-              tank = (MCH_EntityTank)((MCH_EntitySeat)player.func_184187_bx()).getParent(); 
-          } else if (player.func_184187_bx() instanceof MCH_EntityUavStation) {
-            MCH_EntityUavStation uavStation = (MCH_EntityUavStation)player.func_184187_bx();
+          if (player.getRidingEntity() instanceof MCH_EntityTank) {
+            tank = (MCH_EntityTank)player.getRidingEntity();
+          } else if (player.getRidingEntity() instanceof MCH_EntitySeat) {
+            if (((MCH_EntitySeat)player.getRidingEntity()).getParent() instanceof MCH_EntityTank)
+              tank = (MCH_EntityTank)((MCH_EntitySeat)player.getRidingEntity()).getParent(); 
+          } else if (player.getRidingEntity() instanceof MCH_EntityUavStation) {
+            MCH_EntityUavStation uavStation = (MCH_EntityUavStation)player.getRidingEntity();
             if (uavStation.getControlAircract() instanceof MCH_EntityTank)
               tank = (MCH_EntityTank)uavStation.getControlAircract(); 
           } 
@@ -66,8 +66,8 @@ public class MCH_TankPacketHandler {
             if (ac.isPilot((Entity)player)) {
               ac.throttleUp = pc.throttleUp;
               ac.throttleDown = pc.throttleDown;
-              double dx = ac.field_70165_t - ac.field_70169_q;
-              double dz = ac.field_70161_v - ac.field_70166_s;
+              double dx = ac.posX - ac.prevPosX;
+              double dz = ac.posZ - ac.prevPosZ;
               double dist = dx * dx + dz * dz;
               if (pc.useBrake && ac.getCurrentThrottle() <= 0.03D && dist < 0.01D) {
                 ac.moveLeft = false;

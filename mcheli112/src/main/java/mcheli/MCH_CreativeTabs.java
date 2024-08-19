@@ -42,20 +42,20 @@ public class MCH_CreativeTabs extends CreativeTabs {
     } 
   }
   
-  public ItemStack func_78016_d() {
+  public ItemStack getTabIconItem() {
     if (this.iconItems.size() <= 0)
       return ItemStack.field_190927_a; 
     this.currentIconIndex = (this.currentIconIndex + 1) % this.iconItems.size();
     return this.iconItems.get(this.currentIconIndex);
   }
   
-  public ItemStack func_151244_d() {
+  public ItemStack getIconItemStack() {
     if (this.fixedItem != null)
       return new ItemStack(this.fixedItem, 1, 0); 
     if (this.switchItemWait > 0) {
       this.switchItemWait--;
     } else {
-      this.lastItem = func_78016_d();
+      this.lastItem = getTabIconItem();
       this.switchItemWait = 60;
     } 
     if (this.lastItem.func_190926_b())
@@ -64,20 +64,20 @@ public class MCH_CreativeTabs extends CreativeTabs {
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_78018_a(NonNullList<ItemStack> list) {
-    super.func_78018_a(list);
+  public void displayAllRelevantItems(NonNullList<ItemStack> list) {
+    super.displayAllRelevantItems(list);
     Comparator<ItemStack> cmp = new Comparator<ItemStack>() {
         public int compare(ItemStack i1, ItemStack i2) {
-          if (i1.func_77973_b() instanceof MCH_ItemAircraft && i2.func_77973_b() instanceof MCH_ItemAircraft) {
-            MCH_AircraftInfo info1 = ((MCH_ItemAircraft)i1.func_77973_b()).getAircraftInfo();
-            MCH_AircraftInfo info2 = ((MCH_ItemAircraft)i2.func_77973_b()).getAircraftInfo();
+          if (i1.getItem() instanceof MCH_ItemAircraft && i2.getItem() instanceof MCH_ItemAircraft) {
+            MCH_AircraftInfo info1 = ((MCH_ItemAircraft)i1.getItem()).getAircraftInfo();
+            MCH_AircraftInfo info2 = ((MCH_ItemAircraft)i2.getItem()).getAircraftInfo();
             if (info1 != null && info2 != null) {
               String s1 = info1.category + "." + info1.name;
               String s2 = info2.category + "." + info2.name;
               return s1.compareTo(s2);
             } 
           } 
-          return i1.func_77973_b().func_77658_a().compareTo(i2.func_77973_b().func_77658_a());
+          return i1.getItem().getUnlocalizedName().compareTo(i2.getItem().getUnlocalizedName());
         }
       };
     Collections.sort((List<ItemStack>)list, cmp);
@@ -88,7 +88,7 @@ public class MCH_CreativeTabs extends CreativeTabs {
       this.iconItems.add(new ItemStack(i)); 
   }
   
-  public String func_78024_c() {
+  public String getTranslatedTabLabel() {
     return "MC Heli";
   }
 }

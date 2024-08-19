@@ -24,7 +24,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class MCH_EntityHeli extends MCH_EntityAircraft {
-  private static final DataParameter<Byte> FOLD_STAT = EntityDataManager.func_187226_a(MCH_EntityHeli.class, DataSerializers.field_187191_a);
+  private static final DataParameter<Byte> FOLD_STAT = EntityDataManager.createKey(MCH_EntityHeli.class, DataSerializers.BYTE);
   
   private MCH_HeliInfo heliInfo;
   
@@ -45,15 +45,15 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
     this.prevRollFactor = 0.0F;
     this.heliInfo = null;
     this.currentSpeed = 0.07D;
-    this.field_70156_m = true;
-    func_70105_a(2.0F, 0.7F);
-    this.field_70159_w = 0.0D;
-    this.field_70181_x = 0.0D;
-    this.field_70179_y = 0.0D;
+    this.preventEntitySpawning = true;
+    setSize(2.0F, 0.7F);
+    this.motionX = 0.0D;
+    this.motionY = 0.0D;
+    this.motionZ = 0.0D;
     this.weapons = createWeapon(0);
     this.rotors = new MCH_Rotor[0];
     this.lastFoldBladeStat = -1;
-    if (this.field_70170_p.field_72995_K)
+    if (this.world.isRemote)
       this.foldBladesCooldown = 40; 
   }
   
@@ -70,7 +70,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
   }
   
   public void changeType(String type) {
-    MCH_Lib.DbgLog(this.field_70170_p, "MCH_EntityHeli.changeType " + type + " : " + toString(), new Object[0]);
+    MCH_Lib.DbgLog(this.world, "MCH_EntityHeli.changeType " + type + " : " + toString(), new Object[0]);
     if (!type.isEmpty())
       this.heliInfo = MCH_HeliInfoManager.get(type); 
     if (this.heliInfo == null) {
@@ -94,32 +94,32 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
     return MCH_Config.MountMinecartHeli.prmBool;
   }
   
-  protected void func_70088_a() {
-    super.func_70088_a();
-    this.field_70180_af.func_187214_a(FOLD_STAT, Byte.valueOf((byte)2));
+  protected void entityInit() {
+    super.entityInit();
+    this.dataManager.register(FOLD_STAT, Byte.valueOf((byte)2));
   }
   
-  protected void func_70014_b(NBTTagCompound par1NBTTagCompound) {
-    super.func_70014_b(par1NBTTagCompound);
-    par1NBTTagCompound.func_74780_a("RotorSpeed", getCurrentThrottle());
-    par1NBTTagCompound.func_74780_a("rotetionRotor", this.rotationRotor);
-    par1NBTTagCompound.func_74757_a("FoldBlade", (getFoldBladeStat() == 0));
+  protected void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {
+    super.writeEntityToNBT(par1NBTTagCompound);
+    par1NBTTagCompound.setDouble("RotorSpeed", getCurrentThrottle());
+    par1NBTTagCompound.setDouble("rotetionRotor", this.rotationRotor);
+    par1NBTTagCompound.setBoolean("FoldBlade", (getFoldBladeStat() == 0));
   }
   
-  protected void func_70037_a(NBTTagCompound par1NBTTagCompound) {
-    super.func_70037_a(par1NBTTagCompound);
+  protected void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
+    super.readEntityFromNBT(par1NBTTagCompound);
     boolean beforeFoldBlade = (getFoldBladeStat() == 0);
     if (getCommonUniqueId().isEmpty()) {
-      setCommonUniqueId(par1NBTTagCompound.func_74779_i("HeliUniqueId"));
+      setCommonUniqueId(par1NBTTagCompound.getString("HeliUniqueId"));
       MCH_Lib.Log((Entity)this, "# MCH_EntityHeli readEntityFromNBT() " + W_Entity.getEntityId((Entity)this) + ", " + getEntityName() + ", AircraftUniqueId=null, HeliUniqueId=" + getCommonUniqueId(), new Object[0]);
     } 
     if (getTypeName().isEmpty()) {
-      setTypeName(par1NBTTagCompound.func_74779_i("HeliType"));
+      setTypeName(par1NBTTagCompound.getString("HeliType"));
       MCH_Lib.Log((Entity)this, "# MCH_EntityHeli readEntityFromNBT() " + W_Entity.getEntityId((Entity)this) + ", " + getEntityName() + ", TypeName=null, HeliType=" + getTypeName(), new Object[0]);
     } 
-    setCurrentThrottle(par1NBTTagCompound.func_74769_h("RotorSpeed"));
-    this.rotationRotor = par1NBTTagCompound.func_74769_h("rotetionRotor");
-    setFoldBladeStat((byte)(par1NBTTagCompound.func_74767_n("FoldBlade") ? 0 : 2));
+    setCurrentThrottle(par1NBTTagCompound.getDouble("RotorSpeed"));
+    this.rotationRotor = par1NBTTagCompound.getDouble("rotetionRotor");
+    setFoldBladeStat((byte)(par1NBTTagCompound.getBoolean("FoldBlade") ? 0 : 2));
     if (this.heliInfo == null) {
       this.heliInfo = MCH_HeliInfoManager.get(getTypeName());
       if (this.heliInfo == null) {
@@ -149,9 +149,9 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
   }
   
   public float getUnfoldLandingGearThrottle() {
-    double x = this.field_70165_t - this.field_70169_q;
-    double y = this.field_70163_u - this.field_70167_r;
-    double z = this.field_70161_v - this.field_70166_s;
+    double x = this.posX - this.prevPosX;
+    double y = this.posY - this.prevPosY;
+    double z = this.posZ - this.prevPosZ;
     float s = (getAcInfo()).speed / 3.5F;
     return (x * x + y * y + z * z <= s) ? 0.8F : 0.3F;
   }
@@ -162,7 +162,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
     this.rotors = new MCH_Rotor[this.heliInfo.rotorList.size()];
     int i = 0;
     for (MCH_HeliInfo.Rotor r : this.heliInfo.rotorList) {
-      this.rotors[i] = new MCH_Rotor(r.bladeNum, r.bladeRot, this.field_70170_p.field_72995_K ? 2 : 2, (float)r.pos.field_72450_a, (float)r.pos.field_72448_b, (float)r.pos.field_72449_c, (float)r.rot.field_72450_a, (float)r.rot.field_72448_b, (float)r.rot.field_72449_c, r.haveFoldFunc);
+      this.rotors[i] = new MCH_Rotor(r.bladeNum, r.bladeRot, this.world.isRemote ? 2 : 2, (float)r.pos.xCoord, (float)r.pos.yCoord, (float)r.pos.zCoord, (float)r.rot.xCoord, (float)r.rot.yCoord, (float)r.rot.zCoord, r.haveFoldFunc);
       i++;
     } 
   }
@@ -231,19 +231,19 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
   }
   
   protected byte getFoldBladeStat() {
-    return ((Byte)this.field_70180_af.func_187225_a(FOLD_STAT)).byteValue();
+    return ((Byte)this.dataManager.get(FOLD_STAT)).byteValue();
   }
   
   public void setFoldBladeStat(byte b) {
-    if (!this.field_70170_p.field_72995_K)
+    if (!this.world.isRemote)
       if (b >= 0 && b <= 3)
-        this.field_70180_af.func_187227_b(FOLD_STAT, Byte.valueOf(b));  
+        this.dataManager.set(FOLD_STAT, Byte.valueOf(b));  
   }
   
   public boolean canSwitchGunnerMode() {
     if (super.canSwitchGunnerMode() && canUseBlades()) {
-      float roll = MathHelper.func_76135_e(MathHelper.func_76142_g(getRotRoll()));
-      float pitch = MathHelper.func_76135_e(MathHelper.func_76142_g(getRotPitch()));
+      float roll = MathHelper.abs(MathHelper.wrapDegrees(getRotRoll()));
+      float pitch = MathHelper.abs(MathHelper.wrapDegrees(getRotPitch()));
       if (roll < 40.0F && pitch < 40.0F)
         return true; 
     } 
@@ -252,8 +252,8 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
   
   public boolean canSwitchHoveringMode() {
     if (super.canSwitchHoveringMode() && canUseBlades()) {
-      float roll = MathHelper.func_76135_e(MathHelper.func_76142_g(getRotRoll()));
-      float pitch = MathHelper.func_76135_e(MathHelper.func_76142_g(getRotPitch()));
+      float roll = MathHelper.abs(MathHelper.wrapDegrees(getRotRoll()));
+      float pitch = MathHelper.abs(MathHelper.wrapDegrees(getRotPitch()));
       if (roll < 40.0F && pitch < 40.0F)
         return true; 
     } 
@@ -263,14 +263,14 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
   public void onUpdateAircraft() {
     if (this.heliInfo == null) {
       changeType(getTypeName());
-      this.field_70169_q = this.field_70165_t;
-      this.field_70167_r = this.field_70163_u;
-      this.field_70166_s = this.field_70161_v;
+      this.prevPosX = this.posX;
+      this.prevPosY = this.posY;
+      this.prevPosZ = this.posZ;
       return;
     } 
     if (!this.isRequestedSyncStatus) {
       this.isRequestedSyncStatus = true;
-      if (this.field_70170_p.field_72995_K) {
+      if (this.world.isRemote) {
         int stat = getFoldBladeStat();
         if (stat == 1 || stat == 0)
           forceFoldBlade(); 
@@ -283,11 +283,11 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
     onUpdate_Seats();
     onUpdate_Control();
     onUpdate_Rotor();
-    this.field_70169_q = this.field_70165_t;
-    this.field_70167_r = this.field_70163_u;
-    this.field_70166_s = this.field_70161_v;
+    this.prevPosX = this.posX;
+    this.prevPosY = this.posY;
+    this.prevPosZ = this.posZ;
     if (!isDestroyed() && isHovering())
-      if (MathHelper.func_76135_e(getRotPitch()) < 70.0F)
+      if (MathHelper.abs(getRotPitch()) < 70.0F)
         setRotPitch(getRotPitch() * 0.95F);  
     if (isDestroyed())
       if (getCurrentThrottle() > 0.0D) {
@@ -297,7 +297,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
           setCurrentThrottle(getCurrentThrottle() * 0.98D); 
       }  
     updateCameraViewers();
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       onUpdate_Client();
     } else {
       onUpdate_Server();
@@ -322,7 +322,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
   
   public float getRollFactor() {
     float roll = super.getRollFactor();
-    double d = func_70092_e(this.field_70169_q, this.field_70163_u, this.field_70166_s);
+    double d = getDistanceSq(this.prevPosX, this.posY, this.prevPosZ);
     double s = (getAcInfo()).speed;
     d = (s > 0.1D) ? (d / s) : 0.0D;
     float f = this.prevRollFactor;
@@ -371,7 +371,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
       if (this.moveRight && !this.moveLeft)
         setRotRoll(getRotRoll() + 1.2F * partialTicks); 
     } else {
-      if (MathHelper.func_76135_e(getRotPitch()) < 40.0F)
+      if (MathHelper.abs(getRotPitch()) < 40.0F)
         applyOnGroundPitch(0.97F); 
       if (this.heliInfo.isEnableFoldBlade && this.rotors.length > 0 && getFoldBladeStat() == 0 && !isDestroyed()) {
         if (this.moveLeft && !this.moveRight)
@@ -391,7 +391,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
       } else if (stat == 3) {
         unfoldBlades();
       } 
-      if (this.field_70170_p.field_72995_K)
+      if (this.world.isRemote)
         this.foldBladesCooldown = 40; 
       this.lastFoldBladeStat = stat;
     } else if (this.foldBladesCooldown > 0) {
@@ -428,11 +428,11 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
       } else {
         setCurrentThrottle(0.0D);
       } 
-      if (this.heliInfo.isEnableFoldBlade && this.rotors.length > 0 && getFoldBladeStat() == 0 && this.field_70122_E && 
+      if (this.heliInfo.isEnableFoldBlade && this.rotors.length > 0 && getFoldBladeStat() == 0 && this.onGround && 
         !isDestroyed())
         onUpdate_ControlFoldBladeAndOnGround(); 
     } 
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       if (!W_Lib.isClientPlayer(getRiddenByEntity())) {
         double ct = getThrottle();
         if (getCurrentThrottle() >= ct - 0.02D) {
@@ -465,7 +465,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
       } else {
         setCurrentThrottle(0.0D);
       } 
-    } else if (!this.field_70170_p.field_72995_K || W_Lib.isClientPlayer(getRiddenByEntity())) {
+    } else if (!this.world.isRemote || W_Lib.isClientPlayer(getRiddenByEntity())) {
       if (this.cs_heliAutoThrottleDown)
         if (getCurrentThrottle() > 0.52D) {
           addCurrentThrottle(-0.01D * throttleUpDown);
@@ -473,7 +473,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
           addCurrentThrottle(0.01D * throttleUpDown);
         }  
     } 
-    if (!this.field_70170_p.field_72995_K) {
+    if (!this.world.isRemote) {
       boolean move = false;
       float yaw = getRotYaw();
       double x = 0.0D;
@@ -493,8 +493,8 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
       if (move) {
         double f = 1.0D;
         double d = Math.sqrt(x * x + z * z);
-        this.field_70159_w -= x / d * 0.019999999552965164D * f * (getAcInfo()).speed;
-        this.field_70179_y += z / d * 0.019999999552965164D * f * (getAcInfo()).speed;
+        this.motionX -= x / d * 0.019999999552965164D * f * (getAcInfo()).speed;
+        this.motionZ += z / d * 0.019999999552965164D * f * (getAcInfo()).speed;
       } 
     } 
   }
@@ -505,7 +505,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
     } else {
       setCurrentThrottle(1.0D);
     } 
-    if (!this.field_70170_p.field_72995_K) {
+    if (!this.world.isRemote) {
       boolean move = false;
       float yaw = getRotYaw();
       double x = 0.0D;
@@ -536,14 +536,14 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
       } 
       if (move) {
         double d = Math.sqrt(x * x + z * z);
-        this.field_70159_w -= x / d * 0.009999999776482582D * (getAcInfo()).speed;
-        this.field_70179_y += z / d * 0.009999999776482582D * (getAcInfo()).speed;
+        this.motionX -= x / d * 0.009999999776482582D * (getAcInfo()).speed;
+        this.motionZ += z / d * 0.009999999776482582D * (getAcInfo()).speed;
       } 
     } 
   }
   
   protected void onUpdate_ControlFoldBladeAndOnGround() {
-    if (!this.field_70170_p.field_72995_K) {
+    if (!this.world.isRemote) {
       boolean move = false;
       float yaw = getRotYaw();
       double x = 0.0D;
@@ -562,14 +562,14 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
       } 
       if (move) {
         double d = Math.sqrt(x * x + z * z);
-        this.field_70159_w -= x / d * 0.029999999329447746D;
-        this.field_70179_y += z / d * 0.029999999329447746D;
+        this.motionX -= x / d * 0.029999999329447746D;
+        this.motionZ += z / d * 0.029999999329447746D;
       } 
     } 
   }
   
   protected void onUpdate_Particle2() {
-    if (!this.field_70170_p.field_72995_K)
+    if (!this.world.isRemote)
       return; 
     if (getHP() > getMaxHP() * 0.5D)
       return; 
@@ -585,34 +585,34 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
       float yaw = getRotYaw();
       float pitch = getRotPitch();
       Vec3d pos = MCH_Lib.RotVec3(rotor_pos, -yaw, -pitch, -getRotRoll());
-      double x = this.field_70165_t + pos.field_72450_a;
-      double y = this.field_70163_u + pos.field_72448_b;
-      double z = this.field_70161_v + pos.field_72449_c;
+      double x = this.posX + pos.xCoord;
+      double y = this.posY + pos.yCoord;
+      double z = this.posZ + pos.zCoord;
       if (this.isFirstDamageSmoke)
         this.prevDamageSmokePos[ri] = new Vec3d(x, y, z); 
       Vec3d prev = this.prevDamageSmokePos[ri];
-      double dx = x - prev.field_72450_a;
-      double dy = y - prev.field_72448_b;
-      double dz = z - prev.field_72449_c;
-      int num = (int)(MathHelper.func_76133_a(dx * dx + dy * dy + dz * dz) * 2.0F) + 1;
+      double dx = x - prev.xCoord;
+      double dy = y - prev.yCoord;
+      double dz = z - prev.zCoord;
+      int num = (int)(MathHelper.sqrt(dx * dx + dy * dy + dz * dz) * 2.0F) + 1;
       double i;
       for (i = 0.0D; i < num; i++) {
         double p = (getHP() / getMaxHP());
-        if (p < (this.field_70146_Z.nextFloat() / 2.0F)) {
-          float c = 0.2F + this.field_70146_Z.nextFloat() * 0.3F;
-          MCH_ParticleParam prm = new MCH_ParticleParam(this.field_70170_p, "smoke", prev.field_72450_a + (x - prev.field_72450_a) * i / num, prev.field_72448_b + (y - prev.field_72448_b) * i / num, prev.field_72449_c + (z - prev.field_72449_c) * i / num);
-          prm.motionX = (this.field_70146_Z.nextDouble() - 0.5D) * 0.3D;
-          prm.motionY = this.field_70146_Z.nextDouble() * 0.1D;
-          prm.motionZ = (this.field_70146_Z.nextDouble() - 0.5D) * 0.3D;
-          prm.size = (this.field_70146_Z.nextInt(5) + 5.0F) * 1.0F;
-          prm.setColor(0.7F + this.field_70146_Z.nextFloat() * 0.1F, c, c, c);
+        if (p < (this.rand.nextFloat() / 2.0F)) {
+          float c = 0.2F + this.rand.nextFloat() * 0.3F;
+          MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", prev.xCoord + (x - prev.xCoord) * i / num, prev.yCoord + (y - prev.yCoord) * i / num, prev.zCoord + (z - prev.zCoord) * i / num);
+          prm.motionX = (this.rand.nextDouble() - 0.5D) * 0.3D;
+          prm.motionY = this.rand.nextDouble() * 0.1D;
+          prm.motionZ = (this.rand.nextDouble() - 0.5D) * 0.3D;
+          prm.size = (this.rand.nextInt(5) + 5.0F) * 1.0F;
+          prm.setColor(0.7F + this.rand.nextFloat() * 0.1F, c, c, c);
           MCH_ParticlesUtil.spawnParticle(prm);
-          int ebi = this.field_70146_Z.nextInt(1 + this.extraBoundingBox.length);
+          int ebi = this.rand.nextInt(1 + this.extraBoundingBox.length);
           if (p < 0.3D && ebi > 0) {
             AxisAlignedBB bb = this.extraBoundingBox[ebi - 1].getBoundingBox();
-            double bx = (bb.field_72336_d + bb.field_72340_a) / 2.0D;
-            double by = (bb.field_72337_e + bb.field_72338_b) / 2.0D;
-            double bz = (bb.field_72334_f + bb.field_72339_c) / 2.0D;
+            double bx = (bb.maxX + bb.minX) / 2.0D;
+            double by = (bb.maxY + bb.minY) / 2.0D;
+            double bz = (bb.maxZ + bb.minZ) / 2.0D;
             prm.posX = bx;
             prm.posY = by;
             prm.posZ = bz;
@@ -628,19 +628,19 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
   protected void onUpdate_Client() {
     if (getRiddenByEntity() != null)
       if (W_Lib.isClientPlayer(getRiddenByEntity()))
-        (getRiddenByEntity()).field_70125_A = (getRiddenByEntity()).field_70127_C;  
+        (getRiddenByEntity()).rotationPitch = (getRiddenByEntity()).prevRotationPitch;  
     if (this.aircraftPosRotInc > 0) {
       applyServerPositionAndRotation();
     } else {
-      func_70107_b(this.field_70165_t + this.field_70159_w, this.field_70163_u + this.field_70181_x, this.field_70161_v + this.field_70179_y);
-      if (!isDestroyed() && (this.field_70122_E || MCH_Lib.getBlockIdY((Entity)this, 1, -2) > 0)) {
-        this.field_70159_w *= 0.95D;
-        this.field_70179_y *= 0.95D;
+      setPosition(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+      if (!isDestroyed() && (this.onGround || MCH_Lib.getBlockIdY((Entity)this, 1, -2) > 0)) {
+        this.motionX *= 0.95D;
+        this.motionZ *= 0.95D;
         applyOnGroundPitch(0.95F);
       } 
-      if (func_70090_H()) {
-        this.field_70159_w *= 0.99D;
-        this.field_70179_y *= 0.99D;
+      if (isInWater()) {
+        this.motionX *= 0.99D;
+        this.motionZ *= 0.99D;
       } 
     } 
     if (isDestroyed()) {
@@ -648,7 +648,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
         this.rotDestroyedYaw += 0.3F; 
       setRotYaw(getRotYaw() + this.rotDestroyedYaw * (float)getCurrentThrottle());
       if (MCH_Lib.getBlockIdY((Entity)this, 3, -3) == 0) {
-        if (MathHelper.func_76135_e(getRotPitch()) < 10.0F)
+        if (MathHelper.abs(getRotPitch()) < 10.0F)
           setRotPitch(getRotPitch() + this.rotDestroyedPitch); 
         setRotRoll(getRotRoll() + this.rotDestroyedRoll);
       } 
@@ -656,70 +656,70 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
     if (getRiddenByEntity() != null);
     onUpdate_ParticleSandCloud(false);
     onUpdate_Particle2();
-    updateCamera(this.field_70165_t, this.field_70163_u, this.field_70161_v);
+    updateCamera(this.posX, this.posY, this.posZ);
   }
   
   private void onUpdate_Server() {
-    double prevMotion = Math.sqrt(this.field_70159_w * this.field_70159_w + this.field_70179_y * this.field_70179_y);
+    double prevMotion = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
     float ogp = (getAcInfo()).onGroundPitch;
     if (!isHovering()) {
       double dp = 0.0D;
       if (canFloatWater())
         dp = getWaterDepth(); 
       if (dp == 0.0D) {
-        this.field_70181_x += (!func_70090_H() ? (getAcInfo()).gravity : (getAcInfo()).gravityInWater);
+        this.motionY += (!isInWater() ? (getAcInfo()).gravity : (getAcInfo()).gravityInWater);
         float yaw = getRotYaw() / 180.0F * 3.1415927F;
         float pitch = getRotPitch();
         if (MCH_Lib.getBlockIdY((Entity)this, 3, -3) > 0)
           pitch -= ogp; 
-        this.field_70159_w += 0.1D * MathHelper.func_76126_a(yaw) * this.currentSpeed * -(pitch * pitch * pitch / 20000.0F) * 
+        this.motionX += 0.1D * MathHelper.sin(yaw) * this.currentSpeed * -(pitch * pitch * pitch / 20000.0F) * 
           getCurrentThrottle();
-        this.field_70179_y += 0.1D * MathHelper.func_76134_b(yaw) * this.currentSpeed * (pitch * pitch * pitch / 20000.0F) * 
+        this.motionZ += 0.1D * MathHelper.cos(yaw) * this.currentSpeed * (pitch * pitch * pitch / 20000.0F) * 
           getCurrentThrottle();
         double y = 0.0D;
-        if (MathHelper.func_76135_e(getRotPitch()) + MathHelper.func_76135_e(getRotRoll() * 0.9F) <= 40.0F)
+        if (MathHelper.abs(getRotPitch()) + MathHelper.abs(getRotRoll() * 0.9F) <= 40.0F)
           y = 1.0D - y / 40.0D; 
         double throttle = getCurrentThrottle();
         if (isDestroyed())
           throttle *= -0.65D; 
-        this.field_70181_x += (y * 0.025D + 0.03D) * throttle;
+        this.motionY += (y * 0.025D + 0.03D) * throttle;
       } else {
-        if (MathHelper.func_76135_e(getRotPitch()) < 40.0F) {
+        if (MathHelper.abs(getRotPitch()) < 40.0F) {
           float pitch = getRotPitch();
           pitch -= ogp;
           pitch *= 0.9F;
           pitch += ogp;
           setRotPitch(pitch);
         } 
-        if (MathHelper.func_76135_e(getRotRoll()) < 40.0F)
+        if (MathHelper.abs(getRotRoll()) < 40.0F)
           setRotRoll(getRotRoll() * 0.9F); 
         if (dp < 1.0D) {
-          this.field_70181_x -= 1.0E-4D;
-          this.field_70181_x += 0.007D * getCurrentThrottle();
+          this.motionY -= 1.0E-4D;
+          this.motionY += 0.007D * getCurrentThrottle();
         } else {
-          if (this.field_70181_x < 0.0D)
-            this.field_70181_x *= 0.7D; 
-          this.field_70181_x += 0.007D;
+          if (this.motionY < 0.0D)
+            this.motionY *= 0.7D; 
+          this.motionY += 0.007D;
         } 
       } 
     } else {
-      if (this.field_70146_Z.nextInt(50) == 0)
-        this.field_70159_w += (this.field_70146_Z.nextDouble() - 0.5D) / 30.0D; 
-      if (this.field_70146_Z.nextInt(50) == 0)
-        this.field_70181_x += (this.field_70146_Z.nextDouble() - 0.5D) / 50.0D; 
-      if (this.field_70146_Z.nextInt(50) == 0)
-        this.field_70179_y += (this.field_70146_Z.nextDouble() - 0.5D) / 30.0D; 
+      if (this.rand.nextInt(50) == 0)
+        this.motionX += (this.rand.nextDouble() - 0.5D) / 30.0D; 
+      if (this.rand.nextInt(50) == 0)
+        this.motionY += (this.rand.nextDouble() - 0.5D) / 50.0D; 
+      if (this.rand.nextInt(50) == 0)
+        this.motionZ += (this.rand.nextDouble() - 0.5D) / 30.0D; 
     } 
-    double motion = Math.sqrt(this.field_70159_w * this.field_70159_w + this.field_70179_y * this.field_70179_y);
+    double motion = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
     float speedLimit = (getAcInfo()).speed;
     if (motion > speedLimit) {
-      this.field_70159_w *= speedLimit / motion;
-      this.field_70179_y *= speedLimit / motion;
+      this.motionX *= speedLimit / motion;
+      this.motionZ *= speedLimit / motion;
       motion = speedLimit;
     } 
     if (isDestroyed()) {
-      this.field_70159_w *= 0.0D;
-      this.field_70179_y *= 0.0D;
+      this.motionX *= 0.0D;
+      this.motionZ *= 0.0D;
       this.currentSpeed = 0.0D;
     } 
     if (motion > prevMotion && this.currentSpeed < speedLimit) {
@@ -731,26 +731,26 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
       if (this.currentSpeed < 0.07D)
         this.currentSpeed = 0.07D; 
     } 
-    if (this.field_70122_E) {
-      this.field_70159_w *= 0.5D;
-      this.field_70179_y *= 0.5D;
-      if (MathHelper.func_76135_e(getRotPitch()) < 40.0F) {
+    if (this.onGround) {
+      this.motionX *= 0.5D;
+      this.motionZ *= 0.5D;
+      if (MathHelper.abs(getRotPitch()) < 40.0F) {
         float pitch = getRotPitch();
         pitch -= ogp;
         pitch *= 0.9F;
         pitch += ogp;
         setRotPitch(pitch);
       } 
-      if (MathHelper.func_76135_e(getRotRoll()) < 40.0F)
+      if (MathHelper.abs(getRotRoll()) < 40.0F)
         setRotRoll(getRotRoll() * 0.9F); 
     } 
-    func_70091_d(MoverType.SELF, this.field_70159_w, this.field_70181_x, this.field_70179_y);
-    this.field_70181_x *= 0.95D;
-    this.field_70159_w *= 0.99D;
-    this.field_70179_y *= 0.99D;
-    func_70101_b(getRotYaw(), getRotPitch());
+    moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+    this.motionY *= 0.95D;
+    this.motionX *= 0.99D;
+    this.motionZ *= 0.99D;
+    setRotation(getRotYaw(), getRotPitch());
     onUpdate_updateBlock();
-    if (getRiddenByEntity() != null && (getRiddenByEntity()).field_70128_L)
+    if (getRiddenByEntity() != null && (getRiddenByEntity()).isDead)
       unmountEntity(); 
   }
 }

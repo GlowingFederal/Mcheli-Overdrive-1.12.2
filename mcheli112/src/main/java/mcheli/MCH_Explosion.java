@@ -14,17 +14,17 @@ public class MCH_Explosion {
   }
   
   public static ExplosionResult newExplosion(World w, @Nullable Entity entityExploded, @Nullable Entity player, double x, double y, double z, float size, float sizeBlock, boolean playSound, boolean isSmoking, boolean isFlaming, boolean isDestroyBlock, int countSetFireEntity, MCH_DamageFactor df) {
-    if (w.field_72995_K)
+    if (w.isRemote)
       return null; 
-    MCH_ExplosionV2 exp = new MCH_ExplosionV2(w, entityExploded, player, x, y, z, size, isFlaming, w.func_82736_K().func_82766_b("mobGriefing"));
+    MCH_ExplosionV2 exp = new MCH_ExplosionV2(w, entityExploded, player, x, y, z, size, isFlaming, w.getGameRules().getBoolean("mobGriefing"));
     exp.isDestroyBlock = isDestroyBlock;
     exp.explosionSizeBlock = sizeBlock;
     exp.countSetFireEntity = countSetFireEntity;
     exp.isPlaySound = playSound;
     exp.isInWater = false;
     exp.damageFactor = df;
-    exp.func_77278_a();
-    exp.func_77279_a(false);
+    exp.doExplosionA();
+    exp.doExplosionB(false);
     MCH_PacketEffectExplosion.ExplosionParam param = MCH_PacketEffectExplosion.create();
     param.exploderID = W_Entity.getEntityId(entityExploded);
     param.posX = x;
@@ -32,24 +32,24 @@ public class MCH_Explosion {
     param.posZ = z;
     param.size = size;
     param.inWater = false;
-    param.setAffectedPositions(exp.func_180343_e());
+    param.setAffectedPositions(exp.getAffectedBlockPositions());
     MCH_PacketEffectExplosion.send(param);
     return exp.getResult();
   }
   
   @Nullable
   public static ExplosionResult newExplosionInWater(World w, @Nullable Entity entityExploded, @Nullable Entity player, double x, double y, double z, float size, float sizeBlock, boolean playSound, boolean isSmoking, boolean isFlaming, boolean isDestroyBlock, int countSetFireEntity, MCH_DamageFactor df) {
-    if (w.field_72995_K)
+    if (w.isRemote)
       return null; 
-    MCH_ExplosionV2 exp = new MCH_ExplosionV2(w, entityExploded, player, x, y, z, size, isFlaming, w.func_82736_K().func_82766_b("mobGriefing"));
+    MCH_ExplosionV2 exp = new MCH_ExplosionV2(w, entityExploded, player, x, y, z, size, isFlaming, w.getGameRules().getBoolean("mobGriefing"));
     exp.isDestroyBlock = isDestroyBlock;
     exp.explosionSizeBlock = sizeBlock;
     exp.countSetFireEntity = countSetFireEntity;
     exp.isPlaySound = playSound;
     exp.isInWater = true;
     exp.damageFactor = df;
-    exp.func_77278_a();
-    exp.func_77279_a(false);
+    exp.doExplosionA();
+    exp.doExplosionB(false);
     MCH_PacketEffectExplosion.ExplosionParam param = MCH_PacketEffectExplosion.create();
     param.exploderID = W_Entity.getEntityId(entityExploded);
     param.posX = x;
@@ -57,7 +57,7 @@ public class MCH_Explosion {
     param.posZ = z;
     param.size = size;
     param.inWater = true;
-    param.setAffectedPositions(exp.func_180343_e());
+    param.setAffectedPositions(exp.getAffectedBlockPositions());
     MCH_PacketEffectExplosion.send(param);
     return exp.getResult();
   }

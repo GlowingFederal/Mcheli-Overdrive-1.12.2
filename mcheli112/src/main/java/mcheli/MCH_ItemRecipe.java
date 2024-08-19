@@ -196,9 +196,9 @@ public class MCH_ItemRecipe implements MCH_IRecipeList {
       MCH_Utils.logger().warn(e.getMessage() + ", name:" + name);
       return null;
     } 
-    for (int k = 0; k < r.field_77574_d.size(); k++) {
-      if (r.field_77574_d.get(k) != Ingredient.field_193370_a)
-        if (Arrays.<ItemStack>stream(((Ingredient)r.field_77574_d.get(k)).func_193365_a()).anyMatch(stack -> (stack.func_77973_b() == null)))
+    for (int k = 0; k < r.recipeItems.size(); k++) {
+      if (r.recipeItems.get(k) != Ingredient.field_193370_a)
+        if (Arrays.<ItemStack>stream(((Ingredient)r.recipeItems.get(k)).func_193365_a()).anyMatch(stack -> (stack.getItem() == null)))
           throw new RuntimeException("Error: Invalid ShapedRecipes! " + item + " : " + data);  
     } 
     return (IRecipe)r;
@@ -247,9 +247,9 @@ public class MCH_ItemRecipe implements MCH_IRecipeList {
     for (int i = 0; i < recipe.length; i++)
       recipe[i] = rcp.get(i); 
     ShapelessRecipes r = getShapelessRecipe(new ItemStack(item, createNum), recipe);
-    for (int j = 0; j < r.field_77579_b.size(); j++) {
-      Ingredient ingredient = (Ingredient)r.field_77579_b.get(j);
-      if (Arrays.<ItemStack>stream(ingredient.func_193365_a()).anyMatch(stack -> (stack.func_77973_b() == null)))
+    for (int j = 0; j < r.recipeItems.size(); j++) {
+      Ingredient ingredient = (Ingredient)r.recipeItems.get(j);
+      if (Arrays.<ItemStack>stream(ingredient.func_193365_a()).anyMatch(stack -> (stack.getItem() == null)))
         throw new RuntimeException("Error: Invalid ShapelessRecipes! " + item + " : " + data); 
     } 
     MCH_Recipes.register(name, (IRecipe)r);
@@ -263,7 +263,7 @@ public class MCH_ItemRecipe implements MCH_IRecipeList {
     for (int j = 0; j < i; j++) {
       Object object1 = aobject[j];
       if (object1 instanceof ItemStack) {
-        list.add(Ingredient.func_193369_a(new ItemStack[] { ((ItemStack)object1).func_77946_l() }));
+        list.add(Ingredient.func_193369_a(new ItemStack[] { ((ItemStack)object1).copy() }));
       } else if (object1 instanceof Item) {
         list.add(Ingredient.func_193369_a(new ItemStack[] { new ItemStack((Item)object1) }));
       } else {

@@ -45,7 +45,7 @@ public class MCH_SoundUpdater extends W_SoundUpdater {
     } 
     MCH_AircraftInfo info = this.theAircraft.getAcInfo();
     boolean isBeforeMoving = this.isMoving;
-    boolean isDead = this.theAircraft.field_70128_L;
+    boolean isDead = this.theAircraft.isDead;
     if (isDead || (!this.silent && this.aircraftVolume == 0.0F)) {
       if (isDead)
         stopEntitySound((Entity)this.theAircraft); 
@@ -71,7 +71,7 @@ public class MCH_SoundUpdater extends W_SoundUpdater {
       this.aircraftVolume = info.soundVolume * this.theAircraft.getSoundVolume();
       this.aircraftPitch = info.soundPitch * this.theAircraft.getSoundPitch();
       if (!isRide) {
-        double dist = this.thePlayer.func_70011_f(this.theAircraft.field_70165_t, this.thePlayer.field_70163_u, this.theAircraft.field_70161_v);
+        double dist = this.thePlayer.getDistance(this.theAircraft.posX, this.thePlayer.posY, this.theAircraft.posZ);
         double pitch = this.prevDist - dist;
         if (Math.abs(pitch) > 0.3D) {
           this.addPitch = (float)(this.addPitch + pitch / 40.0D);
@@ -103,12 +103,12 @@ public class MCH_SoundUpdater extends W_SoundUpdater {
       if (isRide) {
         updateSoundLocation((Entity)this.theAircraft);
       } else {
-        double px = this.thePlayer.field_70165_t;
-        double py = this.thePlayer.field_70163_u;
-        double pz = this.thePlayer.field_70161_v;
-        double dx = this.theAircraft.field_70165_t - px;
-        double dy = this.theAircraft.field_70163_u - py;
-        double dz = this.theAircraft.field_70161_v - pz;
+        double px = this.thePlayer.posX;
+        double py = this.thePlayer.posY;
+        double pz = this.thePlayer.posZ;
+        double dx = this.theAircraft.posX - px;
+        double dy = this.theAircraft.posY - py;
+        double dz = this.theAircraft.posZ - pz;
         double dist = info.soundRange / 16.0D;
         dx /= dist;
         dy /= dist;

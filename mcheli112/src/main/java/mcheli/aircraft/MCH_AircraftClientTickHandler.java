@@ -136,7 +136,7 @@ public abstract class MCH_AircraftClientTickHandler extends MCH_ClientTickHandle
         playSoundNG();
       } 
     } 
-    if (this.KeyUnmount.isKeyDown() && !ac.isDestroyed() && ac.func_70302_i_() > 0 && !isPilot)
+    if (this.KeyUnmount.isKeyDown() && !ac.isDestroyed() && ac.getSizeInventory() > 0 && !isPilot)
       MCH_PacketIndOpenScreen.send(3); 
     if (isPilot) {
       if (this.KeyUnmount.isKeyDown()) {
@@ -153,7 +153,7 @@ public abstract class MCH_AircraftClientTickHandler extends MCH_ClientTickHandle
           send = true;
         } 
       } else if (this.KeyDownFromRack.isKeyDown()) {
-        if (ac.func_184187_bx() != null) {
+        if (ac.getRidingEntity() != null) {
           pc.isUnmount = 3;
           send = true;
         } else if (ac.canDownFromRack()) {
@@ -187,8 +187,8 @@ public abstract class MCH_AircraftClientTickHandler extends MCH_ClientTickHandle
         send |= this.KeyBrake.isKeyDown();
         pc.throttleDown = ac.throttleDown = false;
         pc.throttleUp = ac.throttleUp = false;
-        double dx = ac.field_70165_t - ac.field_70169_q;
-        double dz = ac.field_70161_v - ac.field_70166_s;
+        double dx = ac.posX - ac.prevPosX;
+        double dz = ac.posZ - ac.prevPosZ;
         double dist = dx * dx + dz * dz;
         if (ac.getCurrentThrottle() <= 0.03D && dist < 0.01D) {
           pc.moveRight = ac.moveRight = false;
@@ -236,12 +236,12 @@ public abstract class MCH_AircraftClientTickHandler extends MCH_ClientTickHandle
           pc.useWeapon = true;
           pc.useWeaponOption1 = ac.getCurrentWeapon((Entity)player).getLastUsedOptionParameter1();
           pc.useWeaponOption2 = ac.getCurrentWeapon((Entity)player).getLastUsedOptionParameter2();
-          pc.useWeaponPosX = ac.field_70169_q;
-          pc.useWeaponPosY = ac.field_70167_r;
-          pc.useWeaponPosZ = ac.field_70166_s;
+          pc.useWeaponPosX = ac.prevPosX;
+          pc.useWeaponPosY = ac.prevPosY;
+          pc.useWeaponPosZ = ac.prevPosZ;
           send = true;
         } 
       }  
-    return (send || player.field_70173_aa % 100 == 0);
+    return (send || player.ticksExisted % 100 == 0);
   }
 }

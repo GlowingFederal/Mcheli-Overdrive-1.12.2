@@ -21,7 +21,7 @@ public class MCH_PacketTitle extends MCH_Packet {
   
   public void readData(ByteArrayDataInput data) {
     try {
-      this.chatComponent = ITextComponent.Serializer.func_150699_a(data.readUTF());
+      this.chatComponent = ITextComponent.Serializer.jsonToComponent(data.readUTF());
       this.showTime = data.readShort();
       this.position = data.readShort();
     } catch (Exception e) {
@@ -31,7 +31,7 @@ public class MCH_PacketTitle extends MCH_Packet {
   
   public void writeData(DataOutputStream dos) {
     try {
-      dos.writeUTF(ITextComponent.Serializer.func_150696_a(this.chatComponent));
+      dos.writeUTF(ITextComponent.Serializer.componentToJson(this.chatComponent));
       dos.writeShort(this.showTime);
       dos.writeShort(this.position);
     } catch (IOException e) {

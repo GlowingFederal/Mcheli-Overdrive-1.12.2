@@ -9,8 +9,8 @@ import org.lwjgl.opengl.GL11;
 @Deprecated
 public class MCH_ItemAircraftRender implements _IItemRenderer {
   public boolean handleRenderType(ItemStack item, _IItemRenderer.ItemRenderType type) {
-    if (item != null && item.func_77973_b() instanceof MCH_ItemAircraft) {
-      MCH_AircraftInfo info = ((MCH_ItemAircraft)item.func_77973_b()).getAircraftInfo();
+    if (item != null && item.getItem() instanceof MCH_ItemAircraft) {
+      MCH_AircraftInfo info = ((MCH_ItemAircraft)item.getItem()).getAircraftInfo();
       if (info == null)
         return false; 
       if (info != null && info.name.equalsIgnoreCase("mh-60l_dap"))

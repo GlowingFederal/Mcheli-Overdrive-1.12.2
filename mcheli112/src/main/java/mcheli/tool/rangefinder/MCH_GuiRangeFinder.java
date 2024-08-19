@@ -20,11 +20,11 @@ public class MCH_GuiRangeFinder extends MCH_Gui {
     super(minecraft);
   }
   
-  public void func_73866_w_() {
-    super.func_73866_w_();
+  public void initGui() {
+    super.initGui();
   }
   
-  public boolean func_73868_f() {
+  public boolean doesGuiPauseGame() {
     return false;
   }
   
@@ -51,21 +51,21 @@ public class MCH_GuiRangeFinder extends MCH_Gui {
     GL11.glBlendFunc(770, 771);
     W_McClient.MOD_bindTexture("textures/gui/rangefinder.png");
     double size = 512.0D;
-    while (size < this.field_146294_l || size < this.field_146295_m)
+    while (size < this.width || size < this.height)
       size *= 2.0D; 
-    drawTexturedModalRectRotate(-(size - this.field_146294_l) / 2.0D, -(size - this.field_146295_m) / 2.0D, size, size, 0.0D, 0.0D, 256.0D, 256.0D, 0.0F);
+    drawTexturedModalRectRotate(-(size - this.width) / 2.0D, -(size - this.height) / 2.0D, size, size, 0.0D, 0.0D, 256.0D, 256.0D, 0.0F);
     GL11.glBlendFunc(srcBlend, dstBlend);
     GL11.glDisable(3042);
     double factor = size / 512.0D;
     double SCALE_FACTOR = scaleFactor * factor;
-    double CX = (this.field_146297_k.field_71443_c / 2);
-    double CY = (this.field_146297_k.field_71440_d / 2);
+    double CX = (this.mc.displayWidth / 2);
+    double CY = (this.mc.displayHeight / 2);
     double px = (CX - 80.0D * SCALE_FACTOR) / SCALE_FACTOR;
     double py = (CY + 55.0D * SCALE_FACTOR) / SCALE_FACTOR;
     GL11.glPushMatrix();
     GL11.glScaled(factor, factor, factor);
-    ItemStack item = player.func_184614_ca();
-    int damage = (int)((item.func_77958_k() - item.func_77960_j()) / item.func_77958_k() * 100.0D);
+    ItemStack item = player.getHeldItemMainhand();
+    int damage = (int)((item.getMaxDamage() - item.getMetadata()) / item.getMaxDamage() * 100.0D);
     drawDigit(String.format("%3d", new Object[] { Integer.valueOf(damage) }), (int)px, (int)py, 13, (damage > 0) ? -15663328 : -61424);
     if (damage <= 0) {
       drawString("Please craft", (int)px + 40, (int)py + 0, -65536);
@@ -73,12 +73,12 @@ public class MCH_GuiRangeFinder extends MCH_Gui {
     } 
     px = (CX - 20.0D * SCALE_FACTOR) / SCALE_FACTOR;
     if (damage > 0) {
-      Vec3d vs = new Vec3d(player.field_70165_t, player.field_70163_u + player.func_70047_e(), player.field_70161_v);
-      Vec3d ve = MCH_Lib.Rot2Vec3(player.field_70177_z, player.field_70125_A);
-      ve = vs.func_72441_c(ve.field_72450_a * 300.0D, ve.field_72448_b * 300.0D, ve.field_72449_c * 300.0D);
-      RayTraceResult mop = player.field_70170_p.func_72901_a(vs, ve, true);
-      if (mop != null && mop.field_72313_a != RayTraceResult.Type.MISS) {
-        int range = (int)player.func_70011_f(mop.field_72307_f.field_72450_a, mop.field_72307_f.field_72448_b, mop.field_72307_f.field_72449_c);
+      Vec3d vs = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+      Vec3d ve = MCH_Lib.Rot2Vec3(player.rotationYaw, player.rotationPitch);
+      ve = vs.addVector(ve.xCoord * 300.0D, ve.yCoord * 300.0D, ve.zCoord * 300.0D);
+      RayTraceResult mop = player.world.rayTraceBlocks(vs, ve, true);
+      if (mop != null && mop.typeOfHit != RayTraceResult.Type.MISS) {
+        int range = (int)player.getDistance(mop.hitVec.xCoord, mop.hitVec.yCoord, mop.hitVec.zCoord);
         drawDigit(String.format("%4d", new Object[] { Integer.valueOf(range) }), (int)px, (int)py, 13, -15663328);
       } else {
         drawDigit(String.format("----", new Object[0]), (int)px, (int)py, 13, -61424);
@@ -86,8 +86,8 @@ public class MCH_GuiRangeFinder extends MCH_Gui {
     } 
     py -= 4.0D;
     px -= 80.0D;
-    func_73734_a((int)px, (int)py, (int)px + 30, (int)py + 2, -15663328);
-    func_73734_a((int)px, (int)py, (int)px + MCH_ItemRangeFinder.rangeFinderUseCooldown / 2, (int)py + 2, -61424);
+    drawRect((int)px, (int)py, (int)px + 30, (int)py + 2, -15663328);
+    drawRect((int)px, (int)py, (int)px + MCH_ItemRangeFinder.rangeFinderUseCooldown / 2, (int)py + 2, -61424);
     drawString(String.format("x%.1f", new Object[] { Float.valueOf(MCH_ItemRangeFinder.zoom) }), (int)px, (int)py - 20, -1);
     px += 130.0D;
     int mode = MCH_ItemRangeFinder.mode;

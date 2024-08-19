@@ -39,15 +39,15 @@ public class MCH_MultiplayClient {
   private static MCH_OStream dataOutputStream;
   
   public static void startSendImageData() {
-    Minecraft mc = Minecraft.func_71410_x();
-    sendScreenShot(mc.field_71443_c, mc.field_71440_d, mc.func_147110_a());
+    Minecraft mc = Minecraft.getMinecraft();
+    sendScreenShot(mc.displayWidth, mc.displayHeight, mc.getFramebuffer());
   }
   
   public static void sendScreenShot(int displayWidth, int displayHeight, Framebuffer framebufferMc) {
     try {
-      if (OpenGlHelper.func_148822_b()) {
-        displayWidth = framebufferMc.field_147622_a;
-        displayHeight = framebufferMc.field_147620_b;
+      if (OpenGlHelper.isFramebufferEnabled()) {
+        displayWidth = framebufferMc.framebufferTextureWidth;
+        displayHeight = framebufferMc.framebufferTextureHeight;
       } 
       int k = displayWidth * displayHeight;
       if (pixelBuffer == null || pixelBuffer.capacity() < k) {
@@ -57,21 +57,21 @@ public class MCH_MultiplayClient {
       GL11.glPixelStorei(3333, 1);
       GL11.glPixelStorei(3317, 1);
       pixelBuffer.clear();
-      if (OpenGlHelper.func_148822_b()) {
-        GL11.glBindTexture(3553, framebufferMc.field_147617_g);
+      if (OpenGlHelper.isFramebufferEnabled()) {
+        GL11.glBindTexture(3553, framebufferMc.framebufferTexture);
         GL11.glGetTexImage(3553, 0, 32993, 33639, pixelBuffer);
       } else {
         GL11.glReadPixels(0, 0, displayWidth, displayHeight, 32993, 33639, pixelBuffer);
       } 
       pixelBuffer.get(pixelValues);
-      TextureUtil.func_147953_a(pixelValues, displayWidth, displayHeight);
+      TextureUtil.processPixelValues(pixelValues, displayWidth, displayHeight);
       BufferedImage bufferedimage = null;
-      if (OpenGlHelper.func_148822_b()) {
-        bufferedimage = new BufferedImage(framebufferMc.field_147621_c, framebufferMc.field_147618_d, 1);
-        int l = framebufferMc.field_147620_b - framebufferMc.field_147618_d;
-        for (int i1 = l; i1 < framebufferMc.field_147620_b; i1++) {
-          for (int j1 = 0; j1 < framebufferMc.field_147621_c; j1++)
-            bufferedimage.setRGB(j1, i1 - l, pixelValues[i1 * framebufferMc.field_147622_a + j1]); 
+      if (OpenGlHelper.isFramebufferEnabled()) {
+        bufferedimage = new BufferedImage(framebufferMc.framebufferWidth, framebufferMc.framebufferHeight, 1);
+        int l = framebufferMc.framebufferTextureHeight - framebufferMc.framebufferHeight;
+        for (int i1 = l; i1 < framebufferMc.framebufferTextureHeight; i1++) {
+          for (int j1 = 0; j1 < framebufferMc.framebufferWidth; j1++)
+            bufferedimage.setRGB(j1, i1 - l, pixelValues[i1 * framebufferMc.framebufferTextureWidth + j1]); 
         } 
       } else {
         bufferedimage = new BufferedImage(displayWidth, displayHeight, 1);
@@ -133,9 +133,9 @@ public class MCH_MultiplayClient {
       for (String s : CoreModManager.getReparseableCoremods())
         modList.add(s); 
     } 
-    Minecraft mc = Minecraft.func_71410_x();
+    Minecraft mc = Minecraft.getMinecraft();
     MCH_FileSearch search = new MCH_FileSearch();
-    File[] files = search.listFiles((new File(mc.field_71412_D, "mods")).getAbsolutePath(), "*.jar");
+    File[] files = search.listFiles((new File(mc.mcDataDir, "mods")).getAbsolutePath(), "*.jar");
     modList.add(TextFormatting.YELLOW + "=== Manifest ===");
     for (File file : files) {
       try {
@@ -167,7 +167,7 @@ public class MCH_MultiplayClient {
       } 
     } 
     search = new MCH_FileSearch();
-    files = search.listFiles((new File(mc.field_71412_D, "mods")).getAbsolutePath(), "*.litemod");
+    files = search.listFiles((new File(mc.mcDataDir, "mods")).getAbsolutePath(), "*.litemod");
     modList.add(TextFormatting.LIGHT_PURPLE + "=== LiteLoader ===");
     for (File file : files) {
       try {

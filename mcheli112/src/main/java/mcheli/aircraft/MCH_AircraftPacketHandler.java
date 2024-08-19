@@ -21,27 +21,27 @@ import net.minecraftforge.fml.relauncher.Side;
 public class MCH_AircraftPacketHandler {
   @HandleSide({Side.SERVER})
   public static void onPacketIndRotation(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player == null || player.field_70170_p.field_72995_K)
+    if (player == null || player.world.isRemote)
       return; 
     MCH_PacketIndRotation req = new MCH_PacketIndRotation();
     req.readData(data);
     if (req.entityID_Ac <= 0)
       return; 
-    scheduler.func_152344_a(() -> {
-          Entity e = player.field_70170_p.func_73045_a(req.entityID_Ac);
+    scheduler.addScheduledTask(() -> {
+          Entity e = player.world.getEntityByID(req.entityID_Ac);
           if (e instanceof MCH_EntityAircraft) {
             MCH_EntityAircraft ac = (MCH_EntityAircraft)e;
             ac.setRotRoll(req.roll);
             if (req.rollRev) {
-              MCH_Lib.DbgLog(ac.field_70170_p, "onPacketIndRotation Error:req.rollRev y=%.2f, p=%.2f, r=%.2f", new Object[] { Float.valueOf(req.yaw), Float.valueOf(req.pitch), Float.valueOf(req.roll) });
+              MCH_Lib.DbgLog(ac.world, "onPacketIndRotation Error:req.rollRev y=%.2f, p=%.2f, r=%.2f", new Object[] { Float.valueOf(req.yaw), Float.valueOf(req.pitch), Float.valueOf(req.roll) });
               if (ac.getRiddenByEntity() != null) {
-                (ac.getRiddenByEntity()).field_70177_z = req.yaw;
-                (ac.getRiddenByEntity()).field_70126_B = req.yaw;
+                (ac.getRiddenByEntity()).rotationYaw = req.yaw;
+                (ac.getRiddenByEntity()).prevRotationYaw = req.yaw;
               } 
               for (int sid = 0; sid < ac.getSeatNum(); sid++) {
                 Entity entity = ac.getEntityBySeatId(1 + sid);
                 if (entity != null)
-                  entity.field_70177_z += (entity.field_70177_z <= 0.0F) ? 180.0F : -180.0F; 
+                  entity.rotationYaw += (entity.rotationYaw <= 0.0F) ? 180.0F : -180.0F; 
               } 
             } 
             ac.setRotYaw(req.yaw);
@@ -53,34 +53,34 @@ public class MCH_AircraftPacketHandler {
   @Deprecated
   @HandleSide({Side.SERVER})
   public static void onPacketOnMountEntity(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player == null || !player.field_70170_p.field_72995_K)
+    if (player == null || !player.world.isRemote)
       return; 
     MCH_PacketNotifyOnMountEntity req = new MCH_PacketNotifyOnMountEntity();
     req.readData(data);
-    scheduler.func_152344_a(() -> {
-          MCH_Lib.DbgLog(player.field_70170_p, "onPacketOnMountEntity.rcv:%d, %d, %d, %d", new Object[] { Integer.valueOf(W_Entity.getEntityId((Entity)player)), Integer.valueOf(req.entityID_Ac), Integer.valueOf(req.entityID_rider), Integer.valueOf(req.seatID) });
+    scheduler.addScheduledTask(() -> {
+          MCH_Lib.DbgLog(player.world, "onPacketOnMountEntity.rcv:%d, %d, %d, %d", new Object[] { Integer.valueOf(W_Entity.getEntityId((Entity)player)), Integer.valueOf(req.entityID_Ac), Integer.valueOf(req.entityID_rider), Integer.valueOf(req.seatID) });
           if (req.entityID_Ac <= 0)
             return; 
           if (req.entityID_rider <= 0)
             return; 
           if (req.seatID < 0)
             return; 
-          Entity e = player.field_70170_p.func_73045_a(req.entityID_Ac);
+          Entity e = player.world.getEntityByID(req.entityID_Ac);
           if (e instanceof MCH_EntityAircraft)
-            MCH_Lib.DbgLog(player.field_70170_p, "onPacketOnMountEntity:" + W_Entity.getEntityId((Entity)player), new Object[0]); 
+            MCH_Lib.DbgLog(player.world, "onPacketOnMountEntity:" + W_Entity.getEntityId((Entity)player), new Object[0]); 
         });
   }
   
   @HandleSide({Side.CLIENT})
   public static void onPacketNotifyAmmoNum(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player == null || !player.field_70170_p.field_72995_K)
+    if (player == null || !player.world.isRemote)
       return; 
     MCH_PacketNotifyAmmoNum status = new MCH_PacketNotifyAmmoNum();
     status.readData(data);
     if (status.entityID_Ac <= 0)
       return; 
-    scheduler.func_152344_a(() -> {
-          Entity e = player.field_70170_p.func_73045_a(status.entityID_Ac);
+    scheduler.addScheduledTask(() -> {
+          Entity e = player.world.getEntityByID(status.entityID_Ac);
           if (e instanceof MCH_EntityAircraft) {
             MCH_EntityAircraft ac = (MCH_EntityAircraft)e;
             String msg = "onPacketNotifyAmmoNum:";
@@ -94,14 +94,14 @@ public class MCH_AircraftPacketHandler {
                 msg = msg + ", [" + status.ammo[i] + "/" + status.restAmmo[i] + "]";
                 i++;
               } 
-              MCH_Lib.DbgLog(e.field_70170_p, msg, new Object[0]);
+              MCH_Lib.DbgLog(e.world, msg, new Object[0]);
             } else if (status.weaponID < ac.getWeaponNum()) {
               msg = msg + "All=false, WeaponID=" + status.weaponID + ", " + status.ammo[0] + ", " + status.restAmmo[0];
               ac.getWeapon(status.weaponID).setAmmoNum(status.ammo[0]);
               ac.getWeapon(status.weaponID).setRestAllAmmoNum(status.restAmmo[0]);
-              MCH_Lib.DbgLog(e.field_70170_p, msg, new Object[0]);
+              MCH_Lib.DbgLog(e.world, msg, new Object[0]);
             } else {
-              MCH_Lib.DbgLog(e.field_70170_p, "Error:" + status.weaponID, new Object[0]);
+              MCH_Lib.DbgLog(e.world, "Error:" + status.weaponID, new Object[0]);
             } 
           } 
         });
@@ -109,14 +109,14 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.SERVER})
   public static void onPacketStatusRequest(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_PacketStatusRequest req = new MCH_PacketStatusRequest();
     req.readData(data);
     if (req.entityID_AC <= 0)
       return; 
-    scheduler.func_152344_a(() -> {
-          Entity e = player.field_70170_p.func_73045_a(req.entityID_AC);
+    scheduler.addScheduledTask(() -> {
+          Entity e = player.world.getEntityByID(req.entityID_AC);
           if (e instanceof MCH_EntityAircraft)
             MCH_PacketStatusResponse.sendStatus((MCH_EntityAircraft)e, player); 
         });
@@ -124,14 +124,14 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.SERVER})
   public static void onPacketIndNotifyAmmoNum(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_PacketIndNotifyAmmoNum req = new MCH_PacketIndNotifyAmmoNum();
     req.readData(data);
     if (req.entityID_Ac <= 0)
       return; 
-    scheduler.func_152344_a(() -> {
-          Entity e = player.field_70170_p.func_73045_a(req.entityID_Ac);
+    scheduler.addScheduledTask(() -> {
+          Entity e = player.world.getEntityByID(req.entityID_Ac);
           if (e instanceof MCH_EntityAircraft)
             if (req.weaponID >= 0) {
               MCH_PacketNotifyAmmoNum.sendAmmoNum((MCH_EntityAircraft)e, player, req.weaponID);
@@ -143,17 +143,17 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.SERVER})
   public static void onPacketIndReload(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_PacketIndReload ind = new MCH_PacketIndReload();
     ind.readData(data);
     if (ind.entityID_Ac <= 0)
       return; 
-    scheduler.func_152344_a(() -> {
-          Entity e = player.field_70170_p.func_73045_a(ind.entityID_Ac);
+    scheduler.addScheduledTask(() -> {
+          Entity e = player.world.getEntityByID(ind.entityID_Ac);
           if (e instanceof MCH_EntityAircraft) {
             MCH_EntityAircraft ac = (MCH_EntityAircraft)e;
-            MCH_Lib.DbgLog(e.field_70170_p, "onPacketIndReload :%s", new Object[] { (ac.getAcInfo()).displayName });
+            MCH_Lib.DbgLog(e.world, "onPacketIndReload :%s", new Object[] { (ac.getAcInfo()).displayName });
             ac.supplyAmmo(ind.weaponID);
           } 
         });
@@ -161,15 +161,15 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.CLIENT})
   public static void onPacketStatusResponse(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (!player.field_70170_p.field_72995_K)
+    if (!player.world.isRemote)
       return; 
     MCH_PacketStatusResponse status = new MCH_PacketStatusResponse();
     status.readData(data);
     if (status.entityID_AC <= 0)
       return; 
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           String msg = "onPacketStatusResponse:EID=" + status.entityID_AC + ":";
-          Entity e = player.field_70170_p.func_73045_a(status.entityID_AC);
+          Entity e = player.world.getEntityByID(status.entityID_AC);
           if (e instanceof MCH_EntityAircraft) {
             MCH_EntityAircraft ac = (MCH_EntityAircraft)e;
             if (status.seatNum > 0 && status.weaponIDs != null && status.weaponIDs.length == status.seatNum) {
@@ -188,14 +188,14 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.CLIENT})
   public static void onPacketNotifyWeaponID(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (!player.field_70170_p.field_72995_K)
+    if (!player.world.isRemote)
       return; 
     MCH_PacketNotifyWeaponID status = new MCH_PacketNotifyWeaponID();
     status.readData(data);
     if (status.entityID_Ac <= 0)
       return; 
-    scheduler.func_152344_a(() -> {
-          Entity e = player.field_70170_p.func_73045_a(status.entityID_Ac);
+    scheduler.addScheduledTask(() -> {
+          Entity e = player.world.getEntityByID(status.entityID_Ac);
           if (e instanceof MCH_EntityAircraft) {
             MCH_EntityAircraft ac = (MCH_EntityAircraft)e;
             if (ac.isValidSeatID(status.seatID)) {
@@ -215,15 +215,15 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.CLIENT})
   public static void onPacketNotifyHitBullet(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (!player.field_70170_p.field_72995_K)
+    if (!player.world.isRemote)
       return; 
     MCH_PacketNotifyHitBullet status = new MCH_PacketNotifyHitBullet();
     status.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           if (status.entityID_Ac <= 0) {
             MCH_MOD.proxy.hitBullet();
           } else {
-            Entity e = player.field_70170_p.func_73045_a(status.entityID_Ac);
+            Entity e = player.world.getEntityByID(status.entityID_Ac);
             if (e instanceof MCH_EntityAircraft)
               ((MCH_EntityAircraft)e).hitBullet(); 
           } 
@@ -232,14 +232,14 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.SERVER})
   public static void onPacketSeatListRequest(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_PacketSeatListRequest req = new MCH_PacketSeatListRequest();
     req.readData(data);
     if (req.entityID_AC <= 0)
       return; 
-    scheduler.func_152344_a(() -> {
-          Entity e = player.field_70170_p.func_73045_a(req.entityID_AC);
+    scheduler.addScheduledTask(() -> {
+          Entity e = player.world.getEntityByID(req.entityID_AC);
           if (e instanceof MCH_EntityAircraft)
             MCH_PacketSeatListResponse.sendSeatList((MCH_EntityAircraft)e, player); 
         });
@@ -247,19 +247,19 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.CLIENT})
   public static void onPacketNotifyTVMissileEntity(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K) {
+    if (player.world.isRemote) {
       MCH_PacketNotifyTVMissileEntity packet = new MCH_PacketNotifyTVMissileEntity();
       packet.readData(data);
       if (packet.entityID_Ac <= 0)
         return; 
       if (packet.entityID_TVMissile <= 0)
         return; 
-      scheduler.func_152344_a(() -> {
-            Entity e = player.field_70170_p.func_73045_a(packet.entityID_Ac);
+      scheduler.addScheduledTask(() -> {
+            Entity e = player.world.getEntityByID(packet.entityID_Ac);
             if (e == null || !(e instanceof MCH_EntityAircraft))
               return; 
             MCH_EntityAircraft ac = (MCH_EntityAircraft)e;
-            e = player.field_70170_p.func_73045_a(packet.entityID_TVMissile);
+            e = player.world.getEntityByID(packet.entityID_TVMissile);
             if (e == null || !(e instanceof MCH_EntityTvMissile))
               return; 
             ((MCH_EntityTvMissile)e).shootingEntity = (Entity)player;
@@ -270,19 +270,19 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.CLIENT})
   public static void onPacketSeatListResponse(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (!player.field_70170_p.field_72995_K)
+    if (!player.world.isRemote)
       return; 
     MCH_PacketSeatListResponse seatList = new MCH_PacketSeatListResponse();
     seatList.readData(data);
     if (seatList.entityID_AC <= 0)
       return; 
-    scheduler.func_152344_a(() -> {
-          Entity e = player.field_70170_p.func_73045_a(seatList.entityID_AC);
+    scheduler.addScheduledTask(() -> {
+          Entity e = player.world.getEntityByID(seatList.entityID_AC);
           if (e instanceof MCH_EntityAircraft) {
             MCH_EntityAircraft ac = (MCH_EntityAircraft)e;
             if (seatList.seatNum > 0 && seatList.seatNum == (ac.getSeats()).length && seatList.seatEntityID != null && seatList.seatEntityID.length == seatList.seatNum)
               for (int i = 0; i < seatList.seatNum; i++) {
-                Entity entity = player.field_70170_p.func_73045_a(seatList.seatEntityID[i]);
+                Entity entity = player.world.getEntityByID(seatList.seatEntityID[i]);
                 if (entity instanceof MCH_EntitySeat) {
                   MCH_EntitySeat seat = (MCH_EntitySeat)entity;
                   seat.seatID = i;
@@ -297,14 +297,14 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.SERVER})
   public static void onPacket_PlayerControl(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_PacketSeatPlayerControl pc = new MCH_PacketSeatPlayerControl();
     pc.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           MCH_EntityAircraft ac = null;
-          if (player.func_184187_bx() instanceof MCH_EntitySeat) {
-            MCH_EntitySeat seat = (MCH_EntitySeat)player.func_184187_bx();
+          if (player.getRidingEntity() instanceof MCH_EntitySeat) {
+            MCH_EntitySeat seat = (MCH_EntitySeat)player.getRidingEntity();
             ac = seat.getParent();
           } else {
             ac = MCH_EntityAircraft.getAircraft_RiddenOrControl((Entity)player);
@@ -315,7 +315,7 @@ public class MCH_AircraftPacketHandler {
             ac.unmountEntityFromSeat((Entity)player);
           } else if (pc.switchSeat > 0) {
             if (pc.switchSeat == 3) {
-              player.func_184210_p();
+              player.dismountRidingEntity();
               ac.keepOnRideRotation = true;
               ac.processInitialInteract(player, true, EnumHand.MAIN_HAND);
             } 
@@ -331,11 +331,11 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.SERVER})
   public static void onPacket_ClientSetting(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_PacketNotifyClientSetting pc = new MCH_PacketNotifyClientSetting();
     pc.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           MCH_EntityAircraft ac = MCH_EntityAircraft.getAircraft_RiddenOrControl((Entity)player);
           if (ac != null) {
             int sid = ac.getSeatIdByEntity((Entity)player);
@@ -352,19 +352,19 @@ public class MCH_AircraftPacketHandler {
   
   @HandleSide({Side.SERVER})
   public static void onPacketNotifyInfoReloaded(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_PacketNotifyInfoReloaded pc = new MCH_PacketNotifyInfoReloaded();
     pc.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           MCH_EntityAircraft ac;
           switch (pc.type) {
             case 0:
               ac = MCH_EntityAircraft.getAircraft_RiddenOrControl((Entity)player);
               if (ac != null && ac.getAcInfo() != null) {
                 String name = (ac.getAcInfo()).name;
-                for (WorldServer world : (MCH_Utils.getServer()).field_71305_c) {
-                  List<Entity> list = world.field_72996_f;
+                for (WorldServer world : (MCH_Utils.getServer()).worldServers) {
+                  List<Entity> list = world.loadedEntityList;
                   for (int i = 0; i < list.size(); i++) {
                     if (list.get(i) instanceof MCH_EntityAircraft) {
                       ac = (MCH_EntityAircraft)list.get(i);
@@ -380,8 +380,8 @@ public class MCH_AircraftPacketHandler {
               break;
             case 1:
               ContentRegistries.weapon().reloadAll();
-              for (WorldServer world : (MCH_Utils.getServer()).field_71305_c) {
-                List<Entity> list = world.field_72996_f;
+              for (WorldServer world : (MCH_Utils.getServer()).worldServers) {
+                List<Entity> list = world.loadedEntityList;
                 for (int i = 0; i < list.size(); i++) {
                   if (list.get(i) instanceof MCH_EntityAircraft) {
                     ac = (MCH_EntityAircraft)list.get(i);

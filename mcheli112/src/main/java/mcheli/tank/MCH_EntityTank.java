@@ -62,14 +62,14 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     super(world);
     this.tankInfo = null;
     this.currentSpeed = 0.07D;
-    this.field_70156_m = true;
-    func_70105_a(2.0F, 0.7F);
-    this.field_70159_w = 0.0D;
-    this.field_70181_x = 0.0D;
-    this.field_70179_y = 0.0D;
+    this.preventEntitySpawning = true;
+    setSize(2.0F, 0.7F);
+    this.motionX = 0.0D;
+    this.motionY = 0.0D;
+    this.motionZ = 0.0D;
     this.weapons = createWeapon(0);
     this.soundVolume = 0.0F;
-    this.field_70138_W = 0.6F;
+    this.stepHeight = 0.6F;
     this.rotationRotor = 0.0F;
     this.prevRotationRotor = 0.0F;
     this.WheelMng = new MCH_WheelManager(this);
@@ -89,19 +89,19 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   }
   
   public void changeType(String type) {
-    MCH_Lib.DbgLog(this.field_70170_p, "MCH_EntityTank.changeType " + type + " : " + toString(), new Object[0]);
+    MCH_Lib.DbgLog(this.world, "MCH_EntityTank.changeType " + type + " : " + toString(), new Object[0]);
     if (!type.isEmpty())
       this.tankInfo = MCH_TankInfoManager.get(type); 
     if (this.tankInfo == null) {
       MCH_Lib.Log((Entity)this, "##### MCH_EntityTank changeTankType() Tank info null %d, %s, %s", new Object[] { Integer.valueOf(W_Entity.getEntityId((Entity)this)), type, getEntityName() });
-      func_70106_y();
+      setDead();
     } else {
       setAcInfo(this.tankInfo);
       newSeats(getAcInfo().getNumSeatAndRack());
       switchFreeLookModeClient((getAcInfo()).defaultFreelook);
       this.weapons = createWeapon(1 + getSeatNum());
       initPartRotation(getRotYaw(), getRotPitch());
-      this.WheelMng.createWheels(this.field_70170_p, (getAcInfo()).wheels, new Vec3d(0.0D, -0.35D, 
+      this.WheelMng.createWheels(this.world, (getAcInfo()).wheels, new Vec3d(0.0D, -0.35D, 
             (getTankInfo()).weightedCenterZ));
     } 
   }
@@ -115,40 +115,40 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     return MCH_Config.MountMinecartTank.prmBool;
   }
   
-  protected void func_70088_a() {
-    super.func_70088_a();
+  protected void entityInit() {
+    super.entityInit();
   }
   
   public float getGiveDamageRot() {
     return 91.0F;
   }
   
-  protected void func_70014_b(NBTTagCompound par1NBTTagCompound) {
-    super.func_70014_b(par1NBTTagCompound);
+  protected void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {
+    super.writeEntityToNBT(par1NBTTagCompound);
   }
   
-  protected void func_70037_a(NBTTagCompound par1NBTTagCompound) {
-    super.func_70037_a(par1NBTTagCompound);
+  protected void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
+    super.readEntityFromNBT(par1NBTTagCompound);
     if (this.tankInfo == null) {
       this.tankInfo = MCH_TankInfoManager.get(getTypeName());
       if (this.tankInfo == null) {
         MCH_Lib.Log((Entity)this, "##### MCH_EntityTank readEntityFromNBT() Tank info null %d, %s", new Object[] { Integer.valueOf(W_Entity.getEntityId((Entity)this)), getEntityName() });
-        func_70106_y();
+        setDead();
       } else {
         setAcInfo(this.tankInfo);
       } 
     } 
   }
   
-  public void func_70106_y() {
-    super.func_70106_y();
+  public void setDead() {
+    super.setDead();
   }
   
   public void onInteractFirst(EntityPlayer player) {
     this.addkeyRotValue = 0.0F;
-    player.field_70759_as = player.field_70758_at = getLastRiderYaw();
-    player.field_70126_B = player.field_70177_z = getLastRiderYaw();
-    player.field_70125_A = getLastRiderPitch();
+    player.rotationYawHead = player.prevRotationYawHead = getLastRiderYaw();
+    player.prevRotationYaw = player.rotationYaw = getLastRiderYaw();
+    player.rotationPitch = getLastRiderPitch();
   }
   
   public boolean canSwitchGunnerMode() {
@@ -160,14 +160,14 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   public void onUpdateAircraft() {
     if (this.tankInfo == null) {
       changeType(getTypeName());
-      this.field_70169_q = this.field_70165_t;
-      this.field_70167_r = this.field_70163_u;
-      this.field_70166_s = this.field_70161_v;
+      this.prevPosX = this.posX;
+      this.prevPosY = this.posY;
+      this.prevPosZ = this.posZ;
       return;
     } 
     if (!this.isRequestedSyncStatus) {
       this.isRequestedSyncStatus = true;
-      if (this.field_70170_p.field_72995_K)
+      if (this.world.isRemote)
         MCH_PacketStatusRequest.requestStatus(this); 
     } 
     if (this.lastRiddenByEntity == null && getRiddenByEntity() != null)
@@ -185,9 +185,9 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       this.rotationRotor += 360.0F;
       this.prevRotationRotor += 360.0F;
     } 
-    this.field_70169_q = this.field_70165_t;
-    this.field_70167_r = this.field_70163_u;
-    this.field_70166_s = this.field_70161_v;
+    this.prevPosX = this.posX;
+    this.prevPosY = this.posY;
+    this.prevPosZ = this.posZ;
     if (isDestroyed())
       if (getCurrentThrottle() > 0.0D) {
         if (MCH_Lib.getBlockIdY((Entity)this, 3, -2) > 0)
@@ -196,7 +196,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
           setCurrentThrottle(getCurrentThrottle() * 0.98D); 
       }  
     updateCameraViewers();
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       onUpdate_Client();
     } else {
       onUpdate_Server();
@@ -204,12 +204,12 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   }
   
   @SideOnly(Side.CLIENT)
-  public boolean func_90999_ad() {
-    return (isDestroyed() || super.func_90999_ad());
+  public boolean canRenderOnFire() {
+    return (isDestroyed() || super.canRenderOnFire());
   }
   
   public void updateExtraBoundingBox() {
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       super.updateExtraBoundingBox();
     } else if (getCountOnUpdate() <= 1) {
       super.updateExtraBoundingBox();
@@ -219,8 +219,8 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   
   public ClacAxisBB calculateXOffset(List<AxisAlignedBB> list, AxisAlignedBB bb, double x) {
     for (int j5 = 0; j5 < list.size(); j5++)
-      x = ((AxisAlignedBB)list.get(j5)).func_72316_a(bb, x); 
-    return new ClacAxisBB(x, bb.func_72317_d(x, 0.0D, 0.0D));
+      x = ((AxisAlignedBB)list.get(j5)).calculateXOffset(bb, x); 
+    return new ClacAxisBB(x, bb.offset(x, 0.0D, 0.0D));
   }
   
   public ClacAxisBB calculateYOffset(List<AxisAlignedBB> list, AxisAlignedBB bb, double y) {
@@ -229,53 +229,53 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   
   public ClacAxisBB calculateYOffset(List<AxisAlignedBB> list, AxisAlignedBB calcBB, AxisAlignedBB offsetBB, double y) {
     for (int k = 0; k < list.size(); k++)
-      y = ((AxisAlignedBB)list.get(k)).func_72323_b(calcBB, y); 
-    return new ClacAxisBB(y, offsetBB.func_72317_d(0.0D, y, 0.0D));
+      y = ((AxisAlignedBB)list.get(k)).calculateYOffset(calcBB, y); 
+    return new ClacAxisBB(y, offsetBB.offset(0.0D, y, 0.0D));
   }
   
   public ClacAxisBB calculateZOffset(List<AxisAlignedBB> list, AxisAlignedBB bb, double z) {
     for (int k5 = 0; k5 < list.size(); k5++)
-      z = ((AxisAlignedBB)list.get(k5)).func_72322_c(bb, z); 
-    return new ClacAxisBB(z, bb.func_72317_d(0.0D, 0.0D, z));
+      z = ((AxisAlignedBB)list.get(k5)).calculateZOffset(bb, z); 
+    return new ClacAxisBB(z, bb.offset(0.0D, 0.0D, z));
   }
   
-  public void func_70091_d(MoverType type, double x, double y, double z) {
-    this.field_70170_p.field_72984_F.func_76320_a("move");
+  public void moveEntity(MoverType type, double x, double y, double z) {
+    this.world.theProfiler.startSection("move");
     double d2 = x;
     double d3 = y;
     double d4 = z;
-    List<AxisAlignedBB> list1 = getCollisionBoxes((Entity)this, func_174813_aQ().func_72321_a(x, y, z));
-    AxisAlignedBB axisalignedbb = func_174813_aQ();
+    List<AxisAlignedBB> list1 = getCollisionBoxes((Entity)this, getEntityBoundingBox().addCoord(x, y, z));
+    AxisAlignedBB axisalignedbb = getEntityBoundingBox();
     if (y != 0.0D) {
-      ClacAxisBB v = calculateYOffset(list1, func_174813_aQ(), y);
+      ClacAxisBB v = calculateYOffset(list1, getEntityBoundingBox(), y);
       y = v.value;
-      func_174826_a(v.bb);
+      setEntityBoundingBox(v.bb);
     } 
-    boolean flag = (this.field_70122_E || (d3 != y && d3 < 0.0D));
+    boolean flag = (this.onGround || (d3 != y && d3 < 0.0D));
     for (MCH_BoundingBox ebb : this.extraBoundingBox)
-      ebb.updatePosition(this.field_70165_t, this.field_70163_u, this.field_70161_v, getRotYaw(), getRotPitch(), getRotRoll()); 
+      ebb.updatePosition(this.posX, this.posY, this.posZ, getRotYaw(), getRotPitch(), getRotRoll()); 
     if (x != 0.0D) {
-      ClacAxisBB v = calculateXOffset(list1, func_174813_aQ(), x);
+      ClacAxisBB v = calculateXOffset(list1, getEntityBoundingBox(), x);
       x = v.value;
       if (x != 0.0D)
-        func_174826_a(v.bb); 
+        setEntityBoundingBox(v.bb); 
     } 
     if (z != 0.0D) {
-      ClacAxisBB v = calculateZOffset(list1, func_174813_aQ(), z);
+      ClacAxisBB v = calculateZOffset(list1, getEntityBoundingBox(), z);
       z = v.value;
       if (z != 0.0D)
-        func_174826_a(v.bb); 
+        setEntityBoundingBox(v.bb); 
     } 
-    if (this.field_70138_W > 0.0F && flag && (d2 != x || d4 != z)) {
+    if (this.stepHeight > 0.0F && flag && (d2 != x || d4 != z)) {
       double d14 = x;
       double d6 = y;
       double d7 = z;
-      AxisAlignedBB axisalignedbb1 = func_174813_aQ();
-      func_174826_a(axisalignedbb);
-      y = this.field_70138_W;
-      List<AxisAlignedBB> list = getCollisionBoxes((Entity)this, func_174813_aQ().func_72321_a(d2, y, d4));
-      AxisAlignedBB axisalignedbb2 = func_174813_aQ();
-      AxisAlignedBB axisalignedbb3 = axisalignedbb2.func_72321_a(d2, 0.0D, d4);
+      AxisAlignedBB axisalignedbb1 = getEntityBoundingBox();
+      setEntityBoundingBox(axisalignedbb);
+      y = this.stepHeight;
+      List<AxisAlignedBB> list = getCollisionBoxes((Entity)this, getEntityBoundingBox().addCoord(d2, y, d4));
+      AxisAlignedBB axisalignedbb2 = getEntityBoundingBox();
+      AxisAlignedBB axisalignedbb3 = axisalignedbb2.addCoord(d2, 0.0D, d4);
       double d8 = y;
       ClacAxisBB v = calculateYOffset(list, axisalignedbb3, axisalignedbb2, d8);
       d8 = v.value;
@@ -288,7 +288,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       v = calculateZOffset(list, axisalignedbb2, d19);
       d19 = v.value;
       axisalignedbb2 = v.bb;
-      AxisAlignedBB axisalignedbb4 = func_174813_aQ();
+      AxisAlignedBB axisalignedbb4 = getEntityBoundingBox();
       double d20 = y;
       v = calculateYOffset(list, axisalignedbb4, d20);
       d20 = v.value;
@@ -307,61 +307,61 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
         x = d18;
         z = d19;
         y = -d8;
-        func_174826_a(axisalignedbb2);
+        setEntityBoundingBox(axisalignedbb2);
       } else {
         x = d21;
         z = d22;
         y = -d20;
-        func_174826_a(axisalignedbb4);
+        setEntityBoundingBox(axisalignedbb4);
       } 
-      v = calculateYOffset(list, func_174813_aQ(), y);
+      v = calculateYOffset(list, getEntityBoundingBox(), y);
       y = v.value;
-      func_174826_a(v.bb);
+      setEntityBoundingBox(v.bb);
       if (d14 * d14 + d7 * d7 >= x * x + z * z) {
         x = d14;
         y = d6;
         z = d7;
-        func_174826_a(axisalignedbb1);
+        setEntityBoundingBox(axisalignedbb1);
       } 
     } 
-    this.field_70170_p.field_72984_F.func_76319_b();
-    this.field_70170_p.field_72984_F.func_76320_a("rest");
-    func_174829_m();
-    this.field_70123_F = (d2 != x || d4 != z);
-    this.field_70124_G = (d3 != y);
-    this.field_70122_E = (this.field_70124_G && d3 < 0.0D);
-    this.field_70132_H = (this.field_70123_F || this.field_70124_G);
-    int j6 = MathHelper.func_76128_c(this.field_70165_t);
-    int i1 = MathHelper.func_76128_c(this.field_70163_u - 0.20000000298023224D);
-    int k6 = MathHelper.func_76128_c(this.field_70161_v);
+    this.world.theProfiler.endSection();
+    this.world.theProfiler.startSection("rest");
+    resetPositionToBB();
+    this.isCollidedHorizontally = (d2 != x || d4 != z);
+    this.isCollidedVertically = (d3 != y);
+    this.onGround = (this.isCollidedVertically && d3 < 0.0D);
+    this.isCollided = (this.isCollidedHorizontally || this.isCollidedVertically);
+    int j6 = MathHelper.floor(this.posX);
+    int i1 = MathHelper.floor(this.posY - 0.20000000298023224D);
+    int k6 = MathHelper.floor(this.posZ);
     BlockPos blockpos = new BlockPos(j6, i1, k6);
-    IBlockState iblockstate = this.field_70170_p.func_180495_p(blockpos);
-    if (iblockstate.func_185904_a() == Material.field_151579_a) {
-      BlockPos blockpos1 = blockpos.func_177977_b();
-      IBlockState iblockstate1 = this.field_70170_p.func_180495_p(blockpos1);
-      Block block1 = iblockstate1.func_177230_c();
+    IBlockState iblockstate = this.world.getBlockState(blockpos);
+    if (iblockstate.getMaterial() == Material.AIR) {
+      BlockPos blockpos1 = blockpos.down();
+      IBlockState iblockstate1 = this.world.getBlockState(blockpos1);
+      Block block1 = iblockstate1.getBlock();
       if (block1 instanceof net.minecraft.block.BlockFence || block1 instanceof net.minecraft.block.BlockWall || block1 instanceof net.minecraft.block.BlockFenceGate) {
         iblockstate = iblockstate1;
         blockpos = blockpos1;
       } 
     } 
-    func_184231_a(y, this.field_70122_E, iblockstate, blockpos);
+    updateFallState(y, this.onGround, iblockstate, blockpos);
     if (d2 != x)
-      this.field_70159_w = 0.0D; 
+      this.motionX = 0.0D; 
     if (d4 != z)
-      this.field_70179_y = 0.0D; 
-    Block block = iblockstate.func_177230_c();
+      this.motionZ = 0.0D; 
+    Block block = iblockstate.getBlock();
     if (d3 != y)
-      block.func_176216_a(this.field_70170_p, (Entity)this); 
+      block.onLanded(this.world, (Entity)this); 
     try {
-      func_145775_I();
+      doBlockCollisions();
     } catch (Throwable throwable) {
-      CrashReport crashreport = CrashReport.func_85055_a(throwable, "Checking entity block collision");
-      CrashReportCategory crashreportcategory = crashreport.func_85058_a("Entity being checked for collision");
-      func_85029_a(crashreportcategory);
+      CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Checking entity block collision");
+      CrashReportCategory crashreportcategory = crashreport.makeCategory("Entity being checked for collision");
+      addEntityCrashInfo(crashreportcategory);
       throw new ReportedException(crashreport);
     } 
-    this.field_70170_p.field_72984_F.func_76319_b();
+    this.world.theProfiler.endSection();
   }
   
   private void rotationByKey(float partialTicks) {
@@ -378,7 +378,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     if (this.isGunnerMode) {
       setRotPitch(getRotPitch() * 0.95F);
       setRotYaw(getRotYaw() + (getAcInfo()).autoPilotRot * 0.2F);
-      if (MathHelper.func_76135_e(getRotRoll()) > 20.0F)
+      if (MathHelper.abs(getRotRoll()) > 20.0F)
         setRotRoll(getRotRoll() * 0.95F); 
     } 
     updateRecoil(partialTicks);
@@ -391,13 +391,13 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
         gmy = (getAcInfo()).mobilityYawOnGround;
         if (!(getAcInfo()).canRotOnGround) {
           Block block = MCH_Lib.getBlockY((Entity)this, 3, -2, false);
-          if (!W_Block.isEqual(block, W_Block.getWater()) && !W_Block.isEqual(block, W_Blocks.field_150350_a))
+          if (!W_Block.isEqual(block, W_Block.getWater()) && !W_Block.isEqual(block, W_Blocks.AIR))
             gmy = 0.0F; 
         } 
       } 
       float pivotTurnThrottle = (getAcInfo()).pivotTurnThrottle;
-      double dx = this.field_70165_t - this.field_70169_q;
-      double dz = this.field_70161_v - this.field_70166_s;
+      double dx = this.posX - this.prevPosX;
+      double dz = this.posZ - this.prevPosZ;
       double dist = dx * dx + dz * dz;
       if (pivotTurnThrottle <= 0.0F || getCurrentThrottle() >= pivotTurnThrottle || this.throttleBack >= pivotTurnThrottle / 10.0F || dist > this.throttleBack * 0.01D) {
         float sf = (float)Math.sqrt((dist <= 1.0D) ? dist : 1.0D);
@@ -425,7 +425,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
         setCurrentThrottle(0.0D);
       } 
     } 
-    if (getRiddenByEntity() != null && !(getRiddenByEntity()).field_70128_L && isCanopyClose() && canUseFuel() && 
+    if (getRiddenByEntity() != null && !(getRiddenByEntity()).isDead && isCanopyClose() && canUseFuel() && 
       !isDestroyed()) {
       onUpdate_ControlSub();
     } else if (isTargetDrone() && canUseFuel() && !isDestroyed()) {
@@ -438,7 +438,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     } 
     if (getCurrentThrottle() < 0.0D)
       setCurrentThrottle(0.0D); 
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       if (!W_Lib.isClientPlayer(getRiddenByEntity()) || getCountOnUpdate() % 200 == 0) {
         double ct = getThrottle();
         if (getCurrentThrottle() > ct)
@@ -456,10 +456,10 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       float throttleUpDown = (getAcInfo()).throttleUpDown;
       if (this.throttleUp) {
         float f = throttleUpDown;
-        if (func_184187_bx() != null) {
-          double mx = (func_184187_bx()).field_70159_w;
-          double mz = (func_184187_bx()).field_70179_y;
-          f *= MathHelper.func_76133_a(mx * mx + mz * mz) * (getAcInfo()).throttleUpDownOnEntity;
+        if (getRidingEntity() != null) {
+          double mx = (getRidingEntity()).motionX;
+          double mz = (getRidingEntity()).motionZ;
+          f *= MathHelper.sqrt(mx * mx + mz * mz) * (getAcInfo()).throttleUpDownOnEntity;
         } 
         if ((getAcInfo()).enableBack && this.throttleBack > 0.0F) {
           this.throttleBack = (float)(this.throttleBack - 0.01D * f);
@@ -493,7 +493,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   }
   
   protected void onUpdate_Particle2() {
-    if (!this.field_70170_p.field_72995_K)
+    if (!this.world.isRemote)
       return; 
     if (getHP() >= getMaxHP() * 0.5D)
       return; 
@@ -510,31 +510,31 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     for (int ri = 0; ri < bbNum; ri++) {
       if (getHP() >= getMaxHP() * 0.2D && getMaxHP() > 0) {
         int d = (int)(((getHP() / getMaxHP()) - 0.2D) / 0.3D * 15.0D);
-        if (d <= 0 || this.field_70146_Z.nextInt(d) > 0);
+        if (d <= 0 || this.rand.nextInt(d) > 0);
       } else {
         MCH_BoundingBox bb = (getTankInfo()).extraBoundingBox.get(ri);
         Vec3d pos = getTransformedPosition(bb.offsetX, bb.offsetY, bb.offsetZ);
-        double x = pos.field_72450_a;
-        double y = pos.field_72448_b;
-        double z = pos.field_72449_c;
+        double x = pos.xCoord;
+        double y = pos.yCoord;
+        double z = pos.zCoord;
         onUpdate_Particle2SpawnSmoke(ri, x, y, z, 1.0F);
       } 
     } 
     boolean b = true;
     if (getHP() >= getMaxHP() * 0.2D && getMaxHP() > 0) {
       int d = (int)(((getHP() / getMaxHP()) - 0.2D) / 0.3D * 15.0D);
-      if (d > 0 && this.field_70146_Z.nextInt(d) > 0)
+      if (d > 0 && this.rand.nextInt(d) > 0)
         b = false; 
     } 
     if (b) {
-      double px = this.field_70165_t;
-      double py = this.field_70163_u;
-      double pz = this.field_70161_v;
+      double px = this.posX;
+      double py = this.posY;
+      double pz = this.posZ;
       if (getSeatInfo(0) != null && (getSeatInfo(0)).pos != null) {
-        Vec3d pos = MCH_Lib.RotVec3(0.0D, (getSeatInfo(0)).pos.field_72448_b, -2.0D, -yaw, -pitch, -roll);
-        px += pos.field_72450_a;
-        py += pos.field_72448_b;
-        pz += pos.field_72449_c;
+        Vec3d pos = MCH_Lib.RotVec3(0.0D, (getSeatInfo(0)).pos.yCoord, -2.0D, -yaw, -pitch, -roll);
+        px += pos.xCoord;
+        py += pos.yCoord;
+        pz += pos.zCoord;
       } 
       onUpdate_Particle2SpawnSmoke(bbNum, px, py, pz, (bbNum == 0) ? 2.0F : 1.0F);
     } 
@@ -546,13 +546,13 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       this.prevDamageSmokePos[ri] = new Vec3d(x, y, z); 
     int num = 1;
     for (int i = 0; i < num; i++) {
-      float c = 0.2F + this.field_70146_Z.nextFloat() * 0.3F;
-      MCH_ParticleParam prm = new MCH_ParticleParam(this.field_70170_p, "smoke", x, y, z);
-      prm.motionX = size * (this.field_70146_Z.nextDouble() - 0.5D) * 0.3D;
-      prm.motionY = size * this.field_70146_Z.nextDouble() * 0.1D;
-      prm.motionZ = size * (this.field_70146_Z.nextDouble() - 0.5D) * 0.3D;
-      prm.size = size * (this.field_70146_Z.nextInt(5) + 5.0F) * 1.0F;
-      prm.setColor(0.7F + this.field_70146_Z.nextFloat() * 0.1F, c, c, c);
+      float c = 0.2F + this.rand.nextFloat() * 0.3F;
+      MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", x, y, z);
+      prm.motionX = size * (this.rand.nextDouble() - 0.5D) * 0.3D;
+      prm.motionY = size * this.rand.nextDouble() * 0.1D;
+      prm.motionZ = size * (this.rand.nextDouble() - 0.5D) * 0.3D;
+      prm.size = size * (this.rand.nextInt(5) + 5.0F) * 1.0F;
+      prm.setColor(0.7F + this.rand.nextFloat() * 0.1F, c, c, c);
       MCH_ParticlesUtil.spawnParticle(prm);
     } 
     this.prevDamageSmokePos[ri] = new Vec3d(x, y, z);
@@ -562,18 +562,18 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     if (this.isFirstDamageSmoke)
       this.prevDamageSmokePos[ri] = new Vec3d(x, y, z); 
     Vec3d prev = this.prevDamageSmokePos[ri];
-    double dx = x - prev.field_72450_a;
-    double dy = y - prev.field_72448_b;
-    double dz = z - prev.field_72449_c;
-    int num = (int)(MathHelper.func_76133_a(dx * dx + dy * dy + dz * dz) / 0.3D) + 1;
+    double dx = x - prev.xCoord;
+    double dy = y - prev.yCoord;
+    double dz = z - prev.zCoord;
+    int num = (int)(MathHelper.sqrt(dx * dx + dy * dy + dz * dz) / 0.3D) + 1;
     for (int i = 0; i < num; i++) {
-      float c = 0.2F + this.field_70146_Z.nextFloat() * 0.3F;
-      MCH_ParticleParam prm = new MCH_ParticleParam(this.field_70170_p, "smoke", x, y, z);
-      prm.motionX = size * (this.field_70146_Z.nextDouble() - 0.5D) * 0.3D;
-      prm.motionY = size * this.field_70146_Z.nextDouble() * 0.1D;
-      prm.motionZ = size * (this.field_70146_Z.nextDouble() - 0.5D) * 0.3D;
-      prm.size = size * (this.field_70146_Z.nextInt(5) + 5.0F) * 1.0F;
-      prm.setColor(0.7F + this.field_70146_Z.nextFloat() * 0.1F, c, c, c);
+      float c = 0.2F + this.rand.nextFloat() * 0.3F;
+      MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", x, y, z);
+      prm.motionX = size * (this.rand.nextDouble() - 0.5D) * 0.3D;
+      prm.motionY = size * this.rand.nextDouble() * 0.1D;
+      prm.motionZ = size * (this.rand.nextDouble() - 0.5D) * 0.3D;
+      prm.size = size * (this.rand.nextInt(5) + 5.0F) * 1.0F;
+      prm.setColor(0.7F + this.rand.nextFloat() * 0.1F, c, c, c);
       MCH_ParticlesUtil.spawnParticle(prm);
     } 
     this.prevDamageSmokePos[ri] = new Vec3d(x, y, z);
@@ -586,16 +586,16 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   private void onUpdate_ParticleSplash() {
     if (getAcInfo() == null)
       return; 
-    if (!this.field_70170_p.field_72995_K)
+    if (!this.world.isRemote)
       return; 
-    double mx = this.field_70165_t - this.field_70169_q;
-    double mz = this.field_70161_v - this.field_70166_s;
+    double mx = this.posX - this.prevPosX;
+    double mz = this.posZ - this.prevPosZ;
     double dist = mx * mx + mz * mz;
     if (dist > 1.0D)
       dist = 1.0D; 
     for (MCH_AircraftInfo.ParticleSplash p : (getAcInfo()).particleSplashs) {
       for (int i = 0; i < p.num; i++) {
-        if (dist > 0.03D + this.field_70146_Z.nextFloat() * 0.1D)
+        if (dist > 0.03D + this.rand.nextFloat() * 0.1D)
           setParticleSplash(p.pos, -mx * p.acceleration, p.motionY, -mz * p.acceleration, p.gravity, p.size * (0.5D + dist * 0.5D), p.age); 
       } 
     } 
@@ -603,20 +603,20 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   
   private void setParticleSplash(Vec3d pos, double mx, double my, double mz, float gravity, double size, int age) {
     Vec3d v = getTransformedPosition(pos);
-    v = v.func_72441_c(this.field_70146_Z.nextDouble() - 0.5D, (this.field_70146_Z.nextDouble() - 0.5D) * 0.5D, this.field_70146_Z
+    v = v.addVector(this.rand.nextDouble() - 0.5D, (this.rand.nextDouble() - 0.5D) * 0.5D, this.rand
         .nextDouble() - 0.5D);
-    int x = (int)(v.field_72450_a + 0.5D);
-    int y = (int)(v.field_72448_b + 0.0D);
-    int z = (int)(v.field_72449_c + 0.5D);
-    if (W_WorldFunc.isBlockWater(this.field_70170_p, x, y, z)) {
-      float c = this.field_70146_Z.nextFloat() * 0.3F + 0.7F;
-      MCH_ParticleParam prm = new MCH_ParticleParam(this.field_70170_p, "smoke", v.field_72450_a, v.field_72448_b, v.field_72449_c);
-      prm.motionX = mx + (this.field_70146_Z.nextFloat() - 0.5D) * 0.7D;
+    int x = (int)(v.xCoord + 0.5D);
+    int y = (int)(v.yCoord + 0.0D);
+    int z = (int)(v.zCoord + 0.5D);
+    if (W_WorldFunc.isBlockWater(this.world, x, y, z)) {
+      float c = this.rand.nextFloat() * 0.3F + 0.7F;
+      MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", v.xCoord, v.yCoord, v.zCoord);
+      prm.motionX = mx + (this.rand.nextFloat() - 0.5D) * 0.7D;
       prm.motionY = my;
-      prm.motionZ = mz + (this.field_70146_Z.nextFloat() - 0.5D) * 0.7D;
-      prm.size = (float)size * (this.field_70146_Z.nextFloat() * 0.2F + 0.8F);
+      prm.motionZ = mz + (this.rand.nextFloat() - 0.5D) * 0.7D;
+      prm.size = (float)size * (this.rand.nextFloat() * 0.2F + 0.8F);
       prm.setColor(0.9F, c, c, c);
-      prm.age = age + (int)(this.field_70146_Z.nextFloat() * 0.5D * age);
+      prm.age = age + (int)(this.rand.nextFloat() * 0.5D * age);
       prm.gravity = gravity;
       MCH_ParticlesUtil.spawnParticle(prm);
     } 
@@ -636,78 +636,78 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   protected void onUpdate_Client() {
     if (getRiddenByEntity() != null)
       if (W_Lib.isClientPlayer(getRiddenByEntity()))
-        (getRiddenByEntity()).field_70125_A = (getRiddenByEntity()).field_70127_C;  
+        (getRiddenByEntity()).rotationPitch = (getRiddenByEntity()).prevRotationPitch;  
     if (this.aircraftPosRotInc > 0) {
       applyServerPositionAndRotation();
     } else {
-      func_70107_b(this.field_70165_t + this.field_70159_w, this.field_70163_u + this.field_70181_x, this.field_70161_v + this.field_70179_y);
-      if (!isDestroyed() && (this.field_70122_E || MCH_Lib.getBlockIdY((Entity)this, 1, -2) > 0)) {
-        this.field_70159_w *= 0.95D;
-        this.field_70179_y *= 0.95D;
+      setPosition(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+      if (!isDestroyed() && (this.onGround || MCH_Lib.getBlockIdY((Entity)this, 1, -2) > 0)) {
+        this.motionX *= 0.95D;
+        this.motionZ *= 0.95D;
         applyOnGroundPitch(0.95F);
       } 
-      if (func_70090_H()) {
-        this.field_70159_w *= 0.99D;
-        this.field_70179_y *= 0.99D;
+      if (isInWater()) {
+        this.motionX *= 0.99D;
+        this.motionZ *= 0.99D;
       } 
     } 
     updateWheels();
     onUpdate_Particle2();
     updateSound();
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       onUpdate_ParticleLandingGear();
       onUpdate_ParticleSplash();
       onUpdate_ParticleSandCloud(true);
     } 
-    updateCamera(this.field_70165_t, this.field_70163_u, this.field_70161_v);
+    updateCamera(this.posX, this.posY, this.posZ);
   }
   
   public void applyOnGroundPitch(float factor) {}
   
   private void onUpdate_Server() {
-    double prevMotion = Math.sqrt(this.field_70159_w * this.field_70159_w + this.field_70179_y * this.field_70179_y);
+    double prevMotion = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
     double dp = 0.0D;
     if (canFloatWater())
       dp = getWaterDepth(); 
     boolean levelOff = this.isGunnerMode;
     if (dp == 0.0D) {
       if (!levelOff) {
-        this.field_70181_x += 0.04D + (!func_70090_H() ? (getAcInfo()).gravity : (getAcInfo()).gravityInWater);
-        this.field_70181_x += -0.047D * (1.0D - getCurrentThrottle());
+        this.motionY += 0.04D + (!isInWater() ? (getAcInfo()).gravity : (getAcInfo()).gravityInWater);
+        this.motionY += -0.047D * (1.0D - getCurrentThrottle());
       } else {
-        this.field_70181_x *= 0.8D;
+        this.motionY *= 0.8D;
       } 
-    } else if (MathHelper.func_76135_e(getRotRoll()) >= 40.0F || dp < 1.0D) {
-      this.field_70181_x -= 1.0E-4D;
-      this.field_70181_x += 0.007D * getCurrentThrottle();
+    } else if (MathHelper.abs(getRotRoll()) >= 40.0F || dp < 1.0D) {
+      this.motionY -= 1.0E-4D;
+      this.motionY += 0.007D * getCurrentThrottle();
     } else {
-      if (this.field_70181_x < 0.0D)
-        this.field_70181_x /= 2.0D; 
-      this.field_70181_x += 0.007D;
+      if (this.motionY < 0.0D)
+        this.motionY /= 2.0D; 
+      this.motionY += 0.007D;
     } 
     float throttle = (float)(getCurrentThrottle() / 10.0D);
     Vec3d v = MCH_Lib.Rot2Vec3(getRotYaw(), getRotPitch() - 10.0F);
     if (!levelOff)
-      this.field_70181_x += v.field_72448_b * throttle / 8.0D; 
+      this.motionY += v.yCoord * throttle / 8.0D; 
     boolean canMove = true;
     if (!(getAcInfo()).canMoveOnGround) {
       Block block = MCH_Lib.getBlockY((Entity)this, 3, -2, false);
-      if (!W_Block.isEqual(block, W_Block.getWater()) && !W_Block.isEqual(block, W_Blocks.field_150350_a))
+      if (!W_Block.isEqual(block, W_Block.getWater()) && !W_Block.isEqual(block, W_Blocks.AIR))
         canMove = false; 
     } 
     if (canMove)
       if ((getAcInfo()).enableBack && this.throttleBack > 0.0F) {
-        this.field_70159_w -= v.field_72450_a * this.throttleBack;
-        this.field_70179_y -= v.field_72449_c * this.throttleBack;
+        this.motionX -= v.xCoord * this.throttleBack;
+        this.motionZ -= v.zCoord * this.throttleBack;
       } else {
-        this.field_70159_w += v.field_72450_a * throttle;
-        this.field_70179_y += v.field_72449_c * throttle;
+        this.motionX += v.xCoord * throttle;
+        this.motionZ += v.zCoord * throttle;
       }  
-    double motion = Math.sqrt(this.field_70159_w * this.field_70159_w + this.field_70179_y * this.field_70179_y);
+    double motion = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
     float speedLimit = getMaxSpeed();
     if (motion > speedLimit) {
-      this.field_70159_w *= speedLimit / motion;
-      this.field_70179_y *= speedLimit / motion;
+      this.motionX *= speedLimit / motion;
+      this.motionZ *= speedLimit / motion;
       motion = speedLimit;
     } 
     if (motion > prevMotion && this.currentSpeed < speedLimit) {
@@ -719,34 +719,34 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       if (this.currentSpeed < 0.07D)
         this.currentSpeed = 0.07D; 
     } 
-    if (this.field_70122_E || MCH_Lib.getBlockIdY((Entity)this, 1, -2) > 0) {
-      this.field_70159_w *= (getAcInfo()).motionFactor;
-      this.field_70179_y *= (getAcInfo()).motionFactor;
-      if (MathHelper.func_76135_e(getRotPitch()) < 40.0F)
+    if (this.onGround || MCH_Lib.getBlockIdY((Entity)this, 1, -2) > 0) {
+      this.motionX *= (getAcInfo()).motionFactor;
+      this.motionZ *= (getAcInfo()).motionFactor;
+      if (MathHelper.abs(getRotPitch()) < 40.0F)
         applyOnGroundPitch(0.8F); 
     } 
     updateWheels();
-    func_70091_d(MoverType.SELF, this.field_70159_w, this.field_70181_x, this.field_70179_y);
-    this.field_70181_x *= 0.95D;
-    this.field_70159_w *= (getAcInfo()).motionFactor;
-    this.field_70179_y *= (getAcInfo()).motionFactor;
-    func_70101_b(getRotYaw(), getRotPitch());
+    moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+    this.motionY *= 0.95D;
+    this.motionX *= (getAcInfo()).motionFactor;
+    this.motionZ *= (getAcInfo()).motionFactor;
+    setRotation(getRotYaw(), getRotPitch());
     onUpdate_updateBlock();
     updateCollisionBox();
-    if (getRiddenByEntity() != null && (getRiddenByEntity()).field_70128_L)
+    if (getRiddenByEntity() != null && (getRiddenByEntity()).isDead)
       unmountEntity(); 
   }
   
   private void collisionEntity(AxisAlignedBB bb) {
     if (bb == null)
       return; 
-    double speed = Math.sqrt(this.field_70159_w * this.field_70159_w + this.field_70181_x * this.field_70181_x + this.field_70179_y * this.field_70179_y);
+    double speed = Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
     if (speed <= 0.05D)
       return; 
     Entity rider = getRiddenByEntity();
     float damage = (float)(speed * 15.0D);
-    MCH_EntityAircraft rideAc = (func_184187_bx() instanceof MCH_EntitySeat) ? ((MCH_EntitySeat)func_184187_bx()).getParent() : ((func_184187_bx() instanceof MCH_EntityAircraft) ? (MCH_EntityAircraft)func_184187_bx() : null);
-    List<Entity> list = this.field_70170_p.func_175674_a((Entity)this, bb.func_72314_b(0.3D, 0.3D, 0.3D), e -> {
+    MCH_EntityAircraft rideAc = (getRidingEntity() instanceof MCH_EntitySeat) ? ((MCH_EntitySeat)getRidingEntity()).getParent() : ((getRidingEntity() instanceof MCH_EntityAircraft) ? (MCH_EntityAircraft)getRidingEntity() : null);
+    List<Entity> list = this.world.getEntitiesInAABBexcluding((Entity)this, bb.expand(0.3D, 0.3D, 0.3D), e -> {
           if (e == rideAc || e instanceof net.minecraft.entity.item.EntityItem || e instanceof net.minecraft.entity.item.EntityXPOrb || e instanceof mcheli.weapon.MCH_EntityBaseBullet || e instanceof mcheli.chain.MCH_EntityChain || e instanceof MCH_EntitySeat)
             return false; 
           if (e instanceof MCH_EntityTank) {
@@ -760,37 +760,37 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       Entity e = list.get(i);
       if (shouldCollisionDamage(e)) {
         DamageSource ds;
-        double dx = e.field_70165_t - this.field_70165_t;
-        double dz = e.field_70161_v - this.field_70161_v;
+        double dx = e.posX - this.posX;
+        double dz = e.posZ - this.posZ;
         double dist = Math.sqrt(dx * dx + dz * dz);
         if (dist > 5.0D)
           dist = 5.0D; 
         damage = (float)(damage + 5.0D - dist);
         if (rider instanceof EntityLivingBase) {
-          ds = DamageSource.func_76358_a((EntityLivingBase)rider);
+          ds = DamageSource.causeMobDamage((EntityLivingBase)rider);
         } else {
-          ds = DamageSource.field_76377_j;
+          ds = DamageSource.generic;
         } 
         MCH_Lib.applyEntityHurtResistantTimeConfig(e);
-        e.func_70097_a(ds, damage);
+        e.attackEntityFrom(ds, damage);
         if (e instanceof MCH_EntityAircraft) {
-          e.field_70159_w += this.field_70159_w * 0.05D;
-          e.field_70179_y += this.field_70179_y * 0.05D;
+          e.motionX += this.motionX * 0.05D;
+          e.motionZ += this.motionZ * 0.05D;
         } else if (e instanceof net.minecraft.entity.projectile.EntityArrow) {
-          e.func_70106_y();
+          e.setDead();
         } else {
-          e.field_70159_w += this.field_70159_w * 1.5D;
-          e.field_70179_y += this.field_70179_y * 1.5D;
+          e.motionX += this.motionX * 1.5D;
+          e.motionZ += this.motionZ * 1.5D;
         } 
-        if ((getTankInfo()).weightType != 2 && (e.field_70130_N >= 1.0F || e.field_70131_O >= 1.5D)) {
+        if ((getTankInfo()).weightType != 2 && (e.width >= 1.0F || e.height >= 1.5D)) {
           if (e instanceof EntityLivingBase) {
-            ds = DamageSource.func_76358_a((EntityLivingBase)e);
+            ds = DamageSource.causeMobDamage((EntityLivingBase)e);
           } else {
-            ds = DamageSource.field_76377_j;
+            ds = DamageSource.generic;
           } 
-          func_70097_a(ds, damage / 3.0F);
+          attackEntityFrom(ds, damage / 3.0F);
         } 
-        MCH_Lib.DbgLog(this.field_70170_p, "MCH_EntityTank.collisionEntity damage=%.1f %s", new Object[] { Float.valueOf(damage), e.toString() });
+        MCH_Lib.DbgLog(this.world, "MCH_EntityTank.collisionEntity damage=%.1f %s", new Object[] { Float.valueOf(damage), e.toString() });
       } 
     } 
   }
@@ -805,11 +805,11 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       if (this.noCollisionEntities.containsKey(ac))
         return false; 
     } 
-    if (e.func_184187_bx() instanceof MCH_EntityAircraft)
-      if (this.noCollisionEntities.containsKey(e.func_184187_bx()))
+    if (e.getRidingEntity() instanceof MCH_EntityAircraft)
+      if (this.noCollisionEntities.containsKey(e.getRidingEntity()))
         return false;  
-    if (e.func_184187_bx() instanceof MCH_EntitySeat && ((MCH_EntitySeat)e.func_184187_bx()).getParent() != null)
-      if (this.noCollisionEntities.containsKey(((MCH_EntitySeat)e.func_184187_bx()).getParent()))
+    if (e.getRidingEntity() instanceof MCH_EntitySeat && ((MCH_EntitySeat)e.getRidingEntity()).getParent() != null)
+      if (this.noCollisionEntities.containsKey(((MCH_EntitySeat)e.getRidingEntity()).getParent()))
         return false;  
     return true;
   }
@@ -819,7 +819,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       return; 
     this.WheelMng.updateBlock();
     for (MCH_BoundingBox bb : this.extraBoundingBox) {
-      if (this.field_70146_Z.nextInt(3) == 0) {
+      if (this.rand.nextInt(3) == 0) {
         if (MCH_Config.Collision_DestroyBlock.prmBool) {
           Vec3d v = getTransformedPosition(bb.offsetX, bb.offsetY, bb.offsetZ);
           destoryBlockRange(v, bb.width, bb.height);
@@ -828,8 +828,8 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       } 
     } 
     if (MCH_Config.Collision_DestroyBlock.prmBool)
-      destoryBlockRange(getTransformedPosition(0.0D, 0.0D, 0.0D), this.field_70130_N * 1.5D, (this.field_70131_O * 2.0F)); 
-    collisionEntity(func_70046_E());
+      destoryBlockRange(getTransformedPosition(0.0D, 0.0D, 0.0D), this.width * 1.5D, (this.height * 2.0F)); 
+    collisionEntity(getCollisionBoundingBox());
   }
   
   public void destoryBlockRange(Vec3d v, double w, double h) {
@@ -843,16 +843,16 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     for (int x = -ws; x <= ws; x++) {
       for (int z = -ws; z <= ws; z++) {
         for (int y = -hs; y <= hs + 1; y++) {
-          int bx = (int)(v.field_72450_a + x - 0.5D);
-          int by = (int)(v.field_72448_b + y - 1.0D);
-          int bz = (int)(v.field_72449_c + z - 0.5D);
+          int bx = (int)(v.xCoord + x - 0.5D);
+          int by = (int)(v.yCoord + y - 1.0D);
+          int bz = (int)(v.zCoord + z - 0.5D);
           BlockPos blockpos = new BlockPos(bx, by, bz);
-          IBlockState iblockstate = this.field_70170_p.func_180495_p(blockpos);
-          Block block = (by >= 0 && by < 256) ? iblockstate.func_177230_c() : Blocks.field_150350_a;
-          Material mat = iblockstate.func_185904_a();
-          if (!Block.func_149680_a(block, Blocks.field_150350_a)) {
+          IBlockState iblockstate = this.world.getBlockState(blockpos);
+          Block block = (by >= 0 && by < 256) ? iblockstate.getBlock() : Blocks.AIR;
+          Material mat = iblockstate.getMaterial();
+          if (!Block.isEqualTo(block, Blocks.AIR)) {
             for (Block c : noDestroyBlocks) {
-              if (Block.func_149680_a(block, c)) {
+              if (Block.isEqualTo(block, c)) {
                 block = null;
                 break;
               } 
@@ -860,7 +860,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
             if (block == null)
               break; 
             for (Block c : destroyBlocks) {
-              if (Block.func_149680_a(block, c)) {
+              if (Block.isEqualTo(block, c)) {
                 destroyBlock(blockpos);
                 mat = null;
                 break;
@@ -869,7 +869,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
             if (mat == null)
               break; 
             for (Material m : destroyMaterials) {
-              if (iblockstate.func_185904_a() == m) {
+              if (iblockstate.getMaterial() == m) {
                 destroyBlock(blockpos);
                 break;
               } 
@@ -881,15 +881,15 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   }
   
   public void destroyBlock(BlockPos blockpos) {
-    if (this.field_70146_Z.nextInt(8) == 0) {
-      W_WorldFunc.destroyBlock(this.field_70170_p, blockpos, true);
+    if (this.rand.nextInt(8) == 0) {
+      W_WorldFunc.destroyBlock(this.world, blockpos, true);
     } else {
-      this.field_70170_p.func_175698_g(blockpos);
+      this.world.setBlockToAir(blockpos);
     } 
   }
   
   private void updateWheels() {
-    this.WheelMng.move(this.field_70159_w, this.field_70181_x, this.field_70179_y);
+    this.WheelMng.move(this.motionX, this.motionY, this.motionZ);
   }
   
   public float getMaxSpeed() {
@@ -935,7 +935,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       setRotPitch(v.x);
       setRotRoll(v.z);
     } 
-    if (MathHelper.func_76135_e(getRotPitch()) > 90.0F) {
+    if (MathHelper.abs(getRotPitch()) > 90.0F) {
       MCH_Lib.DbgLog(true, "MCH_EntityAircraft.setAngles Error:Pitch=%.1f", new Object[] { Float.valueOf(getRotPitch()) });
       setRotPitch(0.0F);
     } 
@@ -944,9 +944,9 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     if (getRotRoll() < -180.0F)
       setRotRoll(getRotRoll() + 360.0F); 
     this.prevRotationRoll = getRotRoll();
-    this.field_70127_C = getRotPitch();
-    if (func_184187_bx() == null)
-      this.field_70126_B = getRotYaw(); 
+    this.prevRotationPitch = getRotPitch();
+    if (getRidingEntity() == null)
+      this.prevRotationYaw = getRotYaw(); 
     float deltaLimit = (getAcInfo()).cameraRotationSpeed * partialTicks;
     MCH_WeaponSet ws = getCurrentWeapon(player);
     deltaLimit *= (ws != null && ws.getInfo() != null) ? (ws.getInfo()).cameraRotationSpeedPitch : 1.0F;
@@ -959,33 +959,33 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     if (deltaY < -deltaLimit)
       deltaY = -deltaLimit; 
     if (isOverridePlayerYaw() || fixRot) {
-      if (func_184187_bx() == null) {
-        player.field_70126_B = getRotYaw() + fixYaw;
+      if (getRidingEntity() == null) {
+        player.prevRotationYaw = getRotYaw() + fixYaw;
       } else {
-        if (getRotYaw() - player.field_70177_z > 180.0F)
-          player.field_70126_B += 360.0F; 
-        if (getRotYaw() - player.field_70177_z < -180.0F)
-          player.field_70126_B -= 360.0F; 
+        if (getRotYaw() - player.rotationYaw > 180.0F)
+          player.prevRotationYaw += 360.0F; 
+        if (getRotYaw() - player.rotationYaw < -180.0F)
+          player.prevRotationYaw -= 360.0F; 
       } 
-      player.field_70177_z = getRotYaw() + fixYaw;
+      player.rotationYaw = getRotYaw() + fixYaw;
     } else {
-      player.func_70082_c(deltaX, 0.0F);
+      player.setAngles(deltaX, 0.0F);
     } 
     if (isOverridePlayerPitch() || fixRot) {
-      player.field_70127_C = getRotPitch() + fixPitch;
-      player.field_70125_A = getRotPitch() + fixPitch;
+      player.prevRotationPitch = getRotPitch() + fixPitch;
+      player.rotationPitch = getRotPitch() + fixPitch;
     } else {
-      player.func_70082_c(0.0F, deltaY);
+      player.setAngles(0.0F, deltaY);
     } 
-    float playerYaw = MathHelper.func_76142_g(getRotYaw() - player.field_70177_z);
-    float playerPitch = getRotPitch() * MathHelper.func_76134_b((float)(playerYaw * Math.PI / 180.0D)) + -getRotRoll() * MathHelper.func_76126_a((float)(playerYaw * Math.PI / 180.0D));
+    float playerYaw = MathHelper.wrapDegrees(getRotYaw() - player.rotationYaw);
+    float playerPitch = getRotPitch() * MathHelper.cos((float)(playerYaw * Math.PI / 180.0D)) + -getRotRoll() * MathHelper.sin((float)(playerYaw * Math.PI / 180.0D));
     if (MCH_MOD.proxy.isFirstPerson()) {
-      player.field_70125_A = MCH_Lib.RNG(player.field_70125_A, playerPitch + (getAcInfo()).minRotationPitch, playerPitch + 
+      player.rotationPitch = MCH_Lib.RNG(player.rotationPitch, playerPitch + (getAcInfo()).minRotationPitch, playerPitch + 
           (getAcInfo()).maxRotationPitch);
-      player.field_70125_A = MCH_Lib.RNG(player.field_70125_A, -90.0F, 90.0F);
+      player.rotationPitch = MCH_Lib.RNG(player.rotationPitch, -90.0F, 90.0F);
     } 
-    player.field_70127_C = player.field_70125_A;
-    if ((func_184187_bx() == null && ac_yaw != getRotYaw()) || ac_pitch != getRotPitch() || ac_roll != 
+    player.prevRotationPitch = player.rotationPitch;
+    if ((getRidingEntity() == null && ac_yaw != getRotYaw()) || ac_pitch != getRotPitch() || ac_roll != 
       getRotRoll())
       this.aircraftRotChanged = true; 
   }
@@ -1051,7 +1051,12 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   public float getUnfoldLandingGearThrottle() {
     return 0.7F;
   }
-  
+
+  @Override
+  public boolean isEmpty() {
+    return false;
+  }
+
   private static class ClacAxisBB {
     public final double value;
     

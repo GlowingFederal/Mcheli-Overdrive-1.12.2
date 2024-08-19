@@ -23,7 +23,7 @@ public class MCH_Models {
   
   public static _IModelCustom loadModel(String name) throws IllegalArgumentException, _ModelFormatException {
     ResourceLocation resource = MCH_Utils.suffix("models/" + name);
-    IResourceManager resourceManager = Minecraft.func_71410_x().func_110442_L();
+    IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
     IVertexModelLoader[] loaders = { objLoader, mqoLoader, tcnLoader };
     _IModelCustom model = null;
     for (IVertexModelLoader loader : loaders) {

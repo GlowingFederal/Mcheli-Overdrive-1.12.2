@@ -41,7 +41,7 @@ public class MCH_Recipes {
       if (ingredient == Ingredient.field_193370_a)
         continue; 
       boolean flag = false;
-      for (ItemStack itemstack : player.field_71071_by.field_70462_a) {
+      for (ItemStack itemstack : player.inventory.mainInventory) {
         if (ingredient.apply(itemstack)) {
           flag = true;
           break;
@@ -59,9 +59,9 @@ public class MCH_Recipes {
         continue; 
       int i = 0;
       boolean flag = false;
-      for (ItemStack itemstack : player.field_71071_by.field_70462_a) {
+      for (ItemStack itemstack : player.inventory.mainInventory) {
         if (ingredient.apply(itemstack)) {
-          player.field_71071_by.func_70298_a(i, 1);
+          player.inventory.decrStackSize(i, 1);
           flag = true;
           break;
         } 

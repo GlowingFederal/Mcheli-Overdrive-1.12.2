@@ -33,7 +33,7 @@ public class MCH_PacketStatusRequest extends MCH_Packet {
   }
   
   public static void requestStatus(MCH_EntityAircraft ac) {
-    if (ac.field_70170_p.field_72995_K) {
+    if (ac.world.isRemote) {
       MCH_PacketStatusRequest s = new MCH_PacketStatusRequest();
       s.entityID_AC = W_Entity.getEntityId((Entity)ac);
       W_Network.sendToServer((W_PacketBase)s);

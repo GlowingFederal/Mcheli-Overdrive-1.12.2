@@ -9,7 +9,7 @@ public class MCH_TEST_ModelRenderer extends ModelRenderer {
     super(par1ModelBase);
   }
   
-  public void func_78785_a(float par1) {
+  public void render(float par1) {
     GL11.glPushMatrix();
     GL11.glScaled(0.2D, -0.2D, 0.2D);
     MCH_ModelManager.render("helicopters", "ah-64");

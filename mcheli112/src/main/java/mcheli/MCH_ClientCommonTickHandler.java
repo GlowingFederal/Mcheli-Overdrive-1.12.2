@@ -149,8 +149,8 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
     MCH_ClientTickHandlerBase.initRotLimit();
     for (MCH_Key k : this.Keys)
       k.update(); 
-    EntityPlayerSP entityPlayerSP = this.mc.field_71439_g;
-    if (entityPlayerSP != null && this.mc.field_71462_r == null) {
+    EntityPlayerSP entityPlayerSP = this.mc.player;
+    if (entityPlayerSP != null && this.mc.currentScreen == null) {
       if (MCH_ServerSettings.enableCamDistChange)
         if (this.KeyCamDistUp.isKeyDown() || this.KeyCamDistDown.isKeyDown()) {
           int camdist = (int)W_Reflection.getThirdPersonDistance();
@@ -166,7 +166,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
             W_Reflection.setThirdPersonDistance(camdist);
           } 
         }  
-      if (this.mc.field_71462_r == null && (!this.mc.func_71356_B() || MCH_Config.DebugLog)) {
+      if (this.mc.currentScreen == null && (!this.mc.isSingleplayer() || MCH_Config.DebugLog)) {
         isDrawScoreboard = this.KeyScoreboard.isKeyPress();
         if (!isDrawScoreboard && this.KeyMultiplayManager.isKeyDown())
           MCH_PacketIndOpenScreen.send(5); 
@@ -178,7 +178,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
       MCH_MultiplayClient.sendImageData();
       sendLDCount = 0;
     } 
-    boolean inOtherGui = (this.mc.field_71462_r != null);
+    boolean inOtherGui = (this.mc.currentScreen != null);
     for (MCH_ClientTickHandlerBase t : this.ticks)
       t.onTick(inOtherGui); 
     for (MCH_Gui g : this.guiTicks)
@@ -201,12 +201,12 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
   }
   
   public void onTickPre() {
-    if (this.mc.field_71439_g != null && this.mc.field_71441_e != null)
+    if (this.mc.player != null && this.mc.world != null)
       onTick(); 
   }
   
   public void onTickPost() {
-    if (this.mc.field_71439_g != null && this.mc.field_71441_e != null)
+    if (this.mc.player != null && this.mc.world != null)
       MCH_GuiTargetMarker.onClientTick(); 
   }
   
@@ -228,7 +228,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
   
   public static double getCurrentStickY() {
     double inv = 1.0D;
-    if ((Minecraft.func_71410_x()).field_71474_y.field_74338_d)
+    if ((Minecraft.getMinecraft()).gameSettings.invertMouse)
       inv = -inv; 
     if (MCH_Config.InvertMouse.prmBool)
       inv = -inv; 
@@ -244,21 +244,21 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
     prevMouseDeltaY = mouseDeltaY;
     mouseDeltaX = 0.0D;
     mouseDeltaY = 0.0D;
-    if (this.mc.field_71415_G && Display.isActive() && this.mc.field_71462_r == null) {
+    if (this.mc.inGameHasFocus && Display.isActive() && this.mc.currentScreen == null) {
       if (stickMode) {
         if (Math.abs(mouseRollDeltaX) < getMaxStickLength() * 0.2D)
           mouseRollDeltaX *= (1.0F - 0.15F * partialTicks); 
         if (Math.abs(mouseRollDeltaY) < getMaxStickLength() * 0.2D)
           mouseRollDeltaY *= (1.0F - 0.15F * partialTicks); 
       } 
-      this.mc.field_71417_B.func_74374_c();
-      float f1 = this.mc.field_71474_y.field_74341_c * 0.6F + 0.2F;
+      this.mc.mouseHelper.mouseXYChange();
+      float f1 = this.mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
       float f2 = f1 * f1 * f1 * 8.0F;
       double ms = MCH_Config.MouseSensitivity.prmDouble * 0.1D;
-      mouseDeltaX = ms * this.mc.field_71417_B.field_74377_a * f2;
-      mouseDeltaY = ms * this.mc.field_71417_B.field_74375_b * f2;
+      mouseDeltaX = ms * this.mc.mouseHelper.deltaX * f2;
+      mouseDeltaY = ms * this.mc.mouseHelper.deltaY * f2;
       byte inv = 1;
-      if (this.mc.field_71474_y.field_74338_d)
+      if (this.mc.gameSettings.invertMouse)
         inv = -1; 
       if (MCH_Config.InvertMouse.prmBool)
         inv = (byte)(inv * -1); 
@@ -266,7 +266,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
       mouseRollDeltaY += mouseDeltaY * inv;
       double dist = mouseRollDeltaX * mouseRollDeltaX + mouseRollDeltaY * mouseRollDeltaY;
       if (dist > 1.0D) {
-        dist = MathHelper.func_76133_a(dist);
+        dist = MathHelper.sqrt(dist);
         double d = dist;
         if (d > getMaxStickLength())
           d = getMaxStickLength(); 
@@ -281,40 +281,40 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
   public void onRenderTickPre(float partialTicks) {
     MCH_GuiTargetMarker.clearMarkEntityPos();
     if (!MCH_ServerSettings.enableDebugBoundingBox)
-      Minecraft.func_71410_x().func_175598_ae().func_178629_b(false); 
+      Minecraft.getMinecraft().getRenderManager().setDebugBoundingBox(false); 
     MCH_ClientEventHook.haveSearchLightAircraft.clear();
-    if (this.mc != null && this.mc.field_71441_e != null)
-      for (Object o : (Minecraft.func_71410_x()).field_71441_e.field_72996_f) {
+    if (this.mc != null && this.mc.world != null)
+      for (Object o : (Minecraft.getMinecraft()).world.loadedEntityList) {
         if (o instanceof MCH_EntityAircraft)
           if (((MCH_EntityAircraft)o).haveSearchLight())
             MCH_ClientEventHook.haveSearchLightAircraft.add((MCH_EntityAircraft)o);  
       }  
     if (W_McClient.isGamePaused())
       return; 
-    EntityPlayerSP entityPlayerSP = this.mc.field_71439_g;
+    EntityPlayerSP entityPlayerSP = this.mc.player;
     if (entityPlayerSP == null)
       return; 
-    ItemStack currentItemstack = entityPlayerSP.func_184586_b(EnumHand.MAIN_HAND);
-    if (currentItemstack != null && currentItemstack.func_77973_b() instanceof mcheli.tool.MCH_ItemWrench)
-      if (entityPlayerSP.func_184605_cv() > 0)
+    ItemStack currentItemstack = entityPlayerSP.getHeldItem(EnumHand.MAIN_HAND);
+    if (currentItemstack != null && currentItemstack.getItem() instanceof mcheli.tool.MCH_ItemWrench)
+      if (entityPlayerSP.getItemInUseCount() > 0)
         W_Reflection.setItemRendererMainProgress(1.0F);  
     ridingAircraft = MCH_EntityAircraft.getAircraft_RiddenOrControl((Entity)entityPlayerSP);
     if (ridingAircraft != null) {
       cameraMode = ridingAircraft.getCameraMode((EntityPlayer)entityPlayerSP);
-    } else if (entityPlayerSP.func_184187_bx() instanceof MCH_EntityGLTD) {
-      MCH_EntityGLTD gltd = (MCH_EntityGLTD)entityPlayerSP.func_184187_bx();
+    } else if (entityPlayerSP.getRidingEntity() instanceof MCH_EntityGLTD) {
+      MCH_EntityGLTD gltd = (MCH_EntityGLTD)entityPlayerSP.getRidingEntity();
       cameraMode = gltd.camera.getMode(0);
     } else {
       cameraMode = 0;
     } 
     MCH_EntityAircraft ac = null;
-    if (entityPlayerSP.func_184187_bx() instanceof mcheli.helicopter.MCH_EntityHeli || entityPlayerSP.func_184187_bx() instanceof mcheli.plane.MCP_EntityPlane || entityPlayerSP
-      .func_184187_bx() instanceof mcheli.tank.MCH_EntityTank) {
-      ac = (MCH_EntityAircraft)entityPlayerSP.func_184187_bx();
-    } else if (entityPlayerSP.func_184187_bx() instanceof MCH_EntityUavStation) {
-      ac = ((MCH_EntityUavStation)entityPlayerSP.func_184187_bx()).getControlAircract();
-    } else if (entityPlayerSP.func_184187_bx() instanceof mcheli.vehicle.MCH_EntityVehicle) {
-      MCH_EntityAircraft vehicle = (MCH_EntityAircraft)entityPlayerSP.func_184187_bx();
+    if (entityPlayerSP.getRidingEntity() instanceof mcheli.helicopter.MCH_EntityHeli || entityPlayerSP.getRidingEntity() instanceof mcheli.plane.MCP_EntityPlane || entityPlayerSP
+      .getRidingEntity() instanceof mcheli.tank.MCH_EntityTank) {
+      ac = (MCH_EntityAircraft)entityPlayerSP.getRidingEntity();
+    } else if (entityPlayerSP.getRidingEntity() instanceof MCH_EntityUavStation) {
+      ac = ((MCH_EntityUavStation)entityPlayerSP.getRidingEntity()).getControlAircract();
+    } else if (entityPlayerSP.getRidingEntity() instanceof mcheli.vehicle.MCH_EntityVehicle) {
+      MCH_EntityAircraft vehicle = (MCH_EntityAircraft)entityPlayerSP.getRidingEntity();
       vehicle.setupAllRiderRenderPosition(partialTicks, (EntityPlayer)entityPlayerSP);
     } 
     boolean stickMode = false;
@@ -349,26 +349,26 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
         } 
       } 
       if (ac.getAcInfo() == null) {
-        entityPlayerSP.func_70082_c((float)mouseDeltaX, (float)mouseDeltaY);
+        entityPlayerSP.setAngles((float)mouseDeltaX, (float)mouseDeltaY);
       } else {
         ac.setAngles((Entity)entityPlayerSP, fixRot, fixYaw, fixPitch, (float)(mouseDeltaX + prevMouseDeltaX) / 2.0F, (float)(mouseDeltaY + prevMouseDeltaY) / 2.0F, (float)mouseRollDeltaX, (float)mouseRollDeltaY, partialTicks - prevTick);
       } 
       ac.setupAllRiderRenderPosition(partialTicks, (EntityPlayer)entityPlayerSP);
-      double dist = MathHelper.func_76133_a(mouseRollDeltaX * mouseRollDeltaX + mouseRollDeltaY * mouseRollDeltaY);
+      double dist = MathHelper.sqrt(mouseRollDeltaX * mouseRollDeltaX + mouseRollDeltaY * mouseRollDeltaY);
       if (!stickMode || dist < getMaxStickLength() * 0.1D) {
         mouseRollDeltaX *= 0.95D;
         mouseRollDeltaY *= 0.95D;
       } 
-      float roll = MathHelper.func_76142_g(ac.getRotRoll());
-      float yaw = MathHelper.func_76142_g(ac.getRotYaw() - ((EntityPlayer)entityPlayerSP).field_70177_z);
-      roll *= MathHelper.func_76134_b((float)(yaw * Math.PI / 180.0D));
+      float roll = MathHelper.wrapDegrees(ac.getRotRoll());
+      float yaw = MathHelper.wrapDegrees(ac.getRotYaw() - ((EntityPlayer)entityPlayerSP).rotationYaw);
+      roll *= MathHelper.cos((float)(yaw * Math.PI / 180.0D));
       if (ac.getTVMissile() != null && W_Lib.isClientPlayer((ac.getTVMissile()).shootingEntity) && ac
         .getIsGunnerMode((Entity)entityPlayerSP))
         roll = 0.0F; 
       W_Reflection.setCameraRoll(roll);
       correctViewEntityDummy((Entity)entityPlayerSP);
     } else {
-      MCH_EntitySeat seat = (entityPlayerSP.func_184187_bx() instanceof MCH_EntitySeat) ? (MCH_EntitySeat)entityPlayerSP.func_184187_bx() : null;
+      MCH_EntitySeat seat = (entityPlayerSP.getRidingEntity() instanceof MCH_EntitySeat) ? (MCH_EntitySeat)entityPlayerSP.getRidingEntity() : null;
       if (seat != null && seat.getParent() != null) {
         updateMouseDelta(stickMode, partialTicks);
         ac = seat.getParent();
@@ -385,7 +385,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
         v = W_Vec3.rotateRoll((float)((ac.calcRotRoll(partialTicks) / 180.0F) * Math.PI), v);
         MCH_WeaponSet ws = ac.getCurrentWeapon((Entity)entityPlayerSP);
         mouseDeltaY *= (ws != null && ws.getInfo() != null) ? (ws.getInfo()).cameraRotationSpeedPitch : 1.0D;
-        entityPlayerSP.func_70082_c((float)mouseDeltaX, (float)mouseDeltaY);
+        entityPlayerSP.setAngles((float)mouseDeltaX, (float)mouseDeltaY);
         float y = ac.getRotYaw();
         float p = ac.getRotPitch();
         float r = ac.getRotRoll();
@@ -394,19 +394,19 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
         ac.setRotRoll(ac.calcRotRoll(partialTicks));
         float revRoll = 0.0F;
         if (fixRot) {
-          ((EntityPlayer)entityPlayerSP).field_70177_z = ac.getRotYaw() + seatInfo.fixYaw;
-          ((EntityPlayer)entityPlayerSP).field_70125_A = ac.getRotPitch() + seatInfo.fixPitch;
-          if (((EntityPlayer)entityPlayerSP).field_70125_A > 90.0F) {
-            ((EntityPlayer)entityPlayerSP).field_70127_C -= (((EntityPlayer)entityPlayerSP).field_70125_A - 90.0F) * 2.0F;
-            ((EntityPlayer)entityPlayerSP).field_70125_A -= (((EntityPlayer)entityPlayerSP).field_70125_A - 90.0F) * 2.0F;
-            ((EntityPlayer)entityPlayerSP).field_70126_B += 180.0F;
-            ((EntityPlayer)entityPlayerSP).field_70177_z += 180.0F;
+          ((EntityPlayer)entityPlayerSP).rotationYaw = ac.getRotYaw() + seatInfo.fixYaw;
+          ((EntityPlayer)entityPlayerSP).rotationPitch = ac.getRotPitch() + seatInfo.fixPitch;
+          if (((EntityPlayer)entityPlayerSP).rotationPitch > 90.0F) {
+            ((EntityPlayer)entityPlayerSP).prevRotationPitch -= (((EntityPlayer)entityPlayerSP).rotationPitch - 90.0F) * 2.0F;
+            ((EntityPlayer)entityPlayerSP).rotationPitch -= (((EntityPlayer)entityPlayerSP).rotationPitch - 90.0F) * 2.0F;
+            ((EntityPlayer)entityPlayerSP).prevRotationYaw += 180.0F;
+            ((EntityPlayer)entityPlayerSP).rotationYaw += 180.0F;
             revRoll = 180.0F;
-          } else if (((EntityPlayer)entityPlayerSP).field_70125_A < -90.0F) {
-            ((EntityPlayer)entityPlayerSP).field_70127_C -= (((EntityPlayer)entityPlayerSP).field_70125_A - 90.0F) * 2.0F;
-            ((EntityPlayer)entityPlayerSP).field_70125_A -= (((EntityPlayer)entityPlayerSP).field_70125_A - 90.0F) * 2.0F;
-            ((EntityPlayer)entityPlayerSP).field_70126_B += 180.0F;
-            ((EntityPlayer)entityPlayerSP).field_70177_z += 180.0F;
+          } else if (((EntityPlayer)entityPlayerSP).rotationPitch < -90.0F) {
+            ((EntityPlayer)entityPlayerSP).prevRotationPitch -= (((EntityPlayer)entityPlayerSP).rotationPitch - 90.0F) * 2.0F;
+            ((EntityPlayer)entityPlayerSP).rotationPitch -= (((EntityPlayer)entityPlayerSP).rotationPitch - 90.0F) * 2.0F;
+            ((EntityPlayer)entityPlayerSP).prevRotationYaw += 180.0F;
+            ((EntityPlayer)entityPlayerSP).rotationYaw += 180.0F;
             revRoll = 180.0F;
           } 
         } 
@@ -416,9 +416,9 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
         ac.setRotRoll(r);
         mouseRollDeltaX *= 0.9D;
         mouseRollDeltaY *= 0.9D;
-        float roll = MathHelper.func_76142_g(ac.getRotRoll());
-        float yaw = MathHelper.func_76142_g(ac.getRotYaw() - ((EntityPlayer)entityPlayerSP).field_70177_z);
-        roll *= MathHelper.func_76134_b((float)(yaw * Math.PI / 180.0D));
+        float roll = MathHelper.wrapDegrees(ac.getRotRoll());
+        float yaw = MathHelper.wrapDegrees(ac.getRotYaw() - ((EntityPlayer)entityPlayerSP).rotationYaw);
+        roll *= MathHelper.cos((float)(yaw * Math.PI / 180.0D));
         if (ac.getTVMissile() != null && W_Lib.isClientPlayer((ac.getTVMissile()).shootingEntity) && ac
           .getIsGunnerMode((Entity)entityPlayerSP))
           roll = 0.0F; 
@@ -435,45 +435,45 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
     } 
     if (ac != null) {
       if (ac.getSeatIdByEntity((Entity)entityPlayerSP) == 0 && !ac.isDestroyed()) {
-        ac.lastRiderYaw = ((EntityPlayer)entityPlayerSP).field_70177_z;
-        ac.prevLastRiderYaw = ((EntityPlayer)entityPlayerSP).field_70126_B;
-        ac.lastRiderPitch = ((EntityPlayer)entityPlayerSP).field_70125_A;
-        ac.prevLastRiderPitch = ((EntityPlayer)entityPlayerSP).field_70127_C;
+        ac.lastRiderYaw = ((EntityPlayer)entityPlayerSP).rotationYaw;
+        ac.prevLastRiderYaw = ((EntityPlayer)entityPlayerSP).prevRotationYaw;
+        ac.lastRiderPitch = ((EntityPlayer)entityPlayerSP).rotationPitch;
+        ac.prevLastRiderPitch = ((EntityPlayer)entityPlayerSP).prevRotationPitch;
       } 
       ac.updateWeaponsRotation();
     } 
-    MCH_ViewEntityDummy mCH_ViewEntityDummy = MCH_ViewEntityDummy.getInstance(((EntityPlayer)entityPlayerSP).field_70170_p);
+    MCH_ViewEntityDummy mCH_ViewEntityDummy = MCH_ViewEntityDummy.getInstance(((EntityPlayer)entityPlayerSP).world);
     if (mCH_ViewEntityDummy != null) {
-      ((Entity)mCH_ViewEntityDummy).field_70177_z = ((EntityPlayer)entityPlayerSP).field_70177_z;
-      ((Entity)mCH_ViewEntityDummy).field_70126_B = ((EntityPlayer)entityPlayerSP).field_70126_B;
+      ((Entity)mCH_ViewEntityDummy).rotationYaw = ((EntityPlayer)entityPlayerSP).rotationYaw;
+      ((Entity)mCH_ViewEntityDummy).prevRotationYaw = ((EntityPlayer)entityPlayerSP).prevRotationYaw;
       if (ac != null) {
         MCH_WeaponSet wi = ac.getCurrentWeapon((Entity)entityPlayerSP);
         if (wi != null && wi.getInfo() != null && (wi.getInfo()).fixCameraPitch)
-          ((Entity)mCH_ViewEntityDummy).field_70125_A = ((Entity)mCH_ViewEntityDummy).field_70127_C = 0.0F; 
+          ((Entity)mCH_ViewEntityDummy).rotationPitch = ((Entity)mCH_ViewEntityDummy).prevRotationPitch = 0.0F; 
       } 
     } 
     prevTick = partialTicks;
   }
   
   public void correctViewEntityDummy(Entity entity) {
-    MCH_ViewEntityDummy mCH_ViewEntityDummy = MCH_ViewEntityDummy.getInstance(entity.field_70170_p);
+    MCH_ViewEntityDummy mCH_ViewEntityDummy = MCH_ViewEntityDummy.getInstance(entity.world);
     if (mCH_ViewEntityDummy != null)
-      if (((Entity)mCH_ViewEntityDummy).field_70177_z - ((Entity)mCH_ViewEntityDummy).field_70126_B > 180.0F) {
-        ((Entity)mCH_ViewEntityDummy).field_70126_B += 360.0F;
-      } else if (((Entity)mCH_ViewEntityDummy).field_70177_z - ((Entity)mCH_ViewEntityDummy).field_70126_B < -180.0F) {
-        ((Entity)mCH_ViewEntityDummy).field_70126_B -= 360.0F;
+      if (((Entity)mCH_ViewEntityDummy).rotationYaw - ((Entity)mCH_ViewEntityDummy).prevRotationYaw > 180.0F) {
+        ((Entity)mCH_ViewEntityDummy).prevRotationYaw += 360.0F;
+      } else if (((Entity)mCH_ViewEntityDummy).rotationYaw - ((Entity)mCH_ViewEntityDummy).prevRotationYaw < -180.0F) {
+        ((Entity)mCH_ViewEntityDummy).prevRotationYaw -= 360.0F;
       }  
   }
   
   public void onPlayerTickPre(EntityPlayer player) {
-    if (player.field_70170_p.field_72995_K) {
-      ItemStack currentItemstack = player.func_184586_b(EnumHand.MAIN_HAND);
-      if (!currentItemstack.func_190926_b() && currentItemstack.func_77973_b() instanceof mcheli.tool.MCH_ItemWrench)
-        if (player.func_184605_cv() > 0 && player.func_184607_cu() != currentItemstack) {
-          int maxdm = currentItemstack.func_77958_k();
-          int dm = currentItemstack.func_77960_j();
+    if (player.world.isRemote) {
+      ItemStack currentItemstack = player.getHeldItem(EnumHand.MAIN_HAND);
+      if (!currentItemstack.func_190926_b() && currentItemstack.getItem() instanceof mcheli.tool.MCH_ItemWrench)
+        if (player.getItemInUseCount() > 0 && player.getActiveItemStack() != currentItemstack) {
+          int maxdm = currentItemstack.getMaxDamage();
+          int dm = currentItemstack.getMetadata();
           if (dm <= maxdm && dm > 0)
-            player.func_184598_c(EnumHand.MAIN_HAND); 
+            player.setActiveHand(EnumHand.MAIN_HAND); 
         }  
     } 
   }
@@ -481,17 +481,17 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
   public void onPlayerTickPost(EntityPlayer player) {}
   
   public void onRenderTickPost(float partialTicks) {
-    if (this.mc.field_71439_g != null) {
-      MCH_ClientTickHandlerBase.applyRotLimit((Entity)this.mc.field_71439_g);
-      MCH_ViewEntityDummy mCH_ViewEntityDummy = MCH_ViewEntityDummy.getInstance(this.mc.field_71439_g.field_70170_p);
+    if (this.mc.player != null) {
+      MCH_ClientTickHandlerBase.applyRotLimit((Entity)this.mc.player);
+      MCH_ViewEntityDummy mCH_ViewEntityDummy = MCH_ViewEntityDummy.getInstance(this.mc.player.world);
       if (mCH_ViewEntityDummy != null) {
-        ((Entity)mCH_ViewEntityDummy).field_70125_A = this.mc.field_71439_g.field_70125_A;
-        ((Entity)mCH_ViewEntityDummy).field_70177_z = this.mc.field_71439_g.field_70177_z;
-        ((Entity)mCH_ViewEntityDummy).field_70127_C = this.mc.field_71439_g.field_70127_C;
-        ((Entity)mCH_ViewEntityDummy).field_70126_B = this.mc.field_71439_g.field_70126_B;
+        ((Entity)mCH_ViewEntityDummy).rotationPitch = this.mc.player.rotationPitch;
+        ((Entity)mCH_ViewEntityDummy).rotationYaw = this.mc.player.rotationYaw;
+        ((Entity)mCH_ViewEntityDummy).prevRotationPitch = this.mc.player.prevRotationPitch;
+        ((Entity)mCH_ViewEntityDummy).prevRotationYaw = this.mc.player.prevRotationYaw;
       } 
     } 
-    if (this.mc.field_71462_r == null || this.mc.field_71462_r instanceof net.minecraft.client.gui.GuiChat || this.mc.field_71462_r
+    if (this.mc.currentScreen == null || this.mc.currentScreen instanceof net.minecraft.client.gui.GuiChat || this.mc.currentScreen
       .getClass().toString().indexOf("GuiDriveableController") >= 0) {
       for (MCH_Gui gui : this.guis) {
         if (drawGui(gui, partialTicks))
@@ -502,14 +502,14 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
       drawGui(this.gui_SwnGnr, partialTicks);
       drawGui(this.gui_EMarker, partialTicks);
       if (isDrawScoreboard)
-        MCH_GuiScoreboard.drawList(this.mc, this.mc.field_71466_p, false); 
+        MCH_GuiScoreboard.drawList(this.mc, this.mc.fontRendererObj, false); 
       drawGui(this.gui_Title, partialTicks);
     } 
   }
   
   public boolean drawGui(MCH_Gui gui, float partialTicks) {
-    if (gui.isDrawGui((EntityPlayer)this.mc.field_71439_g)) {
-      gui.func_73863_a(0, 0, partialTicks);
+    if (gui.isDrawGui((EntityPlayer)this.mc.player)) {
+      gui.drawScreen(0, 0, partialTicks);
       return true;
     } 
     return false;

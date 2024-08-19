@@ -32,24 +32,24 @@ public class MCH_Radar {
   }
   
   public void updateXZ(Entity centerEntity, int range) {
-    if (!this.worldObj.field_72995_K)
+    if (!this.worldObj.isRemote)
       return; 
     clear();
-    List<Entity> list = centerEntity.field_70170_p.func_72839_b(centerEntity, centerEntity
+    List<Entity> list = centerEntity.world.getEntitiesWithinAABBExcludingEntity(centerEntity, centerEntity
         
-        .func_174813_aQ().func_72314_b(range, range, range));
+        .getEntityBoundingBox().expand(range, range, range));
     for (int i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
       if (entity instanceof net.minecraft.entity.EntityLiving) {
-        double x = entity.field_70165_t - centerEntity.field_70165_t;
-        double z = entity.field_70161_v - centerEntity.field_70161_v;
+        double x = entity.posX - centerEntity.posX;
+        double z = entity.posZ - centerEntity.posZ;
         if (x * x + z * z < (range * range)) {
-          int y = 1 + (int)entity.field_70163_u;
+          int y = 1 + (int)entity.posY;
           if (y < 0)
             y = 1; 
           int blockCnt = 0;
           for (; y < 200; y++) {
-            if (W_WorldFunc.getBlockId(this.worldObj, (int)entity.field_70165_t, y, (int)entity.field_70161_v) != 0) {
+            if (W_WorldFunc.getBlockId(this.worldObj, (int)entity.posX, y, (int)entity.posZ) != 0) {
               blockCnt++;
               if (blockCnt >= 5)
                 break; 

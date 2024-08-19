@@ -31,81 +31,81 @@ public class MCH_EntitySeat extends W_Entity implements IEntitySinglePassenger {
   
   public MCH_EntitySeat(World world) {
     super(world);
-    func_70105_a(1.0F, 1.0F);
-    this.field_70159_w = 0.0D;
-    this.field_70181_x = 0.0D;
-    this.field_70179_y = 0.0D;
+    setSize(1.0F, 1.0F);
+    this.motionX = 0.0D;
+    this.motionY = 0.0D;
+    this.motionZ = 0.0D;
     this.seatID = -1;
     setParent((MCH_EntityAircraft)null);
     this.parentSearchCount = 0;
     this.lastRiddenByEntity = null;
-    this.field_70158_ak = true;
-    this.field_70178_ae = true;
+    this.ignoreFrustumCheck = true;
+    this.isImmuneToFire = true;
   }
   
   public MCH_EntitySeat(World world, double x, double y, double z) {
     this(world);
-    func_70107_b(x, y + 1.0D, z);
-    this.field_70169_q = x;
-    this.field_70167_r = y + 1.0D;
-    this.field_70166_s = z;
+    setPosition(x, y + 1.0D, z);
+    this.prevPosX = x;
+    this.prevPosY = y + 1.0D;
+    this.prevPosZ = z;
   }
   
-  protected boolean func_70041_e_() {
+  protected boolean canTriggerWalking() {
     return false;
   }
   
-  public AxisAlignedBB func_70114_g(Entity par1Entity) {
-    return par1Entity.func_174813_aQ();
+  public AxisAlignedBB getCollisionBox(Entity par1Entity) {
+    return par1Entity.getEntityBoundingBox();
   }
   
-  public AxisAlignedBB func_70046_E() {
-    return func_174813_aQ();
+  public AxisAlignedBB getCollisionBoundingBox() {
+    return getEntityBoundingBox();
   }
   
-  public boolean func_70104_M() {
+  public boolean canBePushed() {
     return false;
   }
   
-  public double func_70042_X() {
+  public double getMountedYOffset() {
     return -0.3D;
   }
   
-  public boolean func_70097_a(DamageSource par1DamageSource, float par2) {
+  public boolean attackEntityFrom(DamageSource par1DamageSource, float par2) {
     if (getParent() != null)
-      return getParent().func_70097_a(par1DamageSource, par2); 
+      return getParent().attackEntityFrom(par1DamageSource, par2); 
     return false;
   }
   
-  public boolean func_70067_L() {
-    return !this.field_70128_L;
+  public boolean canBeCollidedWith() {
+    return !this.isDead;
   }
   
   @SideOnly(Side.CLIENT)
-  public void func_180426_a(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {}
+  public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {}
   
-  public void func_70106_y() {
-    super.func_70106_y();
+  public void setDead() {
+    super.setDead();
   }
   
-  public void func_70071_h_() {
-    super.func_70071_h_();
-    this.field_70143_R = 0.0F;
+  public void onUpdate() {
+    super.onUpdate();
+    this.fallDistance = 0.0F;
     Entity riddenByEntity = getRiddenByEntity();
     if (riddenByEntity != null)
-      riddenByEntity.field_70143_R = 0.0F; 
+      riddenByEntity.fallDistance = 0.0F; 
     if (this.lastRiddenByEntity == null && riddenByEntity != null) {
       if (getParent() != null) {
-        MCH_Lib.DbgLog(this.field_70170_p, "MCH_EntitySeat.onUpdate:SeatID=%d", new Object[] { Integer.valueOf(this.seatID), riddenByEntity.toString() });
+        MCH_Lib.DbgLog(this.world, "MCH_EntitySeat.onUpdate:SeatID=%d", new Object[] { Integer.valueOf(this.seatID), riddenByEntity.toString() });
         getParent().onMountPlayerSeat(this, riddenByEntity);
       } 
     } else if (this.lastRiddenByEntity != null && riddenByEntity == null) {
       if (getParent() != null) {
-        MCH_Lib.DbgLog(this.field_70170_p, "MCH_EntitySeat.onUpdate:SeatID=%d", new Object[] { Integer.valueOf(this.seatID), this.lastRiddenByEntity.toString() });
+        MCH_Lib.DbgLog(this.world, "MCH_EntitySeat.onUpdate:SeatID=%d", new Object[] { Integer.valueOf(this.seatID), this.lastRiddenByEntity.toString() });
         getParent().onUnmountPlayerSeat(this, this.lastRiddenByEntity);
       } 
     } 
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       onUpdate_Client();
     } else {
       onUpdate_Server();
@@ -120,40 +120,40 @@ public class MCH_EntitySeat extends W_Entity implements IEntitySinglePassenger {
   private void onUpdate_Server() {
     checkDetachmentAndDelete();
     Entity riddenByEntity = getRiddenByEntity();
-    if (riddenByEntity == null || riddenByEntity.field_70128_L);
+    if (riddenByEntity == null || riddenByEntity.isDead);
   }
   
-  public void func_184232_k(Entity passenger) {
+  public void updatePassenger(Entity passenger) {
     updatePosition(passenger);
   }
   
   public void updatePosition(@Nullable Entity ridEnt) {
     if (ridEnt != null) {
-      ridEnt.func_70107_b(this.field_70165_t, this.field_70163_u, this.field_70161_v);
-      ridEnt.field_70159_w = ridEnt.field_70181_x = ridEnt.field_70179_y = 0.0D;
+      ridEnt.setPosition(this.posX, this.posY, this.posZ);
+      ridEnt.motionX = ridEnt.motionY = ridEnt.motionZ = 0.0D;
     } 
   }
   
   public void updateRotation(@Nullable Entity ridEnt, float yaw, float pitch) {
     if (ridEnt != null) {
-      ridEnt.field_70177_z = yaw;
-      ridEnt.field_70125_A = pitch;
+      ridEnt.rotationYaw = yaw;
+      ridEnt.rotationPitch = pitch;
     } 
   }
   
   protected void checkDetachmentAndDelete() {
-    if (!this.field_70128_L && (this.seatID < 0 || getParent() == null || (getParent()).field_70128_L)) {
-      if (getParent() != null && (getParent()).field_70128_L)
+    if (!this.isDead && (this.seatID < 0 || getParent() == null || (getParent()).isDead)) {
+      if (getParent() != null && (getParent()).isDead)
         this.parentSearchCount = 100000000; 
       if (this.parentSearchCount >= 1200) {
-        func_70106_y();
-        if (!this.field_70170_p.field_72995_K) {
+        setDead();
+        if (!this.world.isRemote) {
           Entity riddenByEntity = getRiddenByEntity();
           if (riddenByEntity != null)
-            riddenByEntity.func_184210_p(); 
+            riddenByEntity.dismountRidingEntity(); 
         } 
         setParent((MCH_EntityAircraft)null);
-        MCH_Lib.DbgLog(this.field_70170_p, "[Error]座席エンティティは本体が見つからないため削除 seat=%d, parentUniqueID=%s", new Object[] { Integer.valueOf(this.seatID), this.parentUniqueID });
+        MCH_Lib.DbgLog(this.world, "[Error]座席エンティティは本体が見つからないため削除 seat=%d, parentUniqueID=%s", new Object[] { Integer.valueOf(this.seatID), this.parentUniqueID });
       } else {
         this.parentSearchCount++;
       } 
@@ -162,14 +162,14 @@ public class MCH_EntitySeat extends W_Entity implements IEntitySinglePassenger {
     } 
   }
   
-  protected void func_70014_b(NBTTagCompound par1NBTTagCompound) {
-    par1NBTTagCompound.func_74768_a("SeatID", this.seatID);
-    par1NBTTagCompound.func_74778_a("ParentUniqueID", this.parentUniqueID);
+  protected void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {
+    par1NBTTagCompound.setInteger("SeatID", this.seatID);
+    par1NBTTagCompound.setString("ParentUniqueID", this.parentUniqueID);
   }
   
-  protected void func_70037_a(NBTTagCompound par1NBTTagCompound) {
-    this.seatID = par1NBTTagCompound.func_74762_e("SeatID");
-    this.parentUniqueID = par1NBTTagCompound.func_74779_i("ParentUniqueID");
+  protected void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
+    this.seatID = par1NBTTagCompound.getInteger("SeatID");
+    this.parentUniqueID = par1NBTTagCompound.getString("ParentUniqueID");
   }
   
   @SideOnly(Side.CLIENT)
@@ -193,24 +193,24 @@ public class MCH_EntitySeat extends W_Entity implements IEntitySinglePassenger {
     return false;
   }
   
-  public boolean func_184230_a(EntityPlayer player, EnumHand hand) {
+  public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
     if (getParent() == null || getParent().isDestroyed())
       return false; 
     if (!getParent().checkTeam(player))
       return false; 
-    ItemStack itemStack = player.func_184586_b(hand);
-    if (!itemStack.func_190926_b() && itemStack.func_77973_b() instanceof mcheli.tool.MCH_ItemWrench)
-      return getParent().func_184230_a(player, hand); 
-    if (!itemStack.func_190926_b() && itemStack.func_77973_b() instanceof mcheli.mob.MCH_ItemSpawnGunner)
-      return getParent().func_184230_a(player, hand); 
+    ItemStack itemStack = player.getHeldItem(hand);
+    if (!itemStack.func_190926_b() && itemStack.getItem() instanceof mcheli.tool.MCH_ItemWrench)
+      return getParent().processInitialInteract(player, hand); 
+    if (!itemStack.func_190926_b() && itemStack.getItem() instanceof mcheli.mob.MCH_ItemSpawnGunner)
+      return getParent().processInitialInteract(player, hand); 
     Entity riddenByEntity = getRiddenByEntity();
     if (riddenByEntity != null)
       return false; 
-    if (player.func_184187_bx() != null)
+    if (player.getRidingEntity() != null)
       return false; 
     if (!canRideMob((Entity)player))
       return false; 
-    player.func_184220_m((Entity)this);
+    player.startRiding((Entity)this);
     return true;
   }
   
@@ -223,7 +223,7 @@ public class MCH_EntitySeat extends W_Entity implements IEntitySinglePassenger {
     this.parent = parent;
     Entity riddenByEntity = getRiddenByEntity();
     if (riddenByEntity != null) {
-      MCH_Lib.DbgLog(this.field_70170_p, "MCH_EntitySeat.setParent:SeatID=%d %s : " + getParent(), new Object[] { Integer.valueOf(this.seatID), riddenByEntity.toString() });
+      MCH_Lib.DbgLog(this.world, "MCH_EntitySeat.setParent:SeatID=%d %s : " + getParent(), new Object[] { Integer.valueOf(this.seatID), riddenByEntity.toString() });
       if (getParent() != null)
         getParent().onMountPlayerSeat(this, riddenByEntity); 
     } 
@@ -231,7 +231,7 @@ public class MCH_EntitySeat extends W_Entity implements IEntitySinglePassenger {
   
   @Nullable
   public Entity getRiddenByEntity() {
-    List<Entity> passengers = func_184188_bt();
+    List<Entity> passengers = getPassengers();
     return passengers.isEmpty() ? null : passengers.get(0);
   }
 }

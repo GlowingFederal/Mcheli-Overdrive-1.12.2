@@ -38,7 +38,7 @@ public class MCH_HudItemCameraRot extends MCH_HudItem {
       pitch = 70.0F; 
     pitch -= 20.0F;
     pitch = (float)(pitch * 0.16D);
-    float yaw = (float)MCH_Lib.getRotateDiff(ac.field_70177_z, camera.rotationYaw);
+    float yaw = (float)MCH_Lib.getRotateDiff(ac.rotationYaw, camera.rotationYaw);
     yaw *= 2.0F;
     if (yaw < -50.0F)
       yaw = -50.0F; 

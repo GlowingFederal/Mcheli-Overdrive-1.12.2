@@ -18,42 +18,42 @@ public abstract class W_GuiContainer extends GuiContainer {
   public void drawItemStack(ItemStack item, int x, int y) {
     if (item.func_190926_b())
       return; 
-    if (item.func_77973_b() == null)
+    if (item.getItem() == null)
       return; 
-    FontRenderer font = item.func_77973_b().getFontRenderer(item);
+    FontRenderer font = item.getItem().getFontRenderer(item);
     if (font == null)
-      font = this.field_146289_q; 
-    GlStateManager.func_179126_j();
-    GlStateManager.func_179140_f();
-    this.field_146296_j.func_180450_b(item, x, y);
-    this.field_146296_j.func_180453_a(font, item, x, y, null);
-    this.field_73735_i = 0.0F;
-    this.field_146296_j.field_77023_b = 0.0F;
+      font = this.fontRendererObj; 
+    GlStateManager.enableDepth();
+    GlStateManager.disableLighting();
+    this.itemRender.renderItemAndEffectIntoGUI(item, x, y);
+    this.itemRender.renderItemOverlayIntoGUI(font, item, x, y, null);
+    this.zLevel = 0.0F;
+    this.itemRender.zLevel = 0.0F;
   }
   
   public void drawIngredient(Ingredient ingredient, int x, int y) {
     if (ingredient != Ingredient.field_193370_a) {
       ItemStack[] itemstacks = ingredient.func_193365_a();
-      int index = MathHelper.func_76141_d(this.time / 20.0F) % itemstacks.length;
+      int index = MathHelper.floor(this.time / 20.0F) % itemstacks.length;
       drawItemStack(itemstacks[index], x, y);
     } 
   }
   
   public void drawString(String s, int x, int y, int color) {
-    func_73731_b(this.field_146289_q, s, x, y, color);
+    drawString(this.fontRendererObj, s, x, y, color);
   }
   
   public void drawCenteredString(String s, int x, int y, int color) {
-    func_73732_a(this.field_146289_q, s, x, y, color);
+    drawCenteredString(this.fontRendererObj, s, x, y, color);
   }
   
   public int getStringWidth(String s) {
-    return this.field_146289_q.func_78256_a(s);
+    return this.fontRendererObj.getStringWidth(s);
   }
   
-  public void func_73863_a(int mouseX, int mouseY, float partialTicks) {
+  public void drawScreen(int mouseX, int mouseY, float partialTicks) {
     this.time += partialTicks;
-    super.func_73863_a(mouseX, mouseY, partialTicks);
+    super.drawScreen(mouseX, mouseY, partialTicks);
   }
   
   public float getAnimationTime() {

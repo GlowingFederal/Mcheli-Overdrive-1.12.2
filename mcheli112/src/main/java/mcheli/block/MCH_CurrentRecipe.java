@@ -47,7 +47,7 @@ public class MCH_CurrentRecipe {
       this.recipe = null;
     } 
     this.index = idx;
-    this.displayName = (this.recipe != null) ? this.recipe.func_77571_b().func_82833_r() : "None";
+    this.displayName = (this.recipe != null) ? this.recipe.getRecipeOutput().getDisplayName() : "None";
     this.descTexture = getDescTexture(this.recipe);
     this.descPage = 0;
     this.descMaxPage = this.descTexture.size();
@@ -79,7 +79,7 @@ public class MCH_CurrentRecipe {
     this.infoData = new ArrayList<>();
     if (info == null)
       return; 
-    getAcInfoTextSub("Name", info.getItemStack().func_82833_r());
+    getAcInfoTextSub("Name", info.getItemStack().getDisplayName());
     getAcInfoTextSub("HP", "" + info.maxHp);
     int seatNum = !info.isUAV ? info.getNumSeat() : (info.getNumSeat() - 1);
     getAcInfoTextSub("Num of Seat", "" + seatNum);

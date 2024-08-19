@@ -9,11 +9,11 @@ public abstract class W_BlockContainer extends BlockContainer {
     super(par2Material);
   }
   
-  public Block func_149715_a(float f) {
-    return super.func_149715_a(f);
+  public Block setLightLevel(float f) {
+    return super.setLightLevel(f);
   }
   
   public Block setUnlocalizedName(String s) {
-    return super.func_149663_c(s);
+    return super.setUnlocalizedName(s);
   }
 }

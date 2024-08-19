@@ -85,8 +85,8 @@ public class MCH_ThrowableInfo extends MCH_BaseInfo implements IItemContent {
   
   public MCH_ThrowableInfo(AddonResourceLocation location, String path) {
     super(location, path);
-    this.name = location.func_110623_a();
-    this.displayName = location.func_110623_a();
+    this.name = location.getResourcePath();
+    this.displayName = location.getResourcePath();
     this.displayNameLang = new HashMap<>();
     this.itemID = 0;
     this.item = null;

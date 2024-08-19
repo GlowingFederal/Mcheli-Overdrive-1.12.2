@@ -41,14 +41,14 @@ public class MCH_GuiCommonHandler implements IGuiHandler {
         uavStation = PooledGuiParameter.getEntity(player);
         PooledGuiParameter.resetEntity(player);
         if (uavStation instanceof MCH_EntityUavStation)
-          return new MCH_ContainerUavStation(player.field_71071_by, (MCH_EntityUavStation)uavStation); 
+          return new MCH_ContainerUavStation(player.inventory, (MCH_EntityUavStation)uavStation); 
         break;
       case 1:
         ac = null;
-        if (player.func_184187_bx() instanceof MCH_EntityAircraft) {
-          ac = (MCH_EntityAircraft)player.func_184187_bx();
-        } else if (player.func_184187_bx() instanceof MCH_EntityUavStation) {
-          ac = ((MCH_EntityUavStation)player.func_184187_bx()).getControlAircract();
+        if (player.getRidingEntity() instanceof MCH_EntityAircraft) {
+          ac = (MCH_EntityAircraft)player.getRidingEntity();
+        } else if (player.getRidingEntity() instanceof MCH_EntityUavStation) {
+          ac = ((MCH_EntityUavStation)player.getRidingEntity()).getControlAircract();
         } 
         if (ac != null)
           return new MCH_AircraftGuiContainer(player, ac); 
@@ -58,7 +58,7 @@ public class MCH_GuiCommonHandler implements IGuiHandler {
       case 4:
         return new MCH_DraftingTableGuiContainer(player, x, y, z);
       case 5:
-        if (!MCH_Utils.getServer().func_71264_H() || MCH_Config.DebugLog)
+        if (!MCH_Utils.getServer().isSinglePlayer() || MCH_Config.DebugLog)
           return new MCH_ContainerScoreboard(player); 
         break;
     } 
@@ -74,14 +74,14 @@ public class MCH_GuiCommonHandler implements IGuiHandler {
         uavStation = PooledGuiParameter.getEntity(player);
         PooledGuiParameter.resetEntity(player);
         if (uavStation instanceof MCH_EntityUavStation)
-          return new MCH_GuiUavStation(player.field_71071_by, (MCH_EntityUavStation)uavStation); 
+          return new MCH_GuiUavStation(player.inventory, (MCH_EntityUavStation)uavStation); 
         break;
       case 1:
         ac = null;
-        if (player.func_184187_bx() instanceof MCH_EntityAircraft) {
-          ac = (MCH_EntityAircraft)player.func_184187_bx();
-        } else if (player.func_184187_bx() instanceof MCH_EntityUavStation) {
-          ac = ((MCH_EntityUavStation)player.func_184187_bx()).getControlAircract();
+        if (player.getRidingEntity() instanceof MCH_EntityAircraft) {
+          ac = (MCH_EntityAircraft)player.getRidingEntity();
+        } else if (player.getRidingEntity() instanceof MCH_EntityUavStation) {
+          ac = ((MCH_EntityUavStation)player.getRidingEntity()).getControlAircract();
         } 
         if (ac != null)
           return new MCH_AircraftGui(player, ac); 

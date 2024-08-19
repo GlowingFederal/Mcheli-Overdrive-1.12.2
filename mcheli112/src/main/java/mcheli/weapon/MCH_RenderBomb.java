@@ -15,7 +15,7 @@ public class MCH_RenderBomb extends MCH_RenderBulletBase<MCH_EntityBomb> {
   
   public MCH_RenderBomb(RenderManager renderManager) {
     super(renderManager);
-    this.field_76989_e = 0.0F;
+    this.shadowSize = 0.0F;
   }
   
   public void renderBullet(MCH_EntityBomb entity, double posX, double posY, double posZ, float yaw, float partialTickTime) {
@@ -26,8 +26,8 @@ public class MCH_RenderBomb extends MCH_RenderBulletBase<MCH_EntityBomb> {
       return; 
     GL11.glPushMatrix();
     GL11.glTranslated(posX, posY, posZ);
-    GL11.glRotatef(-entity.field_70177_z, 0.0F, 1.0F, 0.0F);
-    GL11.glRotatef(-entity.field_70125_A, -1.0F, 0.0F, 0.0F);
+    GL11.glRotatef(-entity.rotationYaw, 0.0F, 1.0F, 0.0F);
+    GL11.glRotatef(-entity.rotationPitch, -1.0F, 0.0F, 0.0F);
     if (bomb.isBomblet > 0 || (bomb.getInfo()).bomblet <= 0 || (bomb.getInfo()).bombletSTime > 0)
       renderModel(bomb); 
     GL11.glPopMatrix();

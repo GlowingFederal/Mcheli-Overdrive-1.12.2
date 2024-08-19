@@ -33,7 +33,7 @@ public class MCH_HudItemString extends MCH_HudItem {
   public void execute() {
     int x = (int)(centerX + calc(this.posX));
     int y = (int)(centerY + calc(this.posY));
-    int worldTime = (int)((ac.field_70170_p.func_72820_D() + 6000L) % 24000L);
+    int worldTime = (int)((ac.world.getWorldTime() + 6000L) % 24000L);
     Date date = new Date();
     Object[] prm = new Object[this.args.length];
     double hp_per = (ac.getMaxHP() > 0) ? (ac.getHP() / ac.getMaxHP()) : 0.0D;
@@ -67,25 +67,25 @@ public class MCH_HudItemString extends MCH_HudItem {
           prm[i] = Double.valueOf(hp_per * 100.0D);
           break;
         case POS_X:
-          prm[i] = Double.valueOf(ac.field_70165_t);
+          prm[i] = Double.valueOf(ac.posX);
           break;
         case POS_Y:
-          prm[i] = Double.valueOf(ac.field_70163_u);
+          prm[i] = Double.valueOf(ac.posY);
           break;
         case POS_Z:
-          prm[i] = Double.valueOf(ac.field_70161_v);
+          prm[i] = Double.valueOf(ac.posZ);
           break;
         case MOTION_X:
-          prm[i] = Double.valueOf(ac.field_70159_w);
+          prm[i] = Double.valueOf(ac.motionX);
           break;
         case MOTION_Y:
-          prm[i] = Double.valueOf(ac.field_70181_x);
+          prm[i] = Double.valueOf(ac.motionY);
           break;
         case MOTION_Z:
-          prm[i] = Double.valueOf(ac.field_70179_y);
+          prm[i] = Double.valueOf(ac.motionZ);
           break;
         case INVENTORY:
-          prm[i] = Integer.valueOf(ac.func_70302_i_());
+          prm[i] = Integer.valueOf(ac.getSizeInventory());
           break;
         case WPN_NAME:
           prm[i] = WeaponName;
@@ -137,13 +137,13 @@ public class MCH_HudItemString extends MCH_HudItem {
           prm[i] = Float.valueOf(-ac.getRotPitch());
           break;
         case ROLL:
-          prm[i] = Float.valueOf(MathHelper.func_76142_g(ac.getRotRoll()));
+          prm[i] = Float.valueOf(MathHelper.wrapDegrees(ac.getRotRoll()));
           break;
         case PLYR_YAW:
-          prm[i] = Double.valueOf(MCH_Lib.getRotate360((player.field_70177_z + 180.0F)));
+          prm[i] = Double.valueOf(MCH_Lib.getRotate360((player.rotationYaw + 180.0F)));
           break;
         case PLYR_PITCH:
-          prm[i] = Float.valueOf(-player.field_70125_A);
+          prm[i] = Float.valueOf(-player.rotationPitch);
           break;
         case TVM_POS_X:
           prm[i] = Double.valueOf(TVM_PosX);

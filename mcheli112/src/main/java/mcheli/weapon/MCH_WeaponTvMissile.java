@@ -21,7 +21,7 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
     this.acceleration = 2.0F;
     this.explosionPower = 4;
     this.interval = -100;
-    if (w.field_72995_K)
+    if (w.isRemote)
       this.interval -= 10; 
     this.numMode = 2;
     this.lastShotEntity = null;
@@ -40,11 +40,11 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
   
   public void update(int countWait) {
     super.update(countWait);
-    if (!this.worldObj.field_72995_K) {
+    if (!this.worldObj.isRemote) {
       if (this.isTVGuided)
         if (this.tick <= 9) {
           if (this.tick % 3 == 0)
-            if (this.lastShotTvMissile != null && !this.lastShotTvMissile.field_70128_L && this.lastShotEntity != null && !this.lastShotEntity.field_70128_L)
+            if (this.lastShotTvMissile != null && !this.lastShotTvMissile.isDead && this.lastShotEntity != null && !this.lastShotEntity.isDead)
               MCH_PacketNotifyTVMissileEntity.send(W_Entity.getEntityId(this.lastShotEntity), 
                   W_Entity.getEntityId((Entity)this.lastShotTvMissile));  
           if (this.tick == 9) {
@@ -59,7 +59,7 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
   }
   
   public boolean shot(MCH_WeaponParam prm) {
-    if (this.worldObj.field_72995_K)
+    if (this.worldObj.isRemote)
       return shotClient(prm.entity, prm.user); 
     return shotServer(prm);
   }
@@ -71,11 +71,11 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
   }
   
   protected boolean shotServer(MCH_WeaponParam prm) {
-    float yaw = prm.user.field_70177_z + this.fixRotationYaw;
-    float pitch = prm.user.field_70125_A + this.fixRotationPitch;
-    double tX = (-MathHelper.func_76126_a(yaw / 180.0F * 3.1415927F) * MathHelper.func_76134_b(pitch / 180.0F * 3.1415927F));
-    double tZ = (MathHelper.func_76134_b(yaw / 180.0F * 3.1415927F) * MathHelper.func_76134_b(pitch / 180.0F * 3.1415927F));
-    double tY = -MathHelper.func_76126_a(pitch / 180.0F * 3.1415927F);
+    float yaw = prm.user.rotationYaw + this.fixRotationYaw;
+    float pitch = prm.user.rotationPitch + this.fixRotationPitch;
+    double tX = (-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
+    double tZ = (MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
+    double tY = -MathHelper.sin(pitch / 180.0F * 3.1415927F);
     this.isTVGuided = (prm.option1 == 0);
     float acr = this.acceleration;
     if (!this.isTVGuided)
@@ -85,7 +85,7 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
     e.setParameterFromWeapon(this, prm.entity, prm.user);
     this.lastShotEntity = prm.entity;
     this.lastShotTvMissile = e;
-    this.worldObj.func_72838_d((Entity)e);
+    this.worldObj.spawnEntityInWorld((Entity)e);
     playSound(prm.entity);
     return true;
   }

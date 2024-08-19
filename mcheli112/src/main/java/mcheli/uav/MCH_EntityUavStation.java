@@ -50,11 +50,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySinglePassenger, IEntityItemStackPickable {
   public static final float Y_OFFSET = 0.35F;
   
-  private static final DataParameter<Byte> STATUS = EntityDataManager.func_187226_a(MCH_EntityUavStation.class, DataSerializers.field_187191_a);
+  private static final DataParameter<Byte> STATUS = EntityDataManager.createKey(MCH_EntityUavStation.class, DataSerializers.BYTE);
   
-  private static final DataParameter<Integer> LAST_AC_ID = EntityDataManager.func_187226_a(MCH_EntityUavStation.class, DataSerializers.field_187192_b);
+  private static final DataParameter<Integer> LAST_AC_ID = EntityDataManager.createKey(MCH_EntityUavStation.class, DataSerializers.VARINT);
   
-  private static final DataParameter<BlockPos> UAV_POS = EntityDataManager.func_187226_a(MCH_EntityUavStation.class, DataSerializers.field_187200_j);
+  private static final DataParameter<BlockPos> UAV_POS = EntityDataManager.createKey(MCH_EntityUavStation.class, DataSerializers.BLOCK_POS);
   
   protected Entity lastRiddenByEntity;
   
@@ -100,12 +100,12 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
   public MCH_EntityUavStation(World world) {
     super(world);
     this.dropContentsWhenDead = false;
-    this.field_70156_m = true;
-    func_70105_a(2.0F, 0.7F);
-    this.field_70159_w = 0.0D;
-    this.field_70181_x = 0.0D;
-    this.field_70179_y = 0.0D;
-    this.field_70158_ak = true;
+    this.preventEntitySpawning = true;
+    setSize(2.0F, 0.7F);
+    this.motionX = 0.0D;
+    this.motionY = 0.0D;
+    this.motionZ = 0.0D;
+    this.ignoreFrustumCheck = true;
     this.lastRiddenByEntity = null;
     this.aircraftPosRotInc = 0;
     this.aircraftX = 0.0D;
@@ -123,22 +123,22 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
     this.loadedLastControlAircraftGuid = "";
   }
   
-  protected void func_70088_a() {
-    super.func_70088_a();
-    this.field_70180_af.func_187214_a(STATUS, Byte.valueOf((byte)0));
-    this.field_70180_af.func_187214_a(LAST_AC_ID, Integer.valueOf(0));
-    this.field_70180_af.func_187214_a(UAV_POS, BlockPos.field_177992_a);
+  protected void entityInit() {
+    super.entityInit();
+    this.dataManager.register(STATUS, Byte.valueOf((byte)0));
+    this.dataManager.register(LAST_AC_ID, Integer.valueOf(0));
+    this.dataManager.register(UAV_POS, BlockPos.ORIGIN);
     setOpen(true);
   }
   
   public int getStatus() {
-    return ((Byte)this.field_70180_af.func_187225_a(STATUS)).byteValue();
+    return ((Byte)this.dataManager.get(STATUS)).byteValue();
   }
   
   public void setStatus(int n) {
-    if (!this.field_70170_p.field_72995_K) {
-      MCH_Lib.DbgLog(this.field_70170_p, "MCH_EntityUavStation.setStatus(%d)", new Object[] { Integer.valueOf(n) });
-      this.field_70180_af.func_187227_b(STATUS, Byte.valueOf((byte)n));
+    if (!this.world.isRemote) {
+      MCH_Lib.DbgLog(this.world, "MCH_EntityUavStation.setStatus(%d)", new Object[] { Integer.valueOf(n) });
+      this.dataManager.set(STATUS, Byte.valueOf((byte)n));
     } 
   }
   
@@ -165,130 +165,130 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
   
   public void setControlAircract(@Nullable MCH_EntityAircraft ac) {
     this.controlAircraft = ac;
-    if (ac != null && !ac.field_70128_L)
+    if (ac != null && !ac.isDead)
       setLastControlAircraft(ac); 
   }
   
   public void setUavPosition(int x, int y, int z) {
-    if (!this.field_70170_p.field_72995_K) {
+    if (!this.world.isRemote) {
       this.posUavX = x;
       this.posUavY = y;
       this.posUavZ = z;
-      this.field_70180_af.func_187227_b(UAV_POS, new BlockPos(x, y, z));
+      this.dataManager.set(UAV_POS, new BlockPos(x, y, z));
     } 
   }
   
   public void updateUavPosition() {
-    BlockPos uavPos = (BlockPos)this.field_70180_af.func_187225_a(UAV_POS);
-    this.posUavX = uavPos.func_177958_n();
-    this.posUavY = uavPos.func_177956_o();
-    this.posUavZ = uavPos.func_177952_p();
+    BlockPos uavPos = (BlockPos)this.dataManager.get(UAV_POS);
+    this.posUavX = uavPos.getX();
+    this.posUavY = uavPos.getY();
+    this.posUavZ = uavPos.getZ();
   }
   
-  protected void func_70014_b(NBTTagCompound nbt) {
-    super.func_70014_b(nbt);
-    nbt.func_74768_a("UavStatus", getStatus());
-    nbt.func_74768_a("PosUavX", this.posUavX);
-    nbt.func_74768_a("PosUavY", this.posUavY);
-    nbt.func_74768_a("PosUavZ", this.posUavZ);
+  protected void writeEntityToNBT(NBTTagCompound nbt) {
+    super.writeEntityToNBT(nbt);
+    nbt.setInteger("UavStatus", getStatus());
+    nbt.setInteger("PosUavX", this.posUavX);
+    nbt.setInteger("PosUavY", this.posUavY);
+    nbt.setInteger("PosUavZ", this.posUavZ);
     String s = "";
-    if (getLastControlAircraft() != null && !(getLastControlAircraft()).field_70128_L)
+    if (getLastControlAircraft() != null && !(getLastControlAircraft()).isDead)
       s = getLastControlAircraft().getCommonUniqueId(); 
     if (s.isEmpty())
       s = this.loadedLastControlAircraftGuid; 
-    nbt.func_74778_a("LastCtrlAc", s);
+    nbt.setString("LastCtrlAc", s);
   }
   
-  protected void func_70037_a(NBTTagCompound nbt) {
-    super.func_70037_a(nbt);
-    setUavPosition(nbt.func_74762_e("PosUavX"), nbt.func_74762_e("PosUavY"), nbt.func_74762_e("PosUavZ"));
-    if (nbt.func_74764_b("UavStatus")) {
-      setStatus(nbt.func_74762_e("UavStatus"));
+  protected void readEntityFromNBT(NBTTagCompound nbt) {
+    super.readEntityFromNBT(nbt);
+    setUavPosition(nbt.getInteger("PosUavX"), nbt.getInteger("PosUavY"), nbt.getInteger("PosUavZ"));
+    if (nbt.hasKey("UavStatus")) {
+      setStatus(nbt.getInteger("UavStatus"));
     } else {
       setKind(1);
     } 
-    this.loadedLastControlAircraftGuid = nbt.func_74779_i("LastCtrlAc");
+    this.loadedLastControlAircraftGuid = nbt.getString("LastCtrlAc");
   }
   
   public void initUavPostion() {
-    int rt = (int)(MCH_Lib.getRotate360((this.field_70177_z + 45.0F)) / 90.0D);
+    int rt = (int)(MCH_Lib.getRotate360((this.rotationYaw + 45.0F)) / 90.0D);
     this.posUavX = (rt == 0 || rt == 3) ? 12 : -12;
     this.posUavZ = (rt == 0 || rt == 1) ? 12 : -12;
     this.posUavY = 2;
     setUavPosition(this.posUavX, this.posUavY, this.posUavZ);
   }
   
-  public void func_70106_y() {
-    super.func_70106_y();
+  public void setDead() {
+    super.setDead();
   }
   
-  public boolean func_70097_a(DamageSource damageSource, float damage) {
-    if (func_180431_b(damageSource))
+  public boolean attackEntityFrom(DamageSource damageSource, float damage) {
+    if (isEntityInvulnerable(damageSource))
       return false; 
-    if (this.field_70128_L)
+    if (this.isDead)
       return true; 
-    if (this.field_70170_p.field_72995_K)
+    if (this.world.isRemote)
       return true; 
-    String dmt = damageSource.func_76355_l();
+    String dmt = damageSource.getDamageType();
     damage = MCH_Config.applyDamageByExternal((Entity)this, damageSource, damage);
     if (!MCH_Multiplay.canAttackEntity(damageSource, (Entity)this))
       return false; 
     boolean isCreative = false;
-    Entity entity = damageSource.func_76346_g();
+    Entity entity = damageSource.getEntity();
     boolean isDamegeSourcePlayer = false;
     if (entity instanceof EntityPlayer) {
-      isCreative = ((EntityPlayer)entity).field_71075_bZ.field_75098_d;
+      isCreative = ((EntityPlayer)entity).capabilities.isCreativeMode;
       if (dmt.compareTo("player") == 0)
         isDamegeSourcePlayer = true; 
       W_WorldFunc.MOD_playSoundAtEntity((Entity)this, "hit", 1.0F, 1.0F);
     } else {
-      W_WorldFunc.MOD_playSoundAtEntity((Entity)this, "helidmg", 1.0F, 0.9F + this.field_70146_Z.nextFloat() * 0.1F);
+      W_WorldFunc.MOD_playSoundAtEntity((Entity)this, "helidmg", 1.0F, 0.9F + this.rand.nextFloat() * 0.1F);
     } 
-    func_70018_K();
+    setBeenAttacked();
     if (damage > 0.0F) {
       Entity riddenByEntity = getRiddenByEntity();
       if (riddenByEntity != null)
-        riddenByEntity.func_184220_m((Entity)this); 
+        riddenByEntity.startRiding((Entity)this); 
       this.dropContentsWhenDead = true;
-      func_70106_y();
+      setDead();
       if (!isDamegeSourcePlayer)
-        MCH_Explosion.newExplosion(this.field_70170_p, null, riddenByEntity, this.field_70165_t, this.field_70163_u, this.field_70161_v, 1.0F, 0.0F, true, true, false, false, 0); 
+        MCH_Explosion.newExplosion(this.world, null, riddenByEntity, this.posX, this.posY, this.posZ, 1.0F, 0.0F, true, true, false, false, 0); 
       if (!isCreative) {
         int kind = getKind();
         if (kind > 0)
-          func_145778_a((Item)MCH_MOD.itemUavStation[kind - 1], 1, 0.0F); 
+          dropItemWithOffset((Item)MCH_MOD.itemUavStation[kind - 1], 1, 0.0F); 
       } 
     } 
     return true;
   }
   
-  protected boolean func_70041_e_() {
+  protected boolean canTriggerWalking() {
     return false;
   }
   
-  public AxisAlignedBB func_70114_g(Entity par1Entity) {
-    return par1Entity.func_174813_aQ();
+  public AxisAlignedBB getCollisionBox(Entity par1Entity) {
+    return par1Entity.getEntityBoundingBox();
   }
   
-  public AxisAlignedBB func_70046_E() {
-    return func_174813_aQ();
+  public AxisAlignedBB getCollisionBoundingBox() {
+    return getEntityBoundingBox();
   }
   
-  public boolean func_70104_M() {
+  public boolean canBePushed() {
     return false;
   }
   
-  public double func_70042_X() {
+  public double getMountedYOffset() {
     Entity riddenByEntity = getRiddenByEntity();
     if (getKind() == 2 && riddenByEntity != null) {
-      double px = -Math.sin(this.field_70177_z * Math.PI / 180.0D) * 0.9D;
-      double pz = Math.cos(this.field_70177_z * Math.PI / 180.0D) * 0.9D;
-      int x = (int)(this.field_70165_t + px);
-      int y = (int)(this.field_70163_u - 0.5D);
-      int z = (int)(this.field_70161_v + pz);
+      double px = -Math.sin(this.rotationYaw * Math.PI / 180.0D) * 0.9D;
+      double pz = Math.cos(this.rotationYaw * Math.PI / 180.0D) * 0.9D;
+      int x = (int)(this.posX + px);
+      int y = (int)(this.posY - 0.5D);
+      int z = (int)(this.posZ + pz);
       BlockPos blockpos = new BlockPos(x, y, z);
-      IBlockState iblockstate = this.field_70170_p.func_180495_p(blockpos);
-      return iblockstate.func_185914_p() ? -0.4D : -0.9D;
+      IBlockState iblockstate = this.world.getBlockState(blockpos);
+      return iblockstate.isOpaqueCube() ? -0.4D : -0.9D;
     } 
     return 0.35D;
   }
@@ -298,23 +298,23 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
     return 2.0F;
   }
   
-  public boolean func_70067_L() {
-    return !this.field_70128_L;
+  public boolean canBeCollidedWith() {
+    return !this.isDead;
   }
   
-  public void func_70108_f(Entity par1Entity) {}
+  public void applyEntityCollision(Entity par1Entity) {}
   
-  public void func_70024_g(double par1, double par3, double par5) {}
+  public void addVelocity(double par1, double par3, double par5) {}
   
   @SideOnly(Side.CLIENT)
-  public void func_70016_h(double par1, double par3, double par5) {
-    this.velocityX = this.field_70159_w = par1;
-    this.velocityY = this.field_70181_x = par3;
-    this.velocityZ = this.field_70179_y = par5;
+  public void setVelocity(double par1, double par3, double par5) {
+    this.velocityX = this.motionX = par1;
+    this.velocityY = this.motionY = par3;
+    this.velocityZ = this.motionZ = par5;
   }
   
-  public void func_70071_h_() {
-    super.func_70071_h_();
+  public void onUpdate() {
+    super.onUpdate();
     this.prevRotCover = this.rotCover;
     if (isOpen()) {
       if (this.rotCover < 1.0F) {
@@ -334,16 +334,16 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
       setControlAircract((MCH_EntityAircraft)null);
     } 
     int uavStationKind = getKind();
-    if (this.field_70173_aa >= 30 || uavStationKind <= 0 || uavStationKind == 1 || uavStationKind != 2 || (this.field_70170_p.field_72995_K && !this.isRequestedSyncStatus))
+    if (this.ticksExisted >= 30 || uavStationKind <= 0 || uavStationKind == 1 || uavStationKind != 2 || (this.world.isRemote && !this.isRequestedSyncStatus))
       this.isRequestedSyncStatus = true; 
-    this.field_70169_q = this.field_70165_t;
-    this.field_70167_r = this.field_70163_u;
-    this.field_70166_s = this.field_70161_v;
-    if (getControlAircract() != null && (getControlAircract()).field_70128_L)
+    this.prevPosX = this.posX;
+    this.prevPosY = this.posY;
+    this.prevPosZ = this.posZ;
+    if (getControlAircract() != null && (getControlAircract()).isDead)
       setControlAircract((MCH_EntityAircraft)null); 
-    if (getLastControlAircraft() != null && (getLastControlAircraft()).field_70128_L)
+    if (getLastControlAircraft() != null && (getLastControlAircraft()).isDead)
       setLastControlAircraft((MCH_EntityAircraft)null); 
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       onUpdate_Client();
     } else {
       onUpdate_Server();
@@ -360,7 +360,7 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
     if (getLastControlAircraft() == null) {
       int id = getLastControlAircraftEntityId().intValue();
       if (id > 0) {
-        Entity entity = this.field_70170_p.func_73045_a(id);
+        Entity entity = this.world.getEntityByID(id);
         if (entity instanceof MCH_EntityAircraft) {
           MCH_EntityAircraft ac = (MCH_EntityAircraft)entity;
           if (ac.isUAV())
@@ -372,31 +372,31 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
   }
   
   public void setLastControlAircraft(MCH_EntityAircraft ac) {
-    MCH_Lib.DbgLog(this.field_70170_p, "MCH_EntityUavStation.setLastControlAircraft:" + ac, new Object[0]);
+    MCH_Lib.DbgLog(this.world, "MCH_EntityUavStation.setLastControlAircraft:" + ac, new Object[0]);
     this.lastControlAircraft = ac;
   }
   
   public Integer getLastControlAircraftEntityId() {
-    return (Integer)this.field_70180_af.func_187225_a(LAST_AC_ID);
+    return (Integer)this.dataManager.get(LAST_AC_ID);
   }
   
   public void setLastControlAircraftEntityId(int s) {
-    if (!this.field_70170_p.field_72995_K)
-      this.field_70180_af.func_187227_b(LAST_AC_ID, Integer.valueOf(s)); 
+    if (!this.world.isRemote)
+      this.dataManager.set(LAST_AC_ID, Integer.valueOf(s)); 
   }
   
   public void searchLastControlAircraft() {
     if (this.loadedLastControlAircraftGuid.isEmpty())
       return; 
-    List<MCH_EntityAircraft> list = this.field_70170_p.func_72872_a(MCH_EntityAircraft.class, 
-        func_70046_E().func_72314_b(120.0D, 120.0D, 120.0D));
+    List<MCH_EntityAircraft> list = this.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, 
+        getCollisionBoundingBox().expand(120.0D, 120.0D, 120.0D));
     if (list == null)
       return; 
     for (int i = 0; i < list.size(); i++) {
       MCH_EntityAircraft ac = list.get(i);
       if (ac.getCommonUniqueId().equals(this.loadedLastControlAircraftGuid)) {
         String n = "no info : " + ac;
-        MCH_Lib.DbgLog(this.field_70170_p, "MCH_EntityUavStation.searchLastControlAircraft:found" + n, new Object[0]);
+        MCH_Lib.DbgLog(this.world, "MCH_EntityUavStation.searchLastControlAircraft:found" + n, new Object[0]);
         setLastControlAircraft(ac);
         setLastControlAircraftEntityId(W_Entity.getEntityId((Entity)ac));
         this.loadedLastControlAircraftGuid = "";
@@ -408,67 +408,67 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
   protected void onUpdate_Client() {
     if (this.aircraftPosRotInc > 0) {
       double rpinc = this.aircraftPosRotInc;
-      double yaw = MathHelper.func_76138_g(this.aircraftYaw - this.field_70177_z);
-      this.field_70177_z = (float)(this.field_70177_z + yaw / rpinc);
-      this.field_70125_A = (float)(this.field_70125_A + (this.aircraftPitch - this.field_70125_A) / rpinc);
-      func_70107_b(this.field_70165_t + (this.aircraftX - this.field_70165_t) / rpinc, this.field_70163_u + (this.aircraftY - this.field_70163_u) / rpinc, this.field_70161_v + (this.aircraftZ - this.field_70161_v) / rpinc);
-      func_70101_b(this.field_70177_z, this.field_70125_A);
+      double yaw = MathHelper.wrapDegrees(this.aircraftYaw - this.rotationYaw);
+      this.rotationYaw = (float)(this.rotationYaw + yaw / rpinc);
+      this.rotationPitch = (float)(this.rotationPitch + (this.aircraftPitch - this.rotationPitch) / rpinc);
+      setPosition(this.posX + (this.aircraftX - this.posX) / rpinc, this.posY + (this.aircraftY - this.posY) / rpinc, this.posZ + (this.aircraftZ - this.posZ) / rpinc);
+      setRotation(this.rotationYaw, this.rotationPitch);
       this.aircraftPosRotInc--;
     } else {
-      func_70107_b(this.field_70165_t + this.field_70159_w, this.field_70163_u + this.field_70181_x, this.field_70161_v + this.field_70179_y);
-      this.field_70181_x *= 0.96D;
-      this.field_70159_w = 0.0D;
-      this.field_70179_y = 0.0D;
+      setPosition(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+      this.motionY *= 0.96D;
+      this.motionX = 0.0D;
+      this.motionZ = 0.0D;
     } 
     updateUavPosition();
   }
   
   private void onUpdate_Server() {
-    this.field_70181_x -= 0.03D;
-    func_70091_d(MoverType.SELF, 0.0D, this.field_70181_x, 0.0D);
-    this.field_70181_x *= 0.96D;
-    this.field_70159_w = 0.0D;
-    this.field_70179_y = 0.0D;
-    func_70101_b(this.field_70177_z, this.field_70125_A);
+    this.motionY -= 0.03D;
+    moveEntity(MoverType.SELF, 0.0D, this.motionY, 0.0D);
+    this.motionY *= 0.96D;
+    this.motionX = 0.0D;
+    this.motionZ = 0.0D;
+    setRotation(this.rotationYaw, this.rotationPitch);
     Entity riddenByEntity = getRiddenByEntity();
     if (riddenByEntity != null)
-      if (riddenByEntity.field_70128_L) {
+      if (riddenByEntity.isDead) {
         unmountEntity(true);
       } else {
-        ItemStack item = func_70301_a(0);
+        ItemStack item = getStackInSlot(0);
         if (!item.func_190926_b()) {
           handleItem(riddenByEntity, item);
           if (item.func_190916_E() == 0)
-            func_70299_a(0, ItemStack.field_190927_a); 
+            setInventorySlotContents(0, ItemStack.field_190927_a); 
         } 
       }  
     if (getLastControlAircraft() == null)
-      if (this.field_70173_aa % 40 == 0)
+      if (this.ticksExisted % 40 == 0)
         searchLastControlAircraft();  
   }
   
-  public void func_180426_a(double par1, double par3, double par5, float par7, float par8, int par9, boolean teleport) {
+  public void setPositionAndRotationDirect(double par1, double par3, double par5, float par7, float par8, int par9, boolean teleport) {
     this.aircraftPosRotInc = par9 + 8;
     this.aircraftX = par1;
     this.aircraftY = par3;
     this.aircraftZ = par5;
     this.aircraftYaw = par7;
     this.aircraftPitch = par8;
-    this.field_70159_w = this.velocityX;
-    this.field_70181_x = this.velocityY;
-    this.field_70179_y = this.velocityZ;
+    this.motionX = this.velocityX;
+    this.motionY = this.velocityY;
+    this.motionZ = this.velocityZ;
   }
   
-  public void func_184232_k(Entity passenger) {
-    if (func_184196_w(passenger)) {
-      double x = -Math.sin(this.field_70177_z * Math.PI / 180.0D) * 0.9D;
-      double z = Math.cos(this.field_70177_z * Math.PI / 180.0D) * 0.9D;
-      passenger.func_70107_b(this.field_70165_t + x, this.field_70163_u + func_70042_X() + passenger.func_70033_W() + 0.3499999940395355D, this.field_70161_v + z);
+  public void updatePassenger(Entity passenger) {
+    if (isPassenger(passenger)) {
+      double x = -Math.sin(this.rotationYaw * Math.PI / 180.0D) * 0.9D;
+      double z = Math.cos(this.rotationYaw * Math.PI / 180.0D) * 0.9D;
+      passenger.setPosition(this.posX + x, this.posY + getMountedYOffset() + passenger.getYOffset() + 0.3499999940395355D, this.posZ + z);
     } 
   }
   
   public void controlLastAircraft(Entity user) {
-    if (getLastControlAircraft() != null && !(getLastControlAircraft()).field_70128_L) {
+    if (getLastControlAircraft() != null && !(getLastControlAircraft()).isDead) {
       getLastControlAircraft().setUavStation(this);
       setControlAircract(getLastControlAircraft());
       W_EntityPlayer.closeScreen(user);
@@ -477,24 +477,24 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
   
   public void handleItem(@Nullable Entity user, ItemStack itemStack) {
     MCH_EntityTank mCH_EntityTank;
-    if (user == null || user.field_70128_L || itemStack.func_190926_b() || itemStack.func_190916_E() != 1)
+    if (user == null || user.isDead || itemStack.func_190926_b() || itemStack.func_190916_E() != 1)
       return; 
-    if (this.field_70170_p.field_72995_K)
+    if (this.world.isRemote)
       return; 
     MCH_EntityAircraft ac = null;
-    double x = this.field_70165_t + this.posUavX;
-    double y = this.field_70163_u + this.posUavY;
-    double z = this.field_70161_v + this.posUavZ;
+    double x = this.posX + this.posUavX;
+    double y = this.posY + this.posUavY;
+    double z = this.posZ + this.posUavZ;
     if (y <= 1.0D)
       y = 2.0D; 
-    Item item = itemStack.func_77973_b();
+    Item item = itemStack.getItem();
     if (item instanceof MCP_ItemPlane) {
       MCP_PlaneInfo pi = MCP_PlaneInfoManager.getFromItem(item);
       if (pi != null && pi.isUAV)
         if (!pi.isSmallUAV && getKind() == 2) {
           ac = null;
         } else {
-          MCP_EntityPlane mCP_EntityPlane = ((MCP_ItemPlane)item).createAircraft(this.field_70170_p, x, y, z, itemStack);
+          MCP_EntityPlane mCP_EntityPlane = ((MCP_ItemPlane)item).createAircraft(this.world, x, y, z, itemStack);
         }  
     } 
     if (item instanceof MCH_ItemHeli) {
@@ -503,7 +503,7 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
         if (!hi.isSmallUAV && getKind() == 2) {
           ac = null;
         } else {
-          MCH_EntityHeli mCH_EntityHeli = ((MCH_ItemHeli)item).createAircraft(this.field_70170_p, x, y, z, itemStack);
+          MCH_EntityHeli mCH_EntityHeli = ((MCH_ItemHeli)item).createAircraft(this.world, x, y, z, itemStack);
         }  
     } 
     if (item instanceof MCH_ItemTank) {
@@ -512,25 +512,25 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
         if (!hi.isSmallUAV && getKind() == 2) {
           ac = null;
         } else {
-          mCH_EntityTank = ((MCH_ItemTank)item).createAircraft(this.field_70170_p, x, y, z, itemStack);
+          mCH_EntityTank = ((MCH_ItemTank)item).createAircraft(this.world, x, y, z, itemStack);
         }  
     } 
     if (mCH_EntityTank == null)
       return; 
-    ((MCH_EntityAircraft)mCH_EntityTank).field_70177_z = this.field_70177_z - 180.0F;
-    ((MCH_EntityAircraft)mCH_EntityTank).field_70126_B = ((MCH_EntityAircraft)mCH_EntityTank).field_70177_z;
-    user.field_70177_z = this.field_70177_z - 180.0F;
-    if (this.field_70170_p.func_184144_a((Entity)mCH_EntityTank, mCH_EntityTank.func_174813_aQ().func_72314_b(-0.1D, -0.1D, -0.1D)).isEmpty()) {
+    ((MCH_EntityAircraft)mCH_EntityTank).rotationYaw = this.rotationYaw - 180.0F;
+    ((MCH_EntityAircraft)mCH_EntityTank).prevRotationYaw = ((MCH_EntityAircraft)mCH_EntityTank).rotationYaw;
+    user.rotationYaw = this.rotationYaw - 180.0F;
+    if (this.world.getCollisionBoxes((Entity)mCH_EntityTank, mCH_EntityTank.getEntityBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty()) {
       itemStack.func_190918_g(1);
-      MCH_Lib.DbgLog(this.field_70170_p, "Create UAV: %s : %s", new Object[] { item
+      MCH_Lib.DbgLog(this.world, "Create UAV: %s : %s", new Object[] { item
             
-            .func_77658_a(), item });
-      user.field_70177_z = this.field_70177_z - 180.0F;
+            .getUnlocalizedName(), item });
+      user.rotationYaw = this.rotationYaw - 180.0F;
       if (!mCH_EntityTank.isTargetDrone()) {
         mCH_EntityTank.setUavStation(this);
         setControlAircract((MCH_EntityAircraft)mCH_EntityTank);
       } 
-      this.field_70170_p.func_72838_d((Entity)mCH_EntityTank);
+      this.world.spawnEntityInWorld((Entity)mCH_EntityTank);
       if (!mCH_EntityTank.isTargetDrone()) {
         mCH_EntityTank.setFuel((int)(mCH_EntityTank.getMaxFuel() * 0.05F));
         W_EntityPlayer.closeScreen(user);
@@ -538,15 +538,15 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
         mCH_EntityTank.setFuel(mCH_EntityTank.getMaxFuel());
       } 
     } else {
-      mCH_EntityTank.func_70106_y();
+      mCH_EntityTank.setDead();
     } 
   }
   
   public void _setInventorySlotContents(int par1, ItemStack itemStack) {
-    func_70299_a(par1, itemStack);
+    setInventorySlotContents(par1, itemStack);
   }
   
-  public boolean func_184230_a(EntityPlayer player, EnumHand hand) {
+  public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
     if (hand != EnumHand.MAIN_HAND)
       return false; 
     int kind = getKind();
@@ -555,7 +555,7 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
     if (getRiddenByEntity() != null)
       return false; 
     if (kind == 2) {
-      if (player.func_70093_af()) {
+      if (player.isSneaking()) {
         setOpen(!isOpen());
         return false;
       } 
@@ -564,18 +564,18 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
     } 
     this.lastRiddenByEntity = null;
     PooledGuiParameter.setEntity(player, (Entity)this);
-    if (!this.field_70170_p.field_72995_K) {
-      player.func_184220_m((Entity)this);
-      player.openGui(MCH_MOD.instance, 0, player.field_70170_p, (int)this.field_70165_t, (int)this.field_70163_u, (int)this.field_70161_v);
+    if (!this.world.isRemote) {
+      player.startRiding((Entity)this);
+      player.openGui(MCH_MOD.instance, 0, player.world, (int)this.posX, (int)this.posY, (int)this.posZ);
     } 
     return true;
   }
   
-  public int func_70302_i_() {
+  public int getSizeInventory() {
     return 1;
   }
   
-  public int func_70297_j_() {
+  public int getInventoryStackLimit() {
     return 1;
   }
   
@@ -583,9 +583,9 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
     Entity rByEntity = null;
     Entity riddenByEntity = getRiddenByEntity();
     if (riddenByEntity != null) {
-      if (!this.field_70170_p.field_72995_K) {
+      if (!this.world.isRemote) {
         rByEntity = riddenByEntity;
-        riddenByEntity.func_184210_p();
+        riddenByEntity.dismountRidingEntity();
       } 
     } else if (this.lastRiddenByEntity != null) {
       rByEntity = this.lastRiddenByEntity;
@@ -593,14 +593,14 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
     if (getControlAircract() != null)
       getControlAircract().setUavStation(null); 
     setControlAircract((MCH_EntityAircraft)null);
-    if (this.field_70170_p.field_72995_K)
+    if (this.world.isRemote)
       W_EntityPlayer.closeScreen(rByEntity); 
     this.lastRiddenByEntity = null;
   }
   
   @Nullable
   public Entity getRiddenByEntity() {
-    List<Entity> passengers = func_184188_bt();
+    List<Entity> passengers = getPassengers();
     return passengers.isEmpty() ? null : passengers.get(0);
   }
   

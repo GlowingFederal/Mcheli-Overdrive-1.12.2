@@ -18,12 +18,12 @@ public class MCH_RenderLib {
     GL11.glBlendFunc(770, 771);
     GL11.glColor4ub((byte)(color >> 16 & 0xFF), (byte)(color >> 8 & 0xFF), (byte)(color >> 0 & 0xFF), (byte)(color >> 24 & 0xFF));
     GL11.glLineWidth(width);
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder builder = tessellator.func_178180_c();
-    builder.func_181668_a(mode, DefaultVertexFormats.field_181705_e);
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder builder = tessellator.getBuffer();
+    builder.begin(mode, DefaultVertexFormats.POSITION);
     for (Vec3d v : points)
-      builder.func_181662_b(v.field_72450_a, v.field_72448_b, v.field_72449_c).func_181675_d(); 
-    tessellator.func_78381_a();
+      builder.pos(v.xCoord, v.yCoord, v.zCoord).endVertex(); 
+    tessellator.draw();
     GL11.glEnable(3553);
     GL11.glDisable(3042);
     GL11.glColor4b((byte)-1, (byte)-1, (byte)-1, (byte)-1);

@@ -17,9 +17,9 @@ public class BuiltInDraftingTableItemRenderer implements IItemModelRenderer {
   }
   
   public void renderItem(ItemStack itemStack, EntityLivingBase entityLivingBase, ItemCameraTransforms.TransformType transformType, float partialTicks) {
-    GlStateManager.func_179094_E();
+    GlStateManager.pushMatrix();
     W_McClient.MOD_bindTexture("textures/blocks/drafting_table.png");
-    GlStateManager.func_179091_B();
+    GlStateManager.enableRescaleNormal();
     switch (transformType) {
       case GROUND:
         GL11.glTranslatef(0.0F, 0.5F, 0.0F);
@@ -27,8 +27,8 @@ public class BuiltInDraftingTableItemRenderer implements IItemModelRenderer {
         break;
       case GUI:
       case FIXED:
-        GlStateManager.func_179109_b(0.0F, -0.5F, 0.0F);
-        GlStateManager.func_179152_a(0.75F, 0.75F, 0.75F);
+        GlStateManager.translate(0.0F, -0.5F, 0.0F);
+        GlStateManager.scale(0.75F, 0.75F, 0.75F);
         break;
       case THIRD_PERSON_LEFT_HAND:
       case THIRD_PERSON_RIGHT_HAND:
@@ -43,8 +43,8 @@ public class BuiltInDraftingTableItemRenderer implements IItemModelRenderer {
         break;
     } 
     MCH_ModelManager.render("blocks", "drafting_table");
-    GlStateManager.func_179121_F();
-    GlStateManager.func_179131_c(1.0F, 1.0F, 1.0F, 1.0F);
-    GlStateManager.func_179147_l();
+    GlStateManager.popMatrix();
+    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+    GlStateManager.enableBlend();
   }
 }

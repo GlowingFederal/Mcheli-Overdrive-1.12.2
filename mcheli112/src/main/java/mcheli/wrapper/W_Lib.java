@@ -26,7 +26,7 @@ public class W_Lib {
   
   public static boolean isClientPlayer(@Nullable Entity entity) {
     if (entity instanceof net.minecraft.entity.player.EntityPlayer)
-      if (entity.field_70170_p.field_72995_K)
+      if (entity.world.isRemote)
         return W_Entity.isEqual(MCH_MOD.proxy.getClientPlayer(), entity);  
     return false;
   }

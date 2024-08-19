@@ -11,21 +11,21 @@ public class EntitySampleBullet extends MCH_EntityRocket {
   public EntitySampleBullet(World par1World) {
     super(par1World, 0.0D, 0.0D, 0.0D, 2.0D, 0.0D, 0.0D, 0.0F, 0.0F, 4.0D);
     setName("hydra70");
-    func_70105_a(1.0F, 1.0F);
+    setSize(1.0F, 1.0F);
     this.explosionPower = 3;
     setPower(22);
-    this.firstPos = Vec3d.field_186680_a;
+    this.firstPos = Vec3d.ZERO;
     this.accelerationFactor = 1.0D;
     this.delayFuse = 100;
   }
   
-  public void func_70037_a(NBTTagCompound par1nbtTagCompound) {
-    this.field_70159_w = 1.0D;
+  public void readEntityFromNBT(NBTTagCompound par1nbtTagCompound) {
+    this.motionX = 1.0D;
   }
   
   public boolean checkValid() {
-    double x = this.field_70165_t - this.firstPos.field_72450_a;
-    double z = this.field_70161_v - this.firstPos.field_72449_c;
-    return (x * x + z * z < 3.38724E7D && this.field_70163_u > -10.0D);
+    double x = this.posX - this.firstPos.xCoord;
+    double z = this.posZ - this.firstPos.zCoord;
+    return (x * x + z * z < 3.38724E7D && this.posY > -10.0D);
   }
 }

@@ -46,12 +46,12 @@ public class GlUtil extends GlStateManager {
   
   public static void pushLineWidth(float width) {
     lineWidthState.push(Float.valueOf(getLineWidth()));
-    func_187441_d(width);
+    glLineWidth(width);
   }
   
   public static float popLineWidth() {
     float f = ((Float)lineWidthState.pop()).floatValue();
-    func_187441_d(f);
+    glLineWidth(f);
     return f;
   }
   
@@ -67,29 +67,29 @@ public class GlUtil extends GlStateManager {
   }
   
   public static void pushBlendFunc(GlStateManager.SourceFactor srcFactor, GlStateManager.DestFactor dstFactor) {
-    pushBlendFunc(srcFactor.field_187395_p, dstFactor.field_187345_o);
+    pushBlendFunc(srcFactor.factor, dstFactor.factor);
   }
   
   public static void pushBlendFunc(int srcFactor, int dstFactor) {
     blendFancState.push(Pair.of(Integer.valueOf(getBlendSrcFactor()), Integer.valueOf(getBlendDstFactor())));
-    func_179112_b(srcFactor, dstFactor);
+    blendFunc(srcFactor, dstFactor);
   }
   
   public static void popBlendFunc() {
     Pair<Integer, Integer> func = blendFancState.pop();
-    func_179112_b(((Integer)func.getLeft()).intValue(), ((Integer)func.getRight()).intValue());
+    blendFunc(((Integer)func.getLeft()).intValue(), ((Integer)func.getRight()).intValue());
   }
   
   public static void polygonMode(GlStateManager.CullFace face, RasterizeType mode) {
-    func_187409_d(face.field_187328_d, mode.mode);
+    glPolygonMode(face.mode, mode.mode);
   }
   
   public static void depthFunc(Function depthFunc) {
-    func_179143_c(depthFunc.func);
+    depthFunc(depthFunc.func);
   }
   
   public static void clearStencilBufferBit() {
-    func_179086_m(1024);
+    clear(1024);
   }
   
   public static void clearStencil(int stencil) {
@@ -170,9 +170,9 @@ public class GlUtil extends GlStateManager {
   
   public static void scissorGui(Minecraft mc, int x, int y, int width, int height) {
     ScaledResolution res = new ScaledResolution(mc);
-    double scaleW = mc.field_71443_c / res.func_78327_c();
-    double scaleH = mc.field_71440_d / res.func_78324_d();
-    scissor((int)(x * scaleW), (int)(mc.field_71440_d - (y + height) * scaleH), (int)(width * scaleW), (int)(height * scaleH));
+    double scaleW = mc.displayWidth / res.getScaledWidth_double();
+    double scaleH = mc.displayHeight / res.getScaledHeight_double();
+    scissor((int)(x * scaleW), (int)(mc.displayHeight - (y + height) * scaleH), (int)(width * scaleW), (int)(height * scaleH));
   }
   
   public static void enableStipple() {
@@ -202,8 +202,8 @@ public class GlUtil extends GlStateManager {
   private static final Deque<Pair<Integer, Integer>> blendFancState = Queues.newArrayDeque();
   
   public static boolean enableStencilBuffer() {
-    Framebuffer framebuffer = Minecraft.func_71410_x().func_147110_a();
-    if (!framebuffer.isStencilEnabled() && OpenGlHelper.func_148822_b()) {
+    Framebuffer framebuffer = Minecraft.getMinecraft().getFramebuffer();
+    if (!framebuffer.isStencilEnabled() && OpenGlHelper.isFramebufferEnabled()) {
       framebuffer.enableStencil();
       return true;
     } 
@@ -211,7 +211,7 @@ public class GlUtil extends GlStateManager {
   }
   
   public static boolean isEnableStencilBuffer() {
-    return Minecraft.func_71410_x().func_147110_a().isStencilEnabled();
+    return Minecraft.getMinecraft().getFramebuffer().isStencilEnabled();
   }
   
   public static Matrix4f translateAsMatrix(float x, float y, float z) {

@@ -18,7 +18,7 @@ public class MCH_RenderHeli extends MCH_RenderAircraft<MCH_EntityHeli> {
   
   public MCH_RenderHeli(RenderManager renderManager) {
     super(renderManager);
-    this.field_76989_e = 2.0F;
+    this.shadowSize = 2.0F;
   }
   
   public void renderAircraft(MCH_EntityAircraft entity, double posX, double posY, double posZ, float yaw, float pitch, float roll, float tickTime) {
@@ -50,7 +50,7 @@ public class MCH_RenderHeli extends MCH_RenderAircraft<MCH_EntityHeli> {
       MCH_Rotor rotor = heli.rotors[i];
       GL11.glPushMatrix();
       if (rotorInfo.oldRenderMethod)
-        GL11.glTranslated(rotorInfo.pos.field_72450_a, rotorInfo.pos.field_72448_b, rotorInfo.pos.field_72449_c); 
+        GL11.glTranslated(rotorInfo.pos.xCoord, rotorInfo.pos.yCoord, rotorInfo.pos.zCoord); 
       for (MCH_Blade b : rotor.blades) {
         GL11.glPushMatrix();
         float rot = b.getRotation();
@@ -61,10 +61,10 @@ public class MCH_RenderHeli extends MCH_RenderAircraft<MCH_EntityHeli> {
           prevRot += 360.0F;
         } 
         if (!rotorInfo.oldRenderMethod)
-          GL11.glTranslated(rotorInfo.pos.field_72450_a, rotorInfo.pos.field_72448_b, rotorInfo.pos.field_72449_c); 
-        GL11.glRotatef(prevRot + (rot - prevRot) * tickTime, (float)rotorInfo.rot.field_72450_a, (float)rotorInfo.rot.field_72448_b, (float)rotorInfo.rot.field_72449_c);
+          GL11.glTranslated(rotorInfo.pos.xCoord, rotorInfo.pos.yCoord, rotorInfo.pos.zCoord); 
+        GL11.glRotatef(prevRot + (rot - prevRot) * tickTime, (float)rotorInfo.rot.xCoord, (float)rotorInfo.rot.yCoord, (float)rotorInfo.rot.zCoord);
         if (!rotorInfo.oldRenderMethod)
-          GL11.glTranslated(-rotorInfo.pos.field_72450_a, -rotorInfo.pos.field_72448_b, -rotorInfo.pos.field_72449_c); 
+          GL11.glTranslated(-rotorInfo.pos.xCoord, -rotorInfo.pos.yCoord, -rotorInfo.pos.zCoord); 
         renderPart(rotorInfo.model, info.model, rotorInfo.modelName);
         GL11.glPopMatrix();
       } 

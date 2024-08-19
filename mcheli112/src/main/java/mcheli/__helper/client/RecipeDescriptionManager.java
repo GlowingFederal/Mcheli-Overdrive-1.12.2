@@ -47,14 +47,14 @@ public class RecipeDescriptionManager {
   private static DescriptionInfo createDescriptionInfo(IResourceManager resourceManager, IRecipe recipe) {
     List<ResourceLocation> textures = Lists.newLinkedList();
     for (int i = 0; i < 20; i++) {
-      String itemName = recipe.func_77571_b().func_77977_a();
+      String itemName = recipe.getRecipeOutput().getUnlocalizedName();
       if (itemName.startsWith("tile."))
         itemName = itemName.substring(5); 
       if (itemName.indexOf(":") >= 0)
         itemName = itemName.substring(itemName.indexOf(":") + 1); 
       String filepath = "textures/drafting_table_desc/" + itemName + "#" + i + ".png";
-      try (IResource resource = resourceManager.func_110536_a(MCH_Utils.suffix(filepath))) {
-        textures.add(resource.func_177241_a());
+      try (IResource resource = resourceManager.getResource(MCH_Utils.suffix(filepath))) {
+        textures.add(resource.getResourceLocation());
       } catch (FileNotFoundException fileNotFoundException) {
       
       } catch (IOException e1) {

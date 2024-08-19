@@ -30,10 +30,10 @@ public class MCH_MissileDetector {
       return; 
     if (this.alertCount > 0)
       this.alertCount--; 
-    boolean isLocked = this.ac.getEntityData().func_74767_n("Tracking");
+    boolean isLocked = this.ac.getEntityData().getBoolean("Tracking");
     if (isLocked)
-      this.ac.getEntityData().func_74757_a("Tracking", false); 
-    if (this.ac.getEntityData().func_74767_n("LockOn")) {
+      this.ac.getEntityData().setBoolean("Tracking", false); 
+    if (this.ac.getEntityData().getBoolean("LockOn")) {
       if (this.alertCount == 0) {
         this.alertCount = 10;
         if (this.ac != null && this.ac.haveFlare() && !this.ac.isDestroyed())
@@ -43,7 +43,7 @@ public class MCH_MissileDetector {
               MCH_PacketNotifyLock.sendToPlayer((EntityPlayer)entity); 
           }  
       } 
-      this.ac.getEntityData().func_74757_a("LockOn", false);
+      this.ac.getEntityData().setBoolean("LockOn", false);
     } 
     if (this.ac.isDestroyed())
       return; 
@@ -53,12 +53,12 @@ public class MCH_MissileDetector {
     if (rider != null)
       if (this.ac.isFlareUsing()) {
         destroyMissile();
-      } else if (!this.ac.isUAV() && !this.world.field_72995_K) {
+      } else if (!this.ac.isUAV() && !this.world.isRemote) {
         if (this.alertCount == 0 && (isLocked || isLockedByMissile())) {
           this.alertCount = 20;
           W_WorldFunc.MOD_playSoundAtEntity((Entity)this.ac, "alert", 1.0F, 1.0F);
         } 
-      } else if (this.ac.isUAV() && this.world.field_72995_K) {
+      } else if (this.ac.isUAV() && this.world.isRemote) {
         if (this.alertCount == 0 && (isLocked || isLockedByMissile())) {
           this.alertCount = 20;
           if (W_Lib.isClientPlayer(rider))
@@ -68,25 +68,25 @@ public class MCH_MissileDetector {
   }
   
   public boolean destroyMissile() {
-    List<MCH_EntityBaseBullet> list = this.world.func_72872_a(MCH_EntityBaseBullet.class, this.ac
+    List<MCH_EntityBaseBullet> list = this.world.getEntitiesWithinAABB(MCH_EntityBaseBullet.class, this.ac
         
-        .func_174813_aQ().func_72314_b(60.0D, 60.0D, 60.0D));
+        .getEntityBoundingBox().expand(60.0D, 60.0D, 60.0D));
     if (list != null)
       for (int i = 0; i < list.size(); i++) {
         MCH_EntityBaseBullet msl = list.get(i);
         if (msl.targetEntity != null)
           if (this.ac.isMountedEntity(msl.targetEntity) || msl.targetEntity.equals(this.ac)) {
             msl.targetEntity = null;
-            msl.func_70106_y();
+            msl.setDead();
           }  
       }  
     return false;
   }
   
   public boolean isLockedByMissile() {
-    List<MCH_EntityBaseBullet> list = this.world.func_72872_a(MCH_EntityBaseBullet.class, this.ac
+    List<MCH_EntityBaseBullet> list = this.world.getEntitiesWithinAABB(MCH_EntityBaseBullet.class, this.ac
         
-        .func_174813_aQ().func_72314_b(60.0D, 60.0D, 60.0D));
+        .getEntityBoundingBox().expand(60.0D, 60.0D, 60.0D));
     if (list != null)
       for (int i = 0; i < list.size(); i++) {
         MCH_EntityBaseBullet msl = list.get(i);

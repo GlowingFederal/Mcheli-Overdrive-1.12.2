@@ -281,7 +281,7 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo implements IItemCont
   
   public MCH_AircraftInfo(AddonResourceLocation location, String path) {
     super(location, path);
-    this.name = location.func_110623_a();
+    this.name = location.getResourcePath();
     this.displayName = this.name;
     this.displayNameLang = new HashMap<>();
     this.itemID = 0;
@@ -673,7 +673,7 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo implements IItemCont
         float pitch = (s.length >= 11) ? toFloat(s[10]) : 0.0F;
         boolean rs = (s.length >= 12) ? toBool(s[11]) : false;
         this.entityRackList.add(new MCH_SeatRackInfo(names, toDouble(s[1]), toDouble(s[2]), toDouble(s[3]), new CameraPosition(this, 
-                toVec3(s[4], s[5], s[6]).func_72441_c(0.0D, 1.5D, 0.0D)), range, para, yaw, pitch, rs));
+                toVec3(s[4], s[5], s[6]).addVector(0.0D, 1.5D, 0.0D)), range, para, yaw, pitch, rs));
       } 
     } else if (item.equalsIgnoreCase("RideRack")) {
       String[] s = splitParam(data);
@@ -734,7 +734,7 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo implements IItemCont
           this.wheels.add(new Wheel(this, new Vec3d(x, y, toFloat(s[i])))); 
         Collections.sort(this.wheels, new Comparator<Wheel>() {
               public int compare(MCH_AircraftInfo.Wheel arg0, MCH_AircraftInfo.Wheel arg1) {
-                return (arg0.pos.field_72449_c > arg1.pos.field_72449_c) ? -1 : 1;
+                return (arg0.pos.zCoord > arg1.pos.zCoord) ? -1 : 1;
               }
             });
       } 
@@ -862,7 +862,7 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo implements IItemCont
         if (seatID <= 0)
           canUsePilot = true; 
         float dfy = (s.length >= 9) ? toFloat(s[8]) : 0.0F;
-        dfy = MathHelper.func_76142_g(dfy);
+        dfy = MathHelper.wrapDegrees(dfy);
         float mny = (s.length >= 10) ? toFloat(s[9]) : 0.0F;
         float mxy = (s.length >= 11) ? toFloat(s[10]) : 0.0F;
         float mnp = (s.length >= 12) ? toFloat(s[11]) : 0.0F;
@@ -1100,14 +1100,14 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo implements IItemCont
         float df = (s.length >= 6) ? toFloat(s[5]) : 1.0F;
         MCH_BoundingBox c = new MCH_BoundingBox(toFloat(s[0]), toFloat(s[1]), toFloat(s[2]), toFloat(s[3]), toFloat(s[4]), df);
         this.extraBoundingBox.add(c);
-        if ((c.getBoundingBox()).field_72337_e > this.markerHeight)
-          this.markerHeight = (float)(c.getBoundingBox()).field_72337_e; 
-        this.markerWidth = (float)Math.max(this.markerWidth, Math.abs((c.getBoundingBox()).field_72336_d) / 2.0D);
-        this.markerWidth = (float)Math.max(this.markerWidth, Math.abs((c.getBoundingBox()).field_72340_a) / 2.0D);
-        this.markerWidth = (float)Math.max(this.markerWidth, Math.abs((c.getBoundingBox()).field_72334_f) / 2.0D);
-        this.markerWidth = (float)Math.max(this.markerWidth, Math.abs((c.getBoundingBox()).field_72339_c) / 2.0D);
-        this.bbZmin = (float)Math.min(this.bbZmin, (c.getBoundingBox()).field_72339_c);
-        this.bbZmax = (float)Math.min(this.bbZmax, (c.getBoundingBox()).field_72334_f);
+        if ((c.getBoundingBox()).maxY > this.markerHeight)
+          this.markerHeight = (float)(c.getBoundingBox()).maxY; 
+        this.markerWidth = (float)Math.max(this.markerWidth, Math.abs((c.getBoundingBox()).maxX) / 2.0D);
+        this.markerWidth = (float)Math.max(this.markerWidth, Math.abs((c.getBoundingBox()).minX) / 2.0D);
+        this.markerWidth = (float)Math.max(this.markerWidth, Math.abs((c.getBoundingBox()).maxZ) / 2.0D);
+        this.markerWidth = (float)Math.max(this.markerWidth, Math.abs((c.getBoundingBox()).minZ) / 2.0D);
+        this.bbZmin = (float)Math.min(this.bbZmin, (c.getBoundingBox()).minZ);
+        this.bbZmax = (float)Math.min(this.bbZmax, (c.getBoundingBox()).maxZ);
       } 
     } else if (item.equalsIgnoreCase("RotorSpeed")) {
       this.rotorSpeed = toFloat(data, -10000.0F, 10000.0F);

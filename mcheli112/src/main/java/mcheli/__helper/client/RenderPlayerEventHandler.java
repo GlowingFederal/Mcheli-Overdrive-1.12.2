@@ -12,29 +12,29 @@ import net.minecraftforge.fml.relauncher.Side;
 
 @EventBusSubscriber(modid = "mcheli", value = {Side.CLIENT})
 public class RenderPlayerEventHandler {
-  private static final Minecraft mc = Minecraft.func_71410_x();
+  private static final Minecraft mc = Minecraft.getMinecraft();
   
   private static Entity cacheViewEntity;
   
   @SubscribeEvent
   static void onRenderPlayerPre(RenderPlayerEvent.Pre event) {
-    RenderManager renderManager = event.getRenderer().func_177068_d();
+    RenderManager renderManager = event.getRenderer().getRenderManager();
     EntityPlayer player = event.getEntityPlayer();
-    Entity entity = player.func_184187_bx();
-    if (W_Lib.isClientPlayer((Entity)event.getEntityPlayer()) && renderManager.field_78734_h != player && entity instanceof mcheli.uav.MCH_EntityUavStation) {
-      cacheViewEntity = mc.func_175606_aa();
-      renderManager.field_78734_h = (Entity)player;
+    Entity entity = player.getRidingEntity();
+    if (W_Lib.isClientPlayer((Entity)event.getEntityPlayer()) && renderManager.renderViewEntity != player && entity instanceof mcheli.uav.MCH_EntityUavStation) {
+      cacheViewEntity = mc.getRenderViewEntity();
+      renderManager.renderViewEntity = (Entity)player;
     } 
   }
   
   @SubscribeEvent
   static void onRenderPlayerPost(RenderPlayerEvent.Post event) {
-    RenderManager renderManager = event.getRenderer().func_177068_d();
+    RenderManager renderManager = event.getRenderer().getRenderManager();
     EntityPlayer player = event.getEntityPlayer();
-    Entity entity = player.func_184187_bx();
+    Entity entity = player.getRidingEntity();
     if (cacheViewEntity != null) {
-      if (W_Lib.isClientPlayer((Entity)event.getEntityPlayer()) && renderManager.field_78734_h != player && entity instanceof mcheli.uav.MCH_EntityUavStation)
-        renderManager.field_78734_h = cacheViewEntity; 
+      if (W_Lib.isClientPlayer((Entity)event.getEntityPlayer()) && renderManager.renderViewEntity != player && entity instanceof mcheli.uav.MCH_EntityUavStation)
+        renderManager.renderViewEntity = cacheViewEntity; 
       cacheViewEntity = null;
     } 
   }

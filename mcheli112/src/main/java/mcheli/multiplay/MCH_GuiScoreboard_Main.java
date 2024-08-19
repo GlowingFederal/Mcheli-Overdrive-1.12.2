@@ -14,16 +14,16 @@ public class MCH_GuiScoreboard_Main extends MCH_GuiScoreboard_Base {
     super(switcher, player);
   }
   
-  public void func_73866_w_() {
-    super.func_73866_w_();
+  public void initGui() {
+    super.initGui();
     if (this.buttonSwitchPVP != null)
       return; 
-    this.field_147003_i = 0;
-    this.field_147009_r = 0;
-    int WIDTH = getScoreboradWidth(this.field_146297_k) * 3 / 4;
+    this.guiLeft = 0;
+    this.guiTop = 0;
+    int WIDTH = getScoreboradWidth(this.mc) * 3 / 4;
     if (WIDTH < 80)
       WIDTH = 80; 
-    int LEFT = getScoreBoardLeft(this.field_146297_k, getTeamNum() + 1, 0) / 4;
+    int LEFT = getScoreBoardLeft(this.mc, getTeamNum() + 1, 0) / 4;
     this.buttonSwitchPVP = new W_GuiButton(1024, LEFT, 80, WIDTH, 20, "");
     this.listGui.add(this.buttonSwitchPVP);
     W_GuiButton btn = new W_GuiButton(256, LEFT, 100, WIDTH, 20, "Team shuffle");
@@ -38,22 +38,22 @@ public class MCH_GuiScoreboard_Main extends MCH_GuiScoreboard_Base {
     this.listGui.add(btn);
   }
   
-  protected void func_73869_a(char c, int code) throws IOException {
+  protected void keyTyped(char c, int code) throws IOException {
     if (code == 1)
-      this.field_146297_k.field_71439_g.func_71053_j(); 
+      this.mc.player.closeScreen(); 
   }
   
   public void updateScreenButtons(List<GuiButton> list) {
     for (GuiButton o : list) {
       GuiButton button = o;
-      if (button.field_146127_k == 1024)
-        button.field_146126_j = "PVP : " + (MCH_ServerSettings.enablePVP ? "ON" : "OFF"); 
+      if (button.id == 1024)
+        button.displayString = "PVP : " + (MCH_ServerSettings.enablePVP ? "ON" : "OFF"); 
     } 
   }
   
-  protected void func_146284_a(GuiButton btn) throws IOException {
-    if (btn != null && btn.field_146124_l)
-      switch (btn.field_146127_k) {
+  protected void actionPerformed(GuiButton btn) throws IOException {
+    if (btn != null && btn.enabled)
+      switch (btn.id) {
         case 256:
           MCH_PacketIndMultiplayCommand.send(256, "");
           break;
@@ -76,7 +76,7 @@ public class MCH_GuiScoreboard_Main extends MCH_GuiScoreboard_Base {
     super.drawGuiContainerForegroundLayerScreen(x, y);
   }
   
-  protected void func_146976_a(float par1, int par2, int par3) {
-    drawList(this.field_146297_k, this.field_146289_q, true);
+  protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3) {
+    drawList(this.mc, this.fontRendererObj, true);
   }
 }

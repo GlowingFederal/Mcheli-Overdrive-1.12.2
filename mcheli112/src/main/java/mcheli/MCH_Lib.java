@@ -28,40 +28,40 @@ public class MCH_Lib {
   
   public static void init() {
     mapMaterial.clear();
-    mapMaterial.put("air", Material.field_151579_a);
-    mapMaterial.put("grass", Material.field_151577_b);
-    mapMaterial.put("ground", Material.field_151578_c);
-    mapMaterial.put("wood", Material.field_151575_d);
-    mapMaterial.put("rock", Material.field_151576_e);
-    mapMaterial.put("iron", Material.field_151573_f);
-    mapMaterial.put("anvil", Material.field_151574_g);
-    mapMaterial.put("water", Material.field_151586_h);
-    mapMaterial.put("lava", Material.field_151587_i);
-    mapMaterial.put("leaves", Material.field_151584_j);
-    mapMaterial.put("plants", Material.field_151585_k);
-    mapMaterial.put("vine", Material.field_151582_l);
-    mapMaterial.put("sponge", Material.field_151583_m);
-    mapMaterial.put("cloth", Material.field_151580_n);
-    mapMaterial.put("fire", Material.field_151581_o);
-    mapMaterial.put("sand", Material.field_151595_p);
-    mapMaterial.put("circuits", Material.field_151594_q);
-    mapMaterial.put("carpet", Material.field_151593_r);
-    mapMaterial.put("glass", Material.field_151592_s);
-    mapMaterial.put("redstoneLight", Material.field_151591_t);
-    mapMaterial.put("tnt", Material.field_151590_u);
-    mapMaterial.put("coral", Material.field_151589_v);
-    mapMaterial.put("ice", Material.field_151588_w);
-    mapMaterial.put("packedIce", Material.field_151598_x);
-    mapMaterial.put("snow", Material.field_151597_y);
-    mapMaterial.put("craftedSnow", Material.field_151596_z);
-    mapMaterial.put("cactus", Material.field_151570_A);
-    mapMaterial.put("clay", Material.field_151571_B);
-    mapMaterial.put("gourd", Material.field_151572_C);
-    mapMaterial.put("dragonEgg", Material.field_151566_D);
-    mapMaterial.put("portal", Material.field_151567_E);
-    mapMaterial.put("cake", Material.field_151568_F);
-    mapMaterial.put("web", Material.field_151569_G);
-    mapMaterial.put("piston", Material.field_76233_E);
+    mapMaterial.put("air", Material.AIR);
+    mapMaterial.put("grass", Material.GRASS);
+    mapMaterial.put("ground", Material.GROUND);
+    mapMaterial.put("wood", Material.WOOD);
+    mapMaterial.put("rock", Material.ROCK);
+    mapMaterial.put("iron", Material.IRON);
+    mapMaterial.put("anvil", Material.ANVIL);
+    mapMaterial.put("water", Material.WATER);
+    mapMaterial.put("lava", Material.LAVA);
+    mapMaterial.put("leaves", Material.LEAVES);
+    mapMaterial.put("plants", Material.PLANTS);
+    mapMaterial.put("vine", Material.VINE);
+    mapMaterial.put("sponge", Material.SPONGE);
+    mapMaterial.put("cloth", Material.CLOTH);
+    mapMaterial.put("fire", Material.FIRE);
+    mapMaterial.put("sand", Material.SAND);
+    mapMaterial.put("circuits", Material.CIRCUITS);
+    mapMaterial.put("carpet", Material.CARPET);
+    mapMaterial.put("glass", Material.GLASS);
+    mapMaterial.put("redstoneLight", Material.REDSTONE_LIGHT);
+    mapMaterial.put("tnt", Material.TNT);
+    mapMaterial.put("coral", Material.CORAL);
+    mapMaterial.put("ice", Material.ICE);
+    mapMaterial.put("packedIce", Material.PACKED_ICE);
+    mapMaterial.put("snow", Material.SNOW);
+    mapMaterial.put("craftedSnow", Material.CRAFTED_SNOW);
+    mapMaterial.put("cactus", Material.CACTUS);
+    mapMaterial.put("clay", Material.CLAY);
+    mapMaterial.put("gourd", Material.GOURD);
+    mapMaterial.put("dragonEgg", Material.DRAGON_EGG);
+    mapMaterial.put("portal", Material.PORTAL);
+    mapMaterial.put("cake", Material.CAKE);
+    mapMaterial.put("web", Material.WEB);
+    mapMaterial.put("piston", Material.PISTON);
   }
   
   public static Material getMaterialFromName(String name) {
@@ -71,9 +71,9 @@ public class MCH_Lib {
   }
   
   public static Vec3d calculateFaceNormal(Vec3d[] vertices) {
-    Vec3d v1 = new Vec3d((vertices[1]).field_72450_a - (vertices[0]).field_72450_a, (vertices[1]).field_72448_b - (vertices[0]).field_72448_b, (vertices[1]).field_72449_c - (vertices[0]).field_72449_c);
-    Vec3d v2 = new Vec3d((vertices[2]).field_72450_a - (vertices[0]).field_72450_a, (vertices[2]).field_72448_b - (vertices[0]).field_72448_b, (vertices[2]).field_72449_c - (vertices[0]).field_72449_c);
-    return v1.func_72431_c(v2).func_72432_b();
+    Vec3d v1 = new Vec3d((vertices[1]).xCoord - (vertices[0]).xCoord, (vertices[1]).yCoord - (vertices[0]).yCoord, (vertices[1]).zCoord - (vertices[0]).zCoord);
+    Vec3d v2 = new Vec3d((vertices[2]).xCoord - (vertices[0]).xCoord, (vertices[2]).yCoord - (vertices[0]).yCoord, (vertices[2]).zCoord - (vertices[0]).zCoord);
+    return v1.crossProduct(v2).normalize();
   }
   
   public static double parseDouble(String s) {
@@ -123,8 +123,8 @@ public class MCH_Lib {
   public static void applyEntityHurtResistantTimeConfig(Entity entity) {
     if (entity instanceof EntityLivingBase) {
       EntityLivingBase elb = (EntityLivingBase)entity;
-      double h_time = MCH_Config.HurtResistantTime.prmDouble * elb.field_70172_ad;
-      elb.field_70172_ad = (int)h_time;
+      double h_time = MCH_Config.HurtResistantTime.prmDouble * elb.hurtResistantTime;
+      elb.hurtResistantTime = (int)h_time;
     } 
   }
   
@@ -133,45 +133,45 @@ public class MCH_Lib {
   }
   
   public static Vec3d Rot2Vec3(float yaw, float pitch) {
-    return new Vec3d((-MathHelper.func_76126_a(yaw / 180.0F * 3.1415927F) * MathHelper.func_76134_b(pitch / 180.0F * 3.1415927F)), 
-        -MathHelper.func_76126_a(pitch / 180.0F * 3.1415927F), (
-        MathHelper.func_76134_b(yaw / 180.0F * 3.1415927F) * MathHelper.func_76134_b(pitch / 180.0F * 3.1415927F)));
+    return new Vec3d((-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F)), 
+        -MathHelper.sin(pitch / 180.0F * 3.1415927F), (
+        MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F)));
   }
   
   public static Vec3d RotVec3(double x, double y, double z, float yaw, float pitch) {
     Vec3d v = new Vec3d(x, y, z);
-    v = v.func_178789_a(pitch / 180.0F * 3.1415927F);
-    v = v.func_178785_b(yaw / 180.0F * 3.1415927F);
+    v = v.rotatePitch(pitch / 180.0F * 3.1415927F);
+    v = v.rotateYaw(yaw / 180.0F * 3.1415927F);
     return v;
   }
   
   public static Vec3d RotVec3(double x, double y, double z, float yaw, float pitch, float roll) {
     Vec3d v = new Vec3d(x, y, z);
     v = W_Vec3.rotateRoll(roll / 180.0F * 3.1415927F, v);
-    v = v.func_178789_a(pitch / 180.0F * 3.1415927F);
-    v = v.func_178785_b(yaw / 180.0F * 3.1415927F);
+    v = v.rotatePitch(pitch / 180.0F * 3.1415927F);
+    v = v.rotateYaw(yaw / 180.0F * 3.1415927F);
     return v;
   }
   
   public static Vec3d RotVec3(Vec3d vin, float yaw, float pitch) {
-    Vec3d v = new Vec3d(vin.field_72450_a, vin.field_72448_b, vin.field_72449_c);
-    v = v.func_178789_a(pitch / 180.0F * 3.1415927F);
-    v = v.func_178785_b(yaw / 180.0F * 3.1415927F);
+    Vec3d v = new Vec3d(vin.xCoord, vin.yCoord, vin.zCoord);
+    v = v.rotatePitch(pitch / 180.0F * 3.1415927F);
+    v = v.rotateYaw(yaw / 180.0F * 3.1415927F);
     return v;
   }
   
   public static Vec3d RotVec3(Vec3d vin, float yaw, float pitch, float roll) {
-    Vec3d v = new Vec3d(vin.field_72450_a, vin.field_72448_b, vin.field_72449_c);
+    Vec3d v = new Vec3d(vin.xCoord, vin.yCoord, vin.zCoord);
     v = W_Vec3.rotateRoll(roll / 180.0F * 3.1415927F, v);
-    v = v.func_178789_a(pitch / 180.0F * 3.1415927F);
-    v = v.func_178785_b(yaw / 180.0F * 3.1415927F);
+    v = v.rotatePitch(pitch / 180.0F * 3.1415927F);
+    v = v.rotateYaw(yaw / 180.0F * 3.1415927F);
     return v;
   }
   
   public static Vec3d _Rot2Vec3(float yaw, float pitch, float roll) {
-    return new Vec3d((-MathHelper.func_76126_a(yaw / 180.0F * 3.1415927F) * MathHelper.func_76134_b(pitch / 180.0F * 3.1415927F)), 
-        -MathHelper.func_76126_a(pitch / 180.0F * 3.1415927F), (
-        MathHelper.func_76134_b(yaw / 180.0F * 3.1415927F) * MathHelper.func_76134_b(pitch / 180.0F * 3.1415927F)));
+    return new Vec3d((-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F)), 
+        -MathHelper.sin(pitch / 180.0F * 3.1415927F), (
+        MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F)));
   }
   
   public static double getRotate360(double r) {
@@ -186,7 +186,7 @@ public class MCH_Lib {
   
   public static void Log(World world, String format, Object... data) {
     if (world != null) {
-      Log((world.field_72995_K ? "[ClientWorld]" : "[ServerWorld]") + " " + format, data);
+      Log((world.isRemote ? "[ClientWorld]" : "[ServerWorld]") + " " + format, data);
     } else {
       Log("[UnknownWorld]" + format, data);
     } 
@@ -194,7 +194,7 @@ public class MCH_Lib {
   
   public static void Log(Entity entity, String format, Object... data) {
     if (entity != null) {
-      Log(entity.field_70170_p, format, data);
+      Log(entity.world, format, data);
     } else {
       Log((World)null, format, data);
     } 
@@ -211,7 +211,7 @@ public class MCH_Lib {
   }
   
   public static void DbgLog(World w, String format, Object... data) {
-    DbgLog(w.field_72995_K, format, data);
+    DbgLog(w.isRemote, format, data);
   }
   
   public static String getTime() {
@@ -236,8 +236,8 @@ public class MCH_Lib {
     for (int i = 0; i + 1 < points.length; i += 2) {
       double x = points[i + 0];
       double y = points[i + 1];
-      points[i + 0] = x * MathHelper.func_76134_b(r) - y * MathHelper.func_76126_a(r);
-      points[i + 1] = x * MathHelper.func_76126_a(r) + y * MathHelper.func_76134_b(r);
+      points[i + 0] = x * MathHelper.cos(r) - y * MathHelper.sin(r);
+      points[i + 1] = x * MathHelper.sin(r) + y * MathHelper.cos(r);
     } 
   }
   
@@ -246,8 +246,8 @@ public class MCH_Lib {
     for (int i = 0; i + 1 < points.size(); i += 2) {
       double x = ((MCH_Vector2)points.get(i + 0)).x;
       double y = ((MCH_Vector2)points.get(i + 0)).y;
-      ((MCH_Vector2)points.get(i + 0)).x = x * MathHelper.func_76134_b(r) - y * MathHelper.func_76126_a(r);
-      ((MCH_Vector2)points.get(i + 0)).y = x * MathHelper.func_76126_a(r) + y * MathHelper.func_76134_b(r);
+      ((MCH_Vector2)points.get(i + 0)).x = x * MathHelper.cos(r) - y * MathHelper.sin(r);
+      ((MCH_Vector2)points.get(i + 0)).y = x * MathHelper.sin(r) + y * MathHelper.cos(r);
     } 
   }
   
@@ -271,7 +271,7 @@ public class MCH_Lib {
     Block block = getBlockY(w, posX, posY, posZ, size, lenY, canColliableOnly);
     if (block == null)
       return 0; 
-    return W_Block.func_149682_b(block);
+    return W_Block.getIdFromBlock(block);
   }
   
   public static int getBlockIdY(Entity entity, int size, int lenY) {
@@ -282,34 +282,34 @@ public class MCH_Lib {
     Block block = getBlockY(entity, size, lenY, canColliableOnly);
     if (block == null)
       return 0; 
-    return W_Block.func_149682_b(block);
+    return W_Block.getIdFromBlock(block);
   }
   
   public static Block getBlockY(Entity entity, int size, int lenY, boolean canColliableOnly) {
-    return getBlockY(entity.field_70170_p, entity.field_70165_t, entity.field_70163_u, entity.field_70161_v, size, lenY, canColliableOnly);
+    return getBlockY(entity.world, entity.posX, entity.posY, entity.posZ, size, lenY, canColliableOnly);
   }
   
   public static Block getBlockY(World world, Vec3d pos, int size, int lenY, boolean canColliableOnly) {
-    return getBlockY(world, pos.field_72450_a, pos.field_72448_b, pos.field_72449_c, size, lenY, canColliableOnly);
+    return getBlockY(world, pos.xCoord, pos.yCoord, pos.zCoord, size, lenY, canColliableOnly);
   }
   
   public static Block getBlockY(World world, double posX, double posY, double posZ, int size, int lenY, boolean canColliableOnly) {
     if (lenY == 0)
-      return W_Blocks.field_150350_a; 
+      return W_Blocks.AIR; 
     int px = (int)(posX + 0.5D);
     int py = (int)(posY + 0.5D);
     int pz = (int)(posZ + 0.5D);
     int cntY = (lenY > 0) ? lenY : -lenY;
     for (int y = 0; y < cntY; y++) {
       if (py + y < 0 || py + y > 255)
-        return W_Blocks.field_150350_a; 
+        return W_Blocks.AIR; 
       for (int x = -size / 2; x <= size / 2; x++) {
         for (int z = -size / 2; z <= size / 2; z++) {
-          IBlockState iblockstate = world.func_180495_p(new BlockPos(px + x, py + ((lenY > 0) ? y : -y), pz + z));
+          IBlockState iblockstate = world.getBlockState(new BlockPos(px + x, py + ((lenY > 0) ? y : -y), pz + z));
           Block block = W_WorldFunc.getBlock(world, px + x, py + ((lenY > 0) ? y : -y), pz + z);
-          if (block != null && block != W_Blocks.field_150350_a)
+          if (block != null && block != W_Blocks.AIR)
             if (canColliableOnly) {
-              if (block.func_176209_a(iblockstate, true))
+              if (block.canCollideCheck(iblockstate, true))
                 return block; 
             } else {
               return block;
@@ -317,15 +317,15 @@ public class MCH_Lib {
         } 
       } 
     } 
-    return W_Blocks.field_150350_a;
+    return W_Blocks.AIR;
   }
   
   public static Vec3d getYawPitchFromVec(Vec3d v) {
-    return getYawPitchFromVec(v.field_72450_a, v.field_72448_b, v.field_72449_c);
+    return getYawPitchFromVec(v.xCoord, v.yCoord, v.zCoord);
   }
   
   public static Vec3d getYawPitchFromVec(double x, double y, double z) {
-    double p = MathHelper.func_76133_a(x * x + z * z);
+    double p = MathHelper.sqrt(x * x + z * z);
     float yaw = (float)(Math.atan2(z, x) * 180.0D / Math.PI);
     float roll = (float)(Math.atan2(y, p) * 180.0D / Math.PI);
     return new Vec3d(0.0D, yaw, roll);
@@ -359,7 +359,7 @@ public class MCH_Lib {
   }
   
   public static void disableFirstPersonItemRender(ItemStack itemStack) {
-    if (itemStack.func_190926_b() && itemStack.func_77973_b() instanceof net.minecraft.item.ItemMapBase)
+    if (itemStack.func_190926_b() && itemStack.getItem() instanceof net.minecraft.item.ItemMapBase)
       if (!(W_McClient.getRenderEntity() instanceof MCH_ViewEntityDummy))
         return;  
     disableFirstPersonItemRender();

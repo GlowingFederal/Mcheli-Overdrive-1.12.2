@@ -19,7 +19,7 @@ public abstract class MCH_AircraftInfoManager<T extends MCH_AircraftInfo> extend
   }
   
   public void addRecipe(IRecipe recipe, int count, String name, String recipeString) {
-    if (recipe == null || recipe.func_77571_b() == null || recipe.func_77571_b().func_77973_b() == null)
+    if (recipe == null || recipe.getRecipeOutput() == null || recipe.getRecipeOutput().getItem() == null)
       throw new RuntimeException("[mcheli]Recipe Parameter Error! recipe" + count + " : " + name + ".txt : " + 
           String.valueOf(recipe) + " : " + recipeString); 
     this.listItemRecipe.add(recipe);
@@ -29,7 +29,7 @@ public abstract class MCH_AircraftInfoManager<T extends MCH_AircraftInfo> extend
   
   public MCH_AircraftInfo getAcInfoFromItem(IRecipe recipe) {
     if (recipe != null)
-      return getAcInfoFromItem(recipe.func_77571_b().func_77973_b()); 
+      return getAcInfoFromItem(recipe.getRecipeOutput().getItem()); 
     return null;
   }
 }

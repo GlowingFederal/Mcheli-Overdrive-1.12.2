@@ -21,7 +21,7 @@ public class BuiltInWrenchItemRenderer implements IItemModelRenderer {
     GL11.glPushMatrix();
     W_McClient.MOD_bindTexture("textures/wrench.png");
     if (IItemModelRenderer.isFirstPerson(transformType))
-      if (entity.func_184587_cr() && entity.func_184600_cs() == EnumHand.MAIN_HAND) {
+      if (entity.isHandActive() && entity.getActiveHand() == EnumHand.MAIN_HAND) {
         float f = MCH_ItemWrench.getUseAnimSmooth(itemStack, partialTicks);
         GL11.glRotatef(65.0F, 0.0F, 0.0F, 1.0F);
         GL11.glRotatef(f + 20.0F, 1.0F, 0.0F, 0.0F);

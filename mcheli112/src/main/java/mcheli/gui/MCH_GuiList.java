@@ -24,13 +24,13 @@ public class MCH_GuiList extends W_GuiButton {
   
   public void func_191745_a(Minecraft mc, int x, int y, float partialTicks) {
     if (isVisible()) {
-      func_73734_a(this.field_146128_h, this.field_146129_i, this.field_146128_h + this.field_146120_f, this.field_146129_i + this.field_146121_g, -2143272896);
+      drawRect(this.xPosition, this.yPosition, this.xPosition + this.width, this.yPosition + this.height, -2143272896);
       this.scrollBar.func_191745_a(mc, x, y, partialTicks);
       for (int i = 0; i < this.maxRowNum; i++) {
         if (i + getStartRow() >= this.listItems.size())
           break; 
         MCH_GuiListItem item = this.listItems.get(i + getStartRow());
-        item.draw(mc, x, y, this.field_146128_h, this.field_146129_i + 5 + 20 * i, partialTicks);
+        item.draw(mc, x, y, this.xPosition, this.yPosition + 5 + 20 * i, partialTicks);
       } 
     } 
   }
@@ -64,15 +64,15 @@ public class MCH_GuiList extends W_GuiButton {
     return (startRow >= 0) ? startRow : 0;
   }
   
-  protected void func_146119_b(Minecraft mc, int x, int y) {
+  protected void mouseDragged(Minecraft mc, int x, int y) {
     if (isVisible())
-      this.scrollBar.func_146119_b(mc, x, y); 
+      this.scrollBar.mouseDragged(mc, x, y); 
   }
   
-  public boolean func_146116_c(Minecraft mc, int x, int y) {
+  public boolean mousePressed(Minecraft mc, int x, int y) {
     boolean b = false;
     if (isVisible()) {
-      b |= this.scrollBar.func_146116_c(mc, x, y);
+      b |= this.scrollBar.mousePressed(mc, x, y);
       for (int i = 0; i < this.maxRowNum; i++) {
         if (i + getStartRow() >= this.listItems.size())
           break; 
@@ -86,9 +86,9 @@ public class MCH_GuiList extends W_GuiButton {
     return b;
   }
   
-  public void func_146118_a(int x, int y) {
+  public void mouseReleased(int x, int y) {
     if (isVisible()) {
-      this.scrollBar.func_146118_a(x, y);
+      this.scrollBar.mouseReleased(x, y);
       for (MCH_GuiListItem item : this.listItems)
         item.mouseReleased(x, y); 
     } 

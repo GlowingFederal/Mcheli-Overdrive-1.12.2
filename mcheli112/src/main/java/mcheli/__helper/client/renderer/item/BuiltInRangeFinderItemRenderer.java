@@ -24,7 +24,7 @@ public class BuiltInRangeFinderItemRenderer implements IItemModelRenderer {
     boolean flag = true;
     if (IItemModelRenderer.isFirstPerson(transformType)) {
       flag = (entity instanceof EntityPlayer && !MCH_ItemRangeFinder.isUsingScope((EntityPlayer)entity));
-      if (entity.func_184587_cr() && entity.func_184600_cs() == EnumHand.MAIN_HAND)
+      if (entity.isHandActive() && entity.getActiveHand() == EnumHand.MAIN_HAND)
         GL11.glTranslated(0.6563000082969666D, 0.34380000829696655D, 0.009999999776482582D); 
     } 
     if (flag)

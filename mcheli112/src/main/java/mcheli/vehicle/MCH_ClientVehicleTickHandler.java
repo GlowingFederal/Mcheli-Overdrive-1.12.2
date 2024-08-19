@@ -47,7 +47,7 @@ public class MCH_ClientVehicleTickHandler extends MCH_AircraftClientTickHandler 
   protected void update(EntityPlayer player, MCH_EntityVehicle vehicle, MCH_VehicleInfo info) {
     if (info != null)
       setRotLimitPitch(info.minRotationPitch, info.maxRotationPitch, (Entity)player); 
-    vehicle.updateCameraRotate(player.field_70177_z, player.field_70125_A);
+    vehicle.updateCameraRotate(player.rotationYaw, player.rotationPitch);
     vehicle.updateRadar(5);
   }
   
@@ -55,23 +55,23 @@ public class MCH_ClientVehicleTickHandler extends MCH_AircraftClientTickHandler 
     for (MCH_Key k : this.Keys)
       k.update(); 
     this.isBeforeRiding = this.isRiding;
-    EntityPlayerSP entityPlayerSP = this.mc.field_71439_g;
+    EntityPlayerSP entityPlayerSP = this.mc.player;
     MCH_EntityVehicle vehicle = null;
     boolean isPilot = true;
     if (entityPlayerSP != null)
-      if (entityPlayerSP.func_184187_bx() instanceof MCH_EntityVehicle) {
-        vehicle = (MCH_EntityVehicle)entityPlayerSP.func_184187_bx();
-      } else if (entityPlayerSP.func_184187_bx() instanceof MCH_EntitySeat) {
-        MCH_EntitySeat seat = (MCH_EntitySeat)entityPlayerSP.func_184187_bx();
+      if (entityPlayerSP.getRidingEntity() instanceof MCH_EntityVehicle) {
+        vehicle = (MCH_EntityVehicle)entityPlayerSP.getRidingEntity();
+      } else if (entityPlayerSP.getRidingEntity() instanceof MCH_EntitySeat) {
+        MCH_EntitySeat seat = (MCH_EntitySeat)entityPlayerSP.getRidingEntity();
         if (seat.getParent() instanceof MCH_EntityVehicle) {
           isPilot = false;
           vehicle = (MCH_EntityVehicle)seat.getParent();
         } 
       }  
     if (vehicle != null && vehicle.getAcInfo() != null) {
-      MCH_Lib.disableFirstPersonItemRender(entityPlayerSP.func_184614_ca());
+      MCH_Lib.disableFirstPersonItemRender(entityPlayerSP.getHeldItemMainhand());
       update((EntityPlayer)entityPlayerSP, vehicle, vehicle.getVehicleInfo());
-      MCH_ViewEntityDummy viewEntityDummy = MCH_ViewEntityDummy.getInstance((World)this.mc.field_71441_e);
+      MCH_ViewEntityDummy viewEntityDummy = MCH_ViewEntityDummy.getInstance((World)this.mc.world);
       viewEntityDummy.update(vehicle.camera);
       if (!inGUI) {
         if (!vehicle.isDestroyed())

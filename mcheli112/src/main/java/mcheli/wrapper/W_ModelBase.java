@@ -18,7 +18,7 @@ public abstract class W_ModelBase extends ModelBase {
   
   public static _IModelCustom loadModel(String name) throws IllegalArgumentException, _ModelFormatException {
     ResourceLocation resource = new ResourceLocation("mcheli", name);
-    String path = resource.func_110623_a();
+    String path = resource.getResourcePath();
     int i = path.lastIndexOf('.');
     if (i == -1)
       throw new IllegalArgumentException("The resource name is not valid"); 

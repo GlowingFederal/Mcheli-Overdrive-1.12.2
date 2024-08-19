@@ -73,7 +73,7 @@ public class MCH_WeaponCreator {
           interval = -interval; 
       } 
       weapon.delayedInterval = interval;
-      if (w.field_72995_K) {
+      if (w.isRemote) {
         weapon.interval = interval;
         weapon.heatCount++;
         weapon.cartridge = info.cartridge;

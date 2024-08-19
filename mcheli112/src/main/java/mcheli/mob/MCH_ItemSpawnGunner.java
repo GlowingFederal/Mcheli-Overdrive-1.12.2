@@ -32,47 +32,47 @@ public class MCH_ItemSpawnGunner extends W_Item {
   public int targetType = 0;
   
   public MCH_ItemSpawnGunner() {
-    this.field_77777_bU = 1;
-    func_77637_a(CreativeTabs.field_78029_e);
+    this.maxStackSize = 1;
+    setCreativeTab(CreativeTabs.TRANSPORTATION);
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand handIn) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand handIn) {
     MCH_EntityGunner mCH_EntityGunner;
     MCH_EntitySeat mCH_EntitySeat;
     MCH_EntityAircraft mCH_EntityAircraft;
-    ItemStack itemstack = player.func_184586_b(handIn);
+    ItemStack itemstack = player.getHeldItem(handIn);
     float f = 1.0F;
-    float pitch = player.field_70127_C + (player.field_70125_A - player.field_70127_C) * f;
-    float yaw = player.field_70126_B + (player.field_70177_z - player.field_70126_B) * f;
-    double dx = player.field_70169_q + (player.field_70165_t - player.field_70169_q) * f;
-    double dy = player.field_70167_r + (player.field_70163_u - player.field_70167_r) * f + player.func_70047_e();
-    double dz = player.field_70166_s + (player.field_70161_v - player.field_70166_s) * f;
+    float pitch = player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * f;
+    float yaw = player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * f;
+    double dx = player.prevPosX + (player.posX - player.prevPosX) * f;
+    double dy = player.prevPosY + (player.posY - player.prevPosY) * f + player.getEyeHeight();
+    double dz = player.prevPosZ + (player.posZ - player.prevPosZ) * f;
     Vec3d vec3 = new Vec3d(dx, dy, dz);
-    float f3 = MathHelper.func_76134_b(-yaw * 0.017453292F - 3.1415927F);
-    float f4 = MathHelper.func_76126_a(-yaw * 0.017453292F - 3.1415927F);
-    float f5 = -MathHelper.func_76134_b(-pitch * 0.017453292F);
-    float f6 = MathHelper.func_76126_a(-pitch * 0.017453292F);
+    float f3 = MathHelper.cos(-yaw * 0.017453292F - 3.1415927F);
+    float f4 = MathHelper.sin(-yaw * 0.017453292F - 3.1415927F);
+    float f5 = -MathHelper.cos(-pitch * 0.017453292F);
+    float f6 = MathHelper.sin(-pitch * 0.017453292F);
     float f7 = f4 * f5;
     float f8 = f3 * f5;
     double d3 = 5.0D;
-    Vec3d vec31 = vec3.func_72441_c(f7 * d3, f6 * d3, f8 * d3);
-    List<MCH_EntityGunner> list = world.func_72872_a(MCH_EntityGunner.class, player
-        .func_174813_aQ().func_72314_b(5.0D, 5.0D, 5.0D));
+    Vec3d vec31 = vec3.addVector(f7 * d3, f6 * d3, f8 * d3);
+    List<MCH_EntityGunner> list = world.getEntitiesWithinAABB(MCH_EntityGunner.class, player
+        .getEntityBoundingBox().expand(5.0D, 5.0D, 5.0D));
     Entity target = null;
     for (int i = 0; i < list.size(); i++) {
       MCH_EntityGunner gunner = list.get(i);
-      if (gunner.func_174813_aQ().func_72327_a(vec3, vec31) != null)
-        if (target == null || player.func_70068_e((Entity)gunner) < player.func_70068_e(target))
+      if (gunner.getEntityBoundingBox().calculateIntercept(vec3, vec31) != null)
+        if (target == null || player.getDistanceSqToEntity((Entity)gunner) < player.getDistanceSqToEntity(target))
           mCH_EntityGunner = gunner;  
     } 
     if (mCH_EntityGunner == null) {
-      List<MCH_EntitySeat> list1 = world.func_72872_a(MCH_EntitySeat.class, player
-          .func_174813_aQ().func_72314_b(5.0D, 5.0D, 5.0D));
+      List<MCH_EntitySeat> list1 = world.getEntitiesWithinAABB(MCH_EntitySeat.class, player
+          .getEntityBoundingBox().expand(5.0D, 5.0D, 5.0D));
       for (int j = 0; j < list1.size(); j++) {
         MCH_EntitySeat seat = list1.get(j);
         if (seat.getParent() != null && seat.getParent().getAcInfo() != null && seat
-          .func_174813_aQ().func_72327_a(vec3, vec31) != null)
-          if (mCH_EntityGunner == null || player.func_70068_e((Entity)seat) < player.func_70068_e((Entity)mCH_EntityGunner))
+          .getEntityBoundingBox().calculateIntercept(vec3, vec31) != null)
+          if (mCH_EntityGunner == null || player.getDistanceSqToEntity((Entity)seat) < player.getDistanceSqToEntity((Entity)mCH_EntityGunner))
             if (seat.getRiddenByEntity() instanceof MCH_EntityGunner) {
               Entity entity = seat.getRiddenByEntity();
             } else {
@@ -81,13 +81,13 @@ public class MCH_ItemSpawnGunner extends W_Item {
       } 
     } 
     if (mCH_EntitySeat == null) {
-      List<MCH_EntityAircraft> list2 = world.func_72872_a(MCH_EntityAircraft.class, player
-          .func_174813_aQ().func_72314_b(5.0D, 5.0D, 5.0D));
+      List<MCH_EntityAircraft> list2 = world.getEntitiesWithinAABB(MCH_EntityAircraft.class, player
+          .getEntityBoundingBox().expand(5.0D, 5.0D, 5.0D));
       for (int j = 0; j < list2.size(); j++) {
         MCH_EntityAircraft ac = list2.get(j);
         if (!ac.isUAV() && ac.getAcInfo() != null && ac
-          .func_174813_aQ().func_72327_a(vec3, vec31) != null)
-          if (mCH_EntitySeat == null || player.func_70068_e((Entity)ac) < player.func_70068_e((Entity)mCH_EntitySeat))
+          .getEntityBoundingBox().calculateIntercept(vec3, vec31) != null)
+          if (mCH_EntitySeat == null || player.getDistanceSqToEntity((Entity)ac) < player.getDistanceSqToEntity((Entity)mCH_EntitySeat))
             if (ac.getRiddenByEntity() instanceof MCH_EntityGunner) {
               Entity entity = ac.getRiddenByEntity();
             } else {
@@ -96,49 +96,49 @@ public class MCH_ItemSpawnGunner extends W_Item {
       } 
     } 
     if (mCH_EntityAircraft instanceof MCH_EntityGunner) {
-      mCH_EntityAircraft.func_184230_a(player, handIn);
+      mCH_EntityAircraft.processInitialInteract(player, handIn);
       return ActionResult.newResult(EnumActionResult.SUCCESS, itemstack);
     } 
-    if (this.targetType == 1 && !world.field_72995_K && player.func_96124_cp() == null) {
-      player.func_145747_a((ITextComponent)new TextComponentString("You are not on team."));
+    if (this.targetType == 1 && !world.isRemote && player.getTeam() == null) {
+      player.addChatMessage((ITextComponent)new TextComponentString("You are not on team."));
       return ActionResult.newResult(EnumActionResult.FAIL, itemstack);
     } 
     if (mCH_EntityAircraft == null) {
-      if (!world.field_72995_K)
-        player.func_145747_a((ITextComponent)new TextComponentString("Right click to seat.")); 
+      if (!world.isRemote)
+        player.addChatMessage((ITextComponent)new TextComponentString("Right click to seat.")); 
       return ActionResult.newResult(EnumActionResult.FAIL, itemstack);
     } 
-    if (!world.field_72995_K) {
-      MCH_EntityGunner gunner = new MCH_EntityGunner(world, ((Entity)mCH_EntityAircraft).field_70165_t, ((Entity)mCH_EntityAircraft).field_70163_u, ((Entity)mCH_EntityAircraft).field_70161_v);
-      gunner.field_70177_z = (((MathHelper.func_76128_c((player.field_70177_z * 4.0F / 360.0F) + 0.5D) & 0x3) - 1) * 90);
-      gunner.isCreative = player.field_71075_bZ.field_75098_d;
+    if (!world.isRemote) {
+      MCH_EntityGunner gunner = new MCH_EntityGunner(world, ((Entity)mCH_EntityAircraft).posX, ((Entity)mCH_EntityAircraft).posY, ((Entity)mCH_EntityAircraft).posZ);
+      gunner.rotationYaw = (((MathHelper.floor((player.rotationYaw * 4.0F / 360.0F) + 0.5D) & 0x3) - 1) * 90);
+      gunner.isCreative = player.capabilities.isCreativeMode;
       gunner.targetType = this.targetType;
-      gunner.ownerUUID = player.func_110124_au().toString();
-      ScorePlayerTeam team = world.func_96441_U().func_96509_i(player.func_145748_c_().func_150254_d());
+      gunner.ownerUUID = player.getUniqueID().toString();
+      ScorePlayerTeam team = world.getScoreboard().getPlayersTeam(player.getDisplayName().getFormattedText());
       if (team != null)
-        gunner.setTeamName(team.func_96661_b()); 
-      world.func_72838_d((Entity)gunner);
-      gunner.func_184220_m((Entity)mCH_EntityAircraft);
+        gunner.setTeamName(team.getRegisteredName()); 
+      world.spawnEntityInWorld((Entity)gunner);
+      gunner.startRiding((Entity)mCH_EntityAircraft);
       W_WorldFunc.MOD_playSoundAtEntity((Entity)gunner, "wrench", 1.0F, 3.0F);
       MCH_EntityAircraft ac = (mCH_EntityAircraft instanceof MCH_EntityAircraft) ? mCH_EntityAircraft : ((MCH_EntitySeat)mCH_EntityAircraft).getParent();
-      String teamPlayerName = ScorePlayerTeam.func_96667_a(player.func_96124_cp(), player.func_145748_c_().func_150254_d());
+      String teamPlayerName = ScorePlayerTeam.formatPlayerName(player.getTeam(), player.getDisplayName().getFormattedText());
       String displayName = TextFormatting.GOLD + (ac.getAcInfo()).displayName + TextFormatting.RESET;
       int seatNo = ac.getSeatIdByEntity((Entity)gunner) + 1;
       if (MCH_MOD.isTodaySep01()) {
         String msg = "Hi " + teamPlayerName + "! I sat in the " + seatNo + " seat of " + displayName + "!";
-        player.func_145747_a((ITextComponent)new TextComponentTranslation("chat.type.text", new Object[] { "EMB4", new TextComponentString(msg) }));
+        player.addChatMessage((ITextComponent)new TextComponentTranslation("chat.type.text", new Object[] { "EMB4", new TextComponentString(msg) }));
       } else {
-        player.func_145747_a((ITextComponent)new TextComponentString("The gunner was put on " + displayName + " seat " + seatNo + " by " + teamPlayerName));
+        player.addChatMessage((ITextComponent)new TextComponentString("The gunner was put on " + displayName + " seat " + seatNo + " by " + teamPlayerName));
       } 
     } 
-    if (!player.field_71075_bZ.field_75098_d)
+    if (!player.capabilities.isCreativeMode)
       itemstack.func_190918_g(1); 
     return ActionResult.newResult(EnumActionResult.SUCCESS, itemstack);
   }
   
   @SideOnly(Side.CLIENT)
   public static int getColorFromItemStack(ItemStack stack, int tintIndex) {
-    MCH_ItemSpawnGunner item = (MCH_ItemSpawnGunner)stack.func_77973_b();
+    MCH_ItemSpawnGunner item = (MCH_ItemSpawnGunner)stack.getItem();
     return (tintIndex == 0) ? item.primaryColor : item.secondaryColor;
   }
 }

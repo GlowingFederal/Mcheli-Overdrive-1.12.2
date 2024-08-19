@@ -28,9 +28,9 @@ public class W_LanguageRegistry {
     if (!map.containsKey(lang))
       map.put(lang, new ArrayList<>()); 
     if (o instanceof Item)
-      ((ArrayList<String>)map.get(lang)).add(((Item)o).func_77658_a() + ".name=" + name); 
+      ((ArrayList<String>)map.get(lang)).add(((Item)o).getUnlocalizedName() + ".name=" + name); 
     if (o instanceof Block) {
-      ((ArrayList<String>)map.get(lang)).add(((Block)o).func_149739_a() + ".name=" + name);
+      ((ArrayList<String>)map.get(lang)).add(((Block)o).getUnlocalizedName() + ".name=" + name);
     } else if (o instanceof net.minecraft.advancements.Advancement) {
       ((ArrayList<String>)map.get(lang)).add("advancement." + key + "=" + name);
       ((ArrayList<String>)map.get(lang)).add("advancement." + key + ".desc=" + desc);

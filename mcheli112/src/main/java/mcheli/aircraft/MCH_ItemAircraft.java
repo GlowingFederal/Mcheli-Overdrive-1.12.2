@@ -36,7 +36,7 @@ public abstract class MCH_ItemAircraft extends W_Item {
   public static void registerDispenseBehavior(Item item) {
     if (isRegistedDispenseBehavior == true)
       return; 
-    BlockDispenser.field_149943_a.func_82595_a(item, new MCH_ItemAircraftDispenseBehavior());
+    BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(item, new MCH_ItemAircraftDispenseBehavior());
   }
   
   @Nullable
@@ -49,8 +49,8 @@ public abstract class MCH_ItemAircraft extends W_Item {
     MCH_EntityAircraft ac = createAircraft(world, (x + 0.5F), (y + 1.0F), (z + 0.5F), itemStack);
     if (ac == null)
       return null; 
-    ac.initRotationYaw((((MathHelper.func_76128_c((rotationYaw * 4.0F / 360.0F) + 0.5D) & 0x3) - 1) * 90));
-    if (!world.func_184144_a((Entity)ac, ac.func_174813_aQ().func_72314_b(-0.1D, -0.1D, -0.1D)).isEmpty())
+    ac.initRotationYaw((((MathHelper.floor((rotationYaw * 4.0F / 360.0F) + 0.5D) & 0x3) - 1) * 90));
+    if (!world.getCollisionBoxes((Entity)ac, ac.getEntityBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty())
       return null; 
     return ac;
   }
@@ -62,37 +62,37 @@ public abstract class MCH_ItemAircraft extends W_Item {
     return super.toString() + "(null)";
   }
   
-  public ActionResult<ItemStack> func_77659_a(World world, EntityPlayer player, EnumHand handIn) {
-    ItemStack itemstack = player.func_184586_b(handIn);
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand handIn) {
+    ItemStack itemstack = player.getHeldItem(handIn);
     float f = 1.0F;
-    float f1 = player.field_70127_C + (player.field_70125_A - player.field_70127_C) * f;
-    float f2 = player.field_70126_B + (player.field_70177_z - player.field_70126_B) * f;
-    double d0 = player.field_70169_q + (player.field_70165_t - player.field_70169_q) * f;
-    double d1 = player.field_70167_r + (player.field_70163_u - player.field_70167_r) * f + 1.62D;
-    double d2 = player.field_70166_s + (player.field_70161_v - player.field_70166_s) * f;
+    float f1 = player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * f;
+    float f2 = player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * f;
+    double d0 = player.prevPosX + (player.posX - player.prevPosX) * f;
+    double d1 = player.prevPosY + (player.posY - player.prevPosY) * f + 1.62D;
+    double d2 = player.prevPosZ + (player.posZ - player.prevPosZ) * f;
     Vec3d vec3 = W_WorldFunc.getWorldVec3(world, d0, d1, d2);
-    float f3 = MathHelper.func_76134_b(-f2 * 0.017453292F - 3.1415927F);
-    float f4 = MathHelper.func_76126_a(-f2 * 0.017453292F - 3.1415927F);
-    float f5 = -MathHelper.func_76134_b(-f1 * 0.017453292F);
-    float f6 = MathHelper.func_76126_a(-f1 * 0.017453292F);
+    float f3 = MathHelper.cos(-f2 * 0.017453292F - 3.1415927F);
+    float f4 = MathHelper.sin(-f2 * 0.017453292F - 3.1415927F);
+    float f5 = -MathHelper.cos(-f1 * 0.017453292F);
+    float f6 = MathHelper.sin(-f1 * 0.017453292F);
     float f7 = f4 * f5;
     float f8 = f3 * f5;
     double d3 = 5.0D;
-    Vec3d vec31 = vec3.func_72441_c(f7 * d3, f6 * d3, f8 * d3);
+    Vec3d vec31 = vec3.addVector(f7 * d3, f6 * d3, f8 * d3);
     RayTraceResult mop = W_WorldFunc.clip(world, vec3, vec31, true);
     if (mop == null)
       return ActionResult.newResult(EnumActionResult.PASS, itemstack); 
-    Vec3d vec32 = player.func_70676_i(f);
+    Vec3d vec32 = player.getLook(f);
     boolean flag = false;
     float f9 = 1.0F;
-    List<Entity> list = world.func_72839_b((Entity)player, player
-        .func_174813_aQ().func_72321_a(vec32.field_72450_a * d3, vec32.field_72448_b * d3, vec32.field_72449_c * d3).func_72314_b(f9, f9, f9));
+    List<Entity> list = world.getEntitiesWithinAABBExcludingEntity((Entity)player, player
+        .getEntityBoundingBox().addCoord(vec32.xCoord * d3, vec32.yCoord * d3, vec32.zCoord * d3).expand(f9, f9, f9));
     for (int i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
-      if (entity.func_70067_L()) {
-        float f10 = entity.func_70111_Y();
-        AxisAlignedBB axisalignedbb = entity.func_174813_aQ().func_72314_b(f10, f10, f10);
-        if (axisalignedbb.func_72318_a(vec3))
+      if (entity.canBeCollidedWith()) {
+        float f10 = entity.getCollisionBorderSize();
+        AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expand(f10, f10, f10);
+        if (axisalignedbb.isVecInside(vec3))
           flag = true; 
       } 
     } 
@@ -102,33 +102,33 @@ public abstract class MCH_ItemAircraft extends W_Item {
       if (MCH_Config.PlaceableOnSpongeOnly.prmBool) {
         MCH_AircraftInfo acInfo = getAircraftInfo();
         if (acInfo != null && acInfo.isFloat && !acInfo.canMoveOnGround) {
-          if (world.func_180495_p(mop.func_178782_a().func_177977_b()).func_177230_c() != Blocks.field_150360_v)
+          if (world.getBlockState(mop.getBlockPos().down()).getBlock() != Blocks.SPONGE)
             return ActionResult.newResult(EnumActionResult.FAIL, itemstack); 
           for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
-              if (world.func_180495_p(mop.func_178782_a().func_177982_a(x, 0, z)).func_177230_c() != Blocks.field_150355_j)
+              if (world.getBlockState(mop.getBlockPos().add(x, 0, z)).getBlock() != Blocks.WATER)
                 return ActionResult.newResult(EnumActionResult.FAIL, itemstack); 
             } 
           } 
         } else {
-          Block block = world.func_180495_p(mop.func_178782_a()).func_177230_c();
+          Block block = world.getBlockState(mop.getBlockPos()).getBlock();
           if (!(block instanceof net.minecraft.block.BlockSponge))
             return ActionResult.newResult(EnumActionResult.FAIL, itemstack); 
         } 
       } 
-      spawnAircraft(itemstack, world, player, mop.func_178782_a());
+      spawnAircraft(itemstack, world, player, mop.getBlockPos());
     } 
     return ActionResult.newResult(EnumActionResult.SUCCESS, itemstack);
   }
   
   public MCH_EntityAircraft spawnAircraft(ItemStack itemStack, World world, EntityPlayer player, BlockPos blockpos) {
-    MCH_EntityAircraft ac = onTileClick(itemStack, world, player.field_70177_z, blockpos.func_177958_n(), blockpos.func_177956_o(), blockpos
-        .func_177952_p());
+    MCH_EntityAircraft ac = onTileClick(itemStack, world, player.rotationYaw, blockpos.getX(), blockpos.getY(), blockpos
+        .getZ());
     if (ac != null) {
-      if (ac.getAcInfo() != null && (ac.getAcInfo()).creativeOnly && !player.field_71075_bZ.field_75098_d)
+      if (ac.getAcInfo() != null && (ac.getAcInfo()).creativeOnly && !player.capabilities.isCreativeMode)
         return null; 
       if (ac.isUAV()) {
-        if (world.field_72995_K)
+        if (world.isRemote)
           if (ac.isSmallUAV()) {
             W_EntityPlayer.addChatMessage(player, "Please use the UAV station OR Portable Controller");
           } else {
@@ -136,12 +136,12 @@ public abstract class MCH_ItemAircraft extends W_Item {
           }  
         ac = null;
       } else {
-        if (!world.field_72995_K) {
+        if (!world.isRemote) {
           ac.getAcDataFromItem(itemStack);
-          world.func_72838_d((Entity)ac);
+          world.spawnEntityInWorld((Entity)ac);
           MCH_CriteriaTriggers.PUT_AIRCRAFT.trigger((EntityPlayerMP)player);
         } 
-        if (!player.field_71075_bZ.field_75098_d)
+        if (!player.capabilities.isCreativeMode)
           itemStack.func_190918_g(1); 
       } 
     } 
@@ -150,11 +150,11 @@ public abstract class MCH_ItemAircraft extends W_Item {
   
   public void rideEntity(ItemStack item, Entity target, EntityPlayer player) {
     if (!MCH_Config.PlaceableOnSpongeOnly.prmBool)
-      if (target instanceof net.minecraft.entity.item.EntityMinecartEmpty && target.func_184188_bt().isEmpty()) {
-        BlockPos blockpos = new BlockPos((int)target.field_70165_t, (int)target.field_70163_u + 2, (int)target.field_70161_v);
-        MCH_EntityAircraft ac = spawnAircraft(item, player.field_70170_p, player, blockpos);
-        if (!player.field_70170_p.field_72995_K && ac != null)
-          ac.func_184220_m(target); 
+      if (target instanceof net.minecraft.entity.item.EntityMinecartEmpty && target.getPassengers().isEmpty()) {
+        BlockPos blockpos = new BlockPos((int)target.posX, (int)target.posY + 2, (int)target.posZ);
+        MCH_EntityAircraft ac = spawnAircraft(item, player.world, player, blockpos);
+        if (!player.world.isRemote && ac != null)
+          ac.startRiding(target); 
       }  
   }
 }

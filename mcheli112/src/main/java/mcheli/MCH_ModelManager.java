@@ -28,7 +28,7 @@ public class MCH_ModelManager extends W_ModelBase {
     map = new HashMap<>();
     defaultModel = null;
     defaultModel = new ModelRenderer((ModelBase)instance, 0, 0);
-    defaultModel.func_78790_a(-5.0F, -5.0F, -5.0F, 10, 10, 10, 0.0F);
+    defaultModel.addBox(-5.0F, -5.0F, -5.0F, 10, 10, 10, 0.0F);
     rand = new Random();
   }
   

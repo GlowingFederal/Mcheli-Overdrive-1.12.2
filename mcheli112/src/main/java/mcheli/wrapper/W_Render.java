@@ -11,14 +11,14 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 public abstract class W_Render<T extends Entity> extends Render<T> {
-  private static FloatBuffer colorBuffer = GLAllocation.func_74529_h(16);
+  private static FloatBuffer colorBuffer = GLAllocation.createDirectFloatBuffer(16);
   
   protected W_Render(RenderManager renderManager) {
     super(renderManager);
   }
   
   protected void bindTexture(String path) {
-    func_110776_a(new ResourceLocation(W_MOD.DOMAIN, path));
+    bindTexture(new ResourceLocation(W_MOD.DOMAIN, path));
   }
   
   protected static final ResourceLocation TEX_DEFAULT = new ResourceLocation(W_MOD.DOMAIN, "textures/default.png");
@@ -27,7 +27,7 @@ public abstract class W_Render<T extends Entity> extends Render<T> {
   
   public int dstBlend;
   
-  protected ResourceLocation func_110775_a(T entity) {
+  protected ResourceLocation getEntityTexture(T entity) {
     return TEX_DEFAULT;
   }
   
@@ -45,7 +45,7 @@ public abstract class W_Render<T extends Entity> extends Render<T> {
     GL11.glEnable(2884);
     int j = lighting % 65536;
     int k = lighting / 65536;
-    OpenGlHelper.func_77475_a(OpenGlHelper.field_77476_b, j / 1.0F, k / 1.0F);
+    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j / 1.0F, k / 1.0F);
     GL11.glColor4f(0.75F, 0.75F, 0.75F, 1.0F);
     GL11.glEnable(3042);
     this.srcBlend = GL11.glGetInteger(3041);

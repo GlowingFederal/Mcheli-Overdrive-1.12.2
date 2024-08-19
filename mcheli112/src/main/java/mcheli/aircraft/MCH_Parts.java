@@ -39,7 +39,7 @@ public class MCH_Parts {
   
   public MCH_Parts(Entity parent, int shiftBit, DataParameter<Integer> dataKey, String name) {
     this.parent = parent;
-    this.dataManager = parent.func_184212_Q();
+    this.dataManager = parent.getDataManager();
     this.shift = shiftBit;
     this.dataKey = dataKey;
     this.status = ((getDataWatcherValue() & 1 << this.shift) != 0);
@@ -47,7 +47,7 @@ public class MCH_Parts {
   }
   
   public int getDataWatcherValue() {
-    return ((Integer)this.dataManager.func_187225_a(this.dataKey)).intValue();
+    return ((Integer)this.dataManager.get(this.dataKey)).intValue();
   }
   
   public void setStatusServer(boolean stat) {
@@ -55,7 +55,7 @@ public class MCH_Parts {
   }
   
   public void setStatusServer(boolean stat, boolean playSound) {
-    if (!this.parent.field_70170_p.field_72995_K)
+    if (!this.parent.world.isRemote)
       if (getStatus() != stat) {
         MCH_Lib.DbgLog(false, "setStatusServer(ID=%d %s :%s -> %s)", new Object[] { Integer.valueOf(this.shift), this.partName, getStatus() ? "ON" : "OFF", stat ? "ON" : "OFF" });
         updateDataWatcher(stat);
@@ -73,9 +73,9 @@ public class MCH_Parts {
     int currentStatus = getDataWatcherValue();
     int mask = 1 << this.shift;
     if (!stat) {
-      this.dataManager.func_187227_b(this.dataKey, Integer.valueOf(currentStatus & (mask ^ 0xFFFFFFFF)));
+      this.dataManager.set(this.dataKey, Integer.valueOf(currentStatus & (mask ^ 0xFFFFFFFF)));
     } else {
-      this.dataManager.func_187227_b(this.dataKey, Integer.valueOf(currentStatus | mask));
+      this.dataManager.set(this.dataKey, Integer.valueOf(currentStatus | mask));
     } 
     this.status = stat;
   }
@@ -93,7 +93,7 @@ public class MCH_Parts {
   }
   
   public void updateStatusClient(int statFromDataWatcher) {
-    if (this.parent.field_70170_p.field_72995_K)
+    if (this.parent.world.isRemote)
       this.status = ((statFromDataWatcher & 1 << this.shift) != 0); 
   }
   
@@ -124,7 +124,7 @@ public class MCH_Parts {
   }
   
   public void playSound(Sound snd) {
-    if (!snd.name.isEmpty() && !this.parent.field_70170_p.field_72995_K)
+    if (!snd.name.isEmpty() && !this.parent.world.isRemote)
       W_WorldFunc.MOD_playSoundAtEntity(this.parent, snd.name, snd.volume, snd.pitch); 
   }
   

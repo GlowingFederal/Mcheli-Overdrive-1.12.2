@@ -34,7 +34,7 @@ public class MCH_SoundEvents {
   
   public static void playSound(World w, double x, double y, double z, String name, float volume, float pitch) {
     SoundEvent sound = getSound(name);
-    w.func_184148_a(null, x, y, z, sound, SoundCategory.MASTER, volume, pitch);
+    w.playSound(null, x, y, z, sound, SoundCategory.MASTER, volume, pitch);
   }
   
   public static SoundEvent getSound(String name) {

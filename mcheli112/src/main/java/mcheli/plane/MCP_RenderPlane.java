@@ -17,7 +17,7 @@ public class MCP_RenderPlane extends MCH_RenderAircraft<MCP_EntityPlane> {
   
   public MCP_RenderPlane(RenderManager renderManager) {
     super(renderManager);
-    this.field_76989_e = 2.0F;
+    this.shadowSize = 2.0F;
   }
   
   public void renderAircraft(MCH_EntityAircraft entity, double posX, double posY, double posZ, float yaw, float pitch, float roll, float tickTime) {
@@ -53,21 +53,21 @@ public class MCP_RenderPlane extends MCH_RenderAircraft<MCP_EntityPlane> {
     float prevRot = plane.getPrevNozzleRotation();
     for (MCP_PlaneInfo.Rotor r : planeInfo.rotorList) {
       GL11.glPushMatrix();
-      GL11.glTranslated(r.pos.field_72450_a, r.pos.field_72448_b, r.pos.field_72449_c);
-      GL11.glRotatef((prevRot + (rot - prevRot) * tickTime) * r.maxRotFactor, (float)r.rot.field_72450_a, (float)r.rot.field_72448_b, (float)r.rot.field_72449_c);
-      GL11.glTranslated(-r.pos.field_72450_a, -r.pos.field_72448_b, -r.pos.field_72449_c);
+      GL11.glTranslated(r.pos.xCoord, r.pos.yCoord, r.pos.zCoord);
+      GL11.glRotatef((prevRot + (rot - prevRot) * tickTime) * r.maxRotFactor, (float)r.rot.xCoord, (float)r.rot.yCoord, (float)r.rot.zCoord);
+      GL11.glTranslated(-r.pos.xCoord, -r.pos.yCoord, -r.pos.zCoord);
       renderPart(r.model, planeInfo.model, r.modelName);
       for (MCP_PlaneInfo.Blade b : r.blades) {
         float br = plane.prevRotationRotor;
         br += (plane.rotationRotor - plane.prevRotationRotor) * tickTime;
         GL11.glPushMatrix();
-        GL11.glTranslated(b.pos.field_72450_a, b.pos.field_72448_b, b.pos.field_72449_c);
-        GL11.glRotatef(br, (float)b.rot.field_72450_a, (float)b.rot.field_72448_b, (float)b.rot.field_72449_c);
-        GL11.glTranslated(-b.pos.field_72450_a, -b.pos.field_72448_b, -b.pos.field_72449_c);
+        GL11.glTranslated(b.pos.xCoord, b.pos.yCoord, b.pos.zCoord);
+        GL11.glRotatef(br, (float)b.rot.xCoord, (float)b.rot.yCoord, (float)b.rot.zCoord);
+        GL11.glTranslated(-b.pos.xCoord, -b.pos.yCoord, -b.pos.zCoord);
         for (int i = 0; i < b.numBlade; i++) {
-          GL11.glTranslated(b.pos.field_72450_a, b.pos.field_72448_b, b.pos.field_72449_c);
-          GL11.glRotatef(b.rotBlade, (float)b.rot.field_72450_a, (float)b.rot.field_72448_b, (float)b.rot.field_72449_c);
-          GL11.glTranslated(-b.pos.field_72450_a, -b.pos.field_72448_b, -b.pos.field_72449_c);
+          GL11.glTranslated(b.pos.xCoord, b.pos.yCoord, b.pos.zCoord);
+          GL11.glRotatef(b.rotBlade, (float)b.rot.xCoord, (float)b.rot.yCoord, (float)b.rot.zCoord);
+          GL11.glTranslated(-b.pos.xCoord, -b.pos.yCoord, -b.pos.zCoord);
           renderPart(b.model, planeInfo.model, b.modelName);
         } 
         GL11.glPopMatrix();
@@ -81,16 +81,16 @@ public class MCP_RenderPlane extends MCH_RenderAircraft<MCP_EntityPlane> {
     float prevRot = plane.getPrevWingRotation();
     for (MCP_PlaneInfo.Wing w : planeInfo.wingList) {
       GL11.glPushMatrix();
-      GL11.glTranslated(w.pos.field_72450_a, w.pos.field_72448_b, w.pos.field_72449_c);
-      GL11.glRotatef((prevRot + (rot - prevRot) * tickTime) * w.maxRotFactor, (float)w.rot.field_72450_a, (float)w.rot.field_72448_b, (float)w.rot.field_72449_c);
-      GL11.glTranslated(-w.pos.field_72450_a, -w.pos.field_72448_b, -w.pos.field_72449_c);
+      GL11.glTranslated(w.pos.xCoord, w.pos.yCoord, w.pos.zCoord);
+      GL11.glRotatef((prevRot + (rot - prevRot) * tickTime) * w.maxRotFactor, (float)w.rot.xCoord, (float)w.rot.yCoord, (float)w.rot.zCoord);
+      GL11.glTranslated(-w.pos.xCoord, -w.pos.yCoord, -w.pos.zCoord);
       renderPart(w.model, planeInfo.model, w.modelName);
       if (w.pylonList != null)
         for (MCP_PlaneInfo.Pylon p : w.pylonList) {
           GL11.glPushMatrix();
-          GL11.glTranslated(p.pos.field_72450_a, p.pos.field_72448_b, p.pos.field_72449_c);
-          GL11.glRotatef((prevRot + (rot - prevRot) * tickTime) * p.maxRotFactor, (float)p.rot.field_72450_a, (float)p.rot.field_72448_b, (float)p.rot.field_72449_c);
-          GL11.glTranslated(-p.pos.field_72450_a, -p.pos.field_72448_b, -p.pos.field_72449_c);
+          GL11.glTranslated(p.pos.xCoord, p.pos.yCoord, p.pos.zCoord);
+          GL11.glRotatef((prevRot + (rot - prevRot) * tickTime) * p.maxRotFactor, (float)p.rot.xCoord, (float)p.rot.yCoord, (float)p.rot.zCoord);
+          GL11.glTranslated(-p.pos.xCoord, -p.pos.yCoord, -p.pos.zCoord);
           renderPart(p.model, planeInfo.model, p.modelName);
           GL11.glPopMatrix();
         }  
@@ -103,9 +103,9 @@ public class MCP_RenderPlane extends MCH_RenderAircraft<MCP_EntityPlane> {
     float prevRot = plane.getPrevNozzleRotation();
     for (MCH_AircraftInfo.DrawnPart n : planeInfo.nozzles) {
       GL11.glPushMatrix();
-      GL11.glTranslated(n.pos.field_72450_a, n.pos.field_72448_b, n.pos.field_72449_c);
-      GL11.glRotatef(prevRot + (rot - prevRot) * tickTime, (float)n.rot.field_72450_a, (float)n.rot.field_72448_b, (float)n.rot.field_72449_c);
-      GL11.glTranslated(-n.pos.field_72450_a, -n.pos.field_72448_b, -n.pos.field_72449_c);
+      GL11.glTranslated(n.pos.xCoord, n.pos.yCoord, n.pos.zCoord);
+      GL11.glRotatef(prevRot + (rot - prevRot) * tickTime, (float)n.rot.xCoord, (float)n.rot.yCoord, (float)n.rot.zCoord);
+      GL11.glTranslated(-n.pos.xCoord, -n.pos.yCoord, -n.pos.zCoord);
       renderPart(n.model, planeInfo.model, n.modelName);
       GL11.glPopMatrix();
     } 

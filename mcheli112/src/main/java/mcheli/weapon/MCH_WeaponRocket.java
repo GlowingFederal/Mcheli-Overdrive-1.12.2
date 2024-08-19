@@ -12,7 +12,7 @@ public class MCH_WeaponRocket extends MCH_WeaponBase {
     this.explosionPower = 3;
     this.power = 22;
     this.interval = 5;
-    if (w.field_72995_K)
+    if (w.isRemote)
       this.interval += 2; 
   }
   
@@ -21,15 +21,15 @@ public class MCH_WeaponRocket extends MCH_WeaponBase {
   }
   
   public boolean shot(MCH_WeaponParam prm) {
-    if (!this.worldObj.field_72995_K) {
+    if (!this.worldObj.isRemote) {
       playSound(prm.entity);
       Vec3d v = MCH_Lib.RotVec3(0.0D, 0.0D, 1.0D, -prm.rotYaw, -prm.rotPitch, -prm.rotRoll);
-      MCH_EntityRocket e = new MCH_EntityRocket(this.worldObj, prm.posX, prm.posY, prm.posZ, v.field_72450_a, v.field_72448_b, v.field_72449_c, prm.rotYaw, prm.rotPitch, this.acceleration);
+      MCH_EntityRocket e = new MCH_EntityRocket(this.worldObj, prm.posX, prm.posY, prm.posZ, v.xCoord, v.yCoord, v.zCoord, prm.rotYaw, prm.rotPitch, this.acceleration);
       e.setName(this.name);
       e.setParameterFromWeapon(this, prm.entity, prm.user);
       if (prm.option1 == 0 && this.numMode > 1)
         e.piercing = 0; 
-      this.worldObj.func_72838_d((Entity)e);
+      this.worldObj.spawnEntityInWorld((Entity)e);
     } else {
       this.optionParameter1 = getCurrentMode();
     } 

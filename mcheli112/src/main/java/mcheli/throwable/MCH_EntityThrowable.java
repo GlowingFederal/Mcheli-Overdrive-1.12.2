@@ -21,7 +21,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IThrowableEntity;
 
 public class MCH_EntityThrowable extends EntityThrowable implements IThrowableEntity {
-  private static final DataParameter<String> INFO_NAME = EntityDataManager.func_187226_a(MCH_EntityThrowable.class, DataSerializers.field_187194_d);
+  private static final DataParameter<String> INFO_NAME = EntityDataManager.createKey(MCH_EntityThrowable.class, DataSerializers.STRING);
   
   private int countOnUpdate;
   
@@ -44,9 +44,9 @@ public class MCH_EntityThrowable extends EntityThrowable implements IThrowableEn
   
   public MCH_EntityThrowable(World par1World, EntityLivingBase par2EntityLivingBase, float acceleration) {
     super(par1World, par2EntityLivingBase);
-    this.field_70159_w *= acceleration;
-    this.field_70181_x *= acceleration;
-    this.field_70179_y *= acceleration;
+    this.motionX *= acceleration;
+    this.motionY *= acceleration;
+    this.motionZ *= acceleration;
     init();
   }
   
@@ -57,13 +57,13 @@ public class MCH_EntityThrowable extends EntityThrowable implements IThrowableEn
   
   public MCH_EntityThrowable(World worldIn, double x, double y, double z, float yaw, float pitch) {
     this(worldIn);
-    func_70105_a(0.25F, 0.25F);
-    func_70012_b(x, y, z, yaw, pitch);
-    this.field_70165_t -= (MathHelper.func_76134_b(this.field_70177_z / 180.0F * 3.1415927F) * 0.16F);
-    this.field_70163_u -= 0.10000000149011612D;
-    this.field_70161_v -= (MathHelper.func_76126_a(this.field_70177_z / 180.0F * 3.1415927F) * 0.16F);
-    func_70107_b(this.field_70165_t, this.field_70163_u, this.field_70161_v);
-    func_184538_a((Entity)null, pitch, yaw, 0.0F, 1.5F, 1.0F);
+    setSize(0.25F, 0.25F);
+    setLocationAndAngles(x, y, z, yaw, pitch);
+    this.posX -= (MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
+    this.posY -= 0.10000000149011612D;
+    this.posZ -= (MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
+    setPosition(this.posX, this.posY, this.posZ);
+    setHeadingFromThrower((Entity)null, pitch, yaw, 0.0F, 1.5F, 1.0F);
   }
   
   public void init() {
@@ -71,78 +71,78 @@ public class MCH_EntityThrowable extends EntityThrowable implements IThrowableEn
     this.countOnUpdate = 0;
     setInfo((MCH_ThrowableInfo)null);
     this.noInfoCount = 0;
-    this.field_70180_af.func_187214_a(INFO_NAME, "");
+    this.dataManager.register(INFO_NAME, "");
   }
   
-  public void func_184538_a(Entity entityThrower, float rotationPitchIn, float rotationYawIn, float pitchOffset, float velocity, float inaccuracy) {
+  public void setHeadingFromThrower(Entity entityThrower, float rotationPitchIn, float rotationYawIn, float pitchOffset, float velocity, float inaccuracy) {
     float f = 0.4F;
     this
-      .field_70159_w = (-MathHelper.func_76126_a(rotationYawIn / 180.0F * 3.1415927F) * MathHelper.func_76134_b(rotationPitchIn / 180.0F * 3.1415927F) * f);
+      .motionX = (-MathHelper.sin(rotationYawIn / 180.0F * 3.1415927F) * MathHelper.cos(rotationPitchIn / 180.0F * 3.1415927F) * f);
     this
-      .field_70179_y = (MathHelper.func_76134_b(rotationYawIn / 180.0F * 3.1415927F) * MathHelper.func_76134_b(rotationPitchIn / 180.0F * 3.1415927F) * f);
-    this.field_70181_x = (-MathHelper.func_76126_a((rotationPitchIn + pitchOffset) / 180.0F * 3.1415927F) * f);
-    func_70186_c(this.field_70159_w, this.field_70181_x, this.field_70179_y, velocity, 1.0F);
+      .motionZ = (MathHelper.cos(rotationYawIn / 180.0F * 3.1415927F) * MathHelper.cos(rotationPitchIn / 180.0F * 3.1415927F) * f);
+    this.motionY = (-MathHelper.sin((rotationPitchIn + pitchOffset) / 180.0F * 3.1415927F) * f);
+    setThrowableHeading(this.motionX, this.motionY, this.motionZ, velocity, 1.0F);
   }
   
-  public void func_70106_y() {
+  public void setDead() {
     String s = (getInfo() != null) ? (getInfo()).name : "null";
-    MCH_Lib.DbgLog(this.field_70170_p, "MCH_EntityThrowable.setDead(%s)", new Object[] { s });
-    super.func_70106_y();
+    MCH_Lib.DbgLog(this.world, "MCH_EntityThrowable.setDead(%s)", new Object[] { s });
+    super.setDead();
   }
   
-  public void func_70071_h_() {
-    this.boundPosX = this.field_70165_t;
-    this.boundPosY = this.field_70163_u;
-    this.boundPosZ = this.field_70161_v;
+  public void onUpdate() {
+    this.boundPosX = this.posX;
+    this.boundPosY = this.posY;
+    this.boundPosZ = this.posZ;
     if (getInfo() != null) {
-      Block block = W_WorldFunc.getBlock(this.field_70170_p, (int)(this.field_70165_t + 0.5D), (int)this.field_70163_u, (int)(this.field_70161_v + 0.5D));
-      Material mat = W_WorldFunc.getBlockMaterial(this.field_70170_p, (int)(this.field_70165_t + 0.5D), (int)this.field_70163_u, (int)(this.field_70161_v + 0.5D));
-      if (block != null && mat == Material.field_151586_h) {
-        this.field_70181_x += (getInfo()).gravityInWater;
+      Block block = W_WorldFunc.getBlock(this.world, (int)(this.posX + 0.5D), (int)this.posY, (int)(this.posZ + 0.5D));
+      Material mat = W_WorldFunc.getBlockMaterial(this.world, (int)(this.posX + 0.5D), (int)this.posY, (int)(this.posZ + 0.5D));
+      if (block != null && mat == Material.WATER) {
+        this.motionY += (getInfo()).gravityInWater;
       } else {
-        this.field_70181_x += (getInfo()).gravity;
+        this.motionY += (getInfo()).gravity;
       } 
     } 
-    super.func_70071_h_();
+    super.onUpdate();
     if (this.lastOnImpact != null) {
       boundBullet(this.lastOnImpact);
-      func_70107_b(this.boundPosX + this.field_70159_w, this.boundPosY + this.field_70181_x, this.boundPosZ + this.field_70179_y);
+      setPosition(this.boundPosX + this.motionX, this.boundPosY + this.motionY, this.boundPosZ + this.motionZ);
       this.lastOnImpact = null;
     } 
     this.countOnUpdate++;
     if (this.countOnUpdate >= 2147483632) {
-      func_70106_y();
+      setDead();
       return;
     } 
     if (getInfo() == null) {
-      String s = (String)this.field_70180_af.func_187225_a(INFO_NAME);
+      String s = (String)this.dataManager.get(INFO_NAME);
       if (!s.isEmpty())
         setInfo(MCH_ThrowableInfoManager.get(s)); 
       if (getInfo() == null) {
         this.noInfoCount++;
         if (this.noInfoCount > 10)
-          func_70106_y(); 
+          setDead(); 
         return;
       } 
     } 
-    if (this.field_70128_L)
+    if (this.isDead)
       return; 
-    if (!this.field_70170_p.field_72995_K) {
+    if (!this.world.isRemote) {
       if (this.countOnUpdate == (getInfo()).timeFuse)
         if ((getInfo()).explosion > 0) {
-          MCH_Explosion.newExplosion(this.field_70170_p, null, null, this.field_70165_t, this.field_70163_u, this.field_70161_v, 
+          MCH_Explosion.newExplosion(this.world, null, null, this.posX, this.posY, this.posZ, 
               (getInfo()).explosion, (getInfo()).explosion, true, true, false, true, 0);
-          func_70106_y();
+          setDead();
           return;
         }  
       if (this.countOnUpdate >= (getInfo()).aliveTime)
-        func_70106_y(); 
+        setDead(); 
     } else if (this.countOnUpdate >= (getInfo()).timeFuse) {
       if ((getInfo()).explosion <= 0)
         for (int i = 0; i < (getInfo()).smokeNum; i++) {
-          float r = (getInfo()).smokeColor.r * 0.9F + this.field_70146_Z.nextFloat() * 0.1F;
-          float g = (getInfo()).smokeColor.g * 0.9F + this.field_70146_Z.nextFloat() * 0.1F;
-          float b = (getInfo()).smokeColor.b * 0.9F + this.field_70146_Z.nextFloat() * 0.1F;
+          float r = (getInfo()).smokeColor.r * 0.9F + this.rand.nextFloat() * 0.1F;
+          float g = (getInfo()).smokeColor.g * 0.9F + this.rand.nextFloat() * 0.1F;
+          float b = (getInfo()).smokeColor.b * 0.9F + this.rand.nextFloat() * 0.1F;
           if ((getInfo()).smokeColor.r == (getInfo()).smokeColor.g)
             g = r; 
           if ((getInfo()).smokeColor.r == (getInfo()).smokeColor.b)
@@ -150,23 +150,23 @@ public class MCH_EntityThrowable extends EntityThrowable implements IThrowableEn
           if ((getInfo()).smokeColor.g == (getInfo()).smokeColor.b)
             b = g; 
           spawnParticle("explode", 4, 
-              (getInfo()).smokeSize + this.field_70146_Z.nextFloat() * (getInfo()).smokeSize / 3.0F, r, g, b, 
-              (getInfo()).smokeVelocityHorizontal * (this.field_70146_Z.nextFloat() - 0.5F), 
-              (getInfo()).smokeVelocityVertical * this.field_70146_Z.nextFloat(), 
-              (getInfo()).smokeVelocityHorizontal * (this.field_70146_Z.nextFloat() - 0.5F));
+              (getInfo()).smokeSize + this.rand.nextFloat() * (getInfo()).smokeSize / 3.0F, r, g, b, 
+              (getInfo()).smokeVelocityHorizontal * (this.rand.nextFloat() - 0.5F), 
+              (getInfo()).smokeVelocityVertical * this.rand.nextFloat(), 
+              (getInfo()).smokeVelocityHorizontal * (this.rand.nextFloat() - 0.5F));
         }  
     } 
   }
   
   public void spawnParticle(String name, int num, float size, float r, float g, float b, float mx, float my, float mz) {
-    if (this.field_70170_p.field_72995_K) {
+    if (this.world.isRemote) {
       if (name.isEmpty() || num < 1)
         return; 
-      double x = (this.field_70165_t - this.field_70169_q) / num;
-      double y = (this.field_70163_u - this.field_70167_r) / num;
-      double z = (this.field_70161_v - this.field_70166_s) / num;
+      double x = (this.posX - this.prevPosX) / num;
+      double y = (this.posY - this.prevPosY) / num;
+      double z = (this.posZ - this.prevPosZ) / num;
       for (int i = 0; i < num; i++) {
-        MCH_ParticleParam prm = new MCH_ParticleParam(this.field_70170_p, "smoke", this.field_70169_q + x * i, 1.0D + this.field_70167_r + y * i, this.field_70166_s + z * i);
+        MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", this.prevPosX + x * i, 1.0D + this.prevPosY + y * i, this.prevPosZ + z * i);
         prm.setMotion(mx, my, mz);
         prm.size = size;
         prm.setColor(1.0F, r, g, b);
@@ -177,46 +177,46 @@ public class MCH_EntityThrowable extends EntityThrowable implements IThrowableEn
     } 
   }
   
-  protected float func_70185_h() {
+  protected float getGravityVelocity() {
     return 0.0F;
   }
   
   public void boundBullet(RayTraceResult m) {
-    if (m.field_178784_b == null)
+    if (m.sideHit == null)
       return; 
     float bound = (getInfo()).bound;
-    switch (m.field_178784_b) {
+    switch (m.sideHit) {
       case DOWN:
       case UP:
-        this.field_70159_w *= 0.8999999761581421D;
-        this.field_70179_y *= 0.8999999761581421D;
-        this.boundPosY = m.field_72307_f.field_72448_b;
-        if ((m.field_178784_b == EnumFacing.DOWN && this.field_70181_x > 0.0D) || (m.field_178784_b == EnumFacing.UP && this.field_70181_x < 0.0D)) {
-          this.field_70181_x = -this.field_70181_x * bound;
+        this.motionX *= 0.8999999761581421D;
+        this.motionZ *= 0.8999999761581421D;
+        this.boundPosY = m.hitVec.yCoord;
+        if ((m.sideHit == EnumFacing.DOWN && this.motionY > 0.0D) || (m.sideHit == EnumFacing.UP && this.motionY < 0.0D)) {
+          this.motionY = -this.motionY * bound;
           break;
         } 
-        this.field_70181_x = 0.0D;
+        this.motionY = 0.0D;
         break;
       case NORTH:
-        if (this.field_70179_y > 0.0D)
-          this.field_70179_y = -this.field_70179_y * bound; 
+        if (this.motionZ > 0.0D)
+          this.motionZ = -this.motionZ * bound; 
         break;
       case SOUTH:
-        if (this.field_70179_y < 0.0D)
-          this.field_70179_y = -this.field_70179_y * bound; 
+        if (this.motionZ < 0.0D)
+          this.motionZ = -this.motionZ * bound; 
         break;
       case WEST:
-        if (this.field_70159_w > 0.0D)
-          this.field_70159_w = -this.field_70159_w * bound; 
+        if (this.motionX > 0.0D)
+          this.motionX = -this.motionX * bound; 
         break;
       case EAST:
-        if (this.field_70159_w < 0.0D)
-          this.field_70159_w = -this.field_70159_w * bound; 
+        if (this.motionX < 0.0D)
+          this.motionX = -this.motionX * bound; 
         break;
     } 
   }
   
-  protected void func_70184_a(RayTraceResult m) {
+  protected void onImpact(RayTraceResult m) {
     if (getInfo() != null)
       this.lastOnImpact = m; 
   }
@@ -229,12 +229,12 @@ public class MCH_EntityThrowable extends EntityThrowable implements IThrowableEn
   public void setInfo(MCH_ThrowableInfo info) {
     this.throwableInfo = info;
     if (info != null)
-      if (!this.field_70170_p.field_72995_K)
-        this.field_70180_af.func_187227_b(INFO_NAME, info.name);  
+      if (!this.world.isRemote)
+        this.dataManager.set(INFO_NAME, info.name);  
   }
   
   public void setThrower(Entity entity) {
     if (entity instanceof EntityLivingBase)
-      this.field_70192_c = (EntityLivingBase)entity; 
+      this.thrower = (EntityLivingBase)entity; 
   }
 }

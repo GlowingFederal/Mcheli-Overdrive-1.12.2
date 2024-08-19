@@ -32,14 +32,14 @@ public class W_MetasequoiaObject extends W_ModelCustom {
   
   public W_MetasequoiaObject(ResourceLocation location, IResource resource) throws _ModelFormatException {
     this.fileName = resource.toString();
-    loadObjModel(resource.func_110527_b());
+    loadObjModel(resource.getInputStream());
   }
   
   public W_MetasequoiaObject(ResourceLocation resource) throws _ModelFormatException {
     this.fileName = resource.toString();
     try {
-      IResource res = Minecraft.func_71410_x().func_110442_L().func_110536_a(resource);
-      loadObjModel(res.func_110527_b());
+      IResource res = Minecraft.getMinecraft().getResourceManager().getResource(resource);
+      loadObjModel(res.getInputStream());
     } catch (IOException e) {
       throw new _ModelFormatException("IO Exception reading model format:" + this.fileName, e);
     } 
@@ -206,15 +206,15 @@ public class W_MetasequoiaObject extends W_ModelCustom {
   }
   
   public void renderAll() {
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder builder = tessellator.func_178180_c();
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder builder = tessellator.getBuffer();
     if (this.currentGroupObject != null) {
-      builder.func_181668_a(this.currentGroupObject.glDrawingMode, DefaultVertexFormats.field_181710_j);
+      builder.begin(this.currentGroupObject.glDrawingMode, DefaultVertexFormats.POSITION_TEX_NORMAL);
     } else {
-      builder.func_181668_a(4, DefaultVertexFormats.field_181710_j);
+      builder.begin(4, DefaultVertexFormats.POSITION_TEX_NORMAL);
     } 
     tessellateAll(tessellator);
-    tessellator.func_78381_a();
+    tessellator.draw();
   }
   
   public void tessellateAll(Tessellator tessellator) {
@@ -391,16 +391,16 @@ public class W_MetasequoiaObject extends W_ModelCustom {
   }
   
   public void renderAllLine(int startLine, int maxLine) {
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder builder = tessellator.func_178180_c();
-    builder.func_181668_a(1, DefaultVertexFormats.field_181705_e);
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder builder = tessellator.getBuffer();
+    builder.begin(1, DefaultVertexFormats.POSITION);
     renderAllLine(tessellator, startLine, maxLine);
-    tessellator.func_78381_a();
+    tessellator.draw();
   }
   
   public void renderAllLine(Tessellator tessellator, int startLine, int maxLine) {
     int lineCnt = 0;
-    BufferBuilder builder = tessellator.func_178180_c();
+    BufferBuilder builder = tessellator.getBuffer();
     for (W_GroupObject groupObject : this.groupObjects) {
       if (groupObject.faces.size() > 0)
         for (W_Face face : groupObject.faces) {
@@ -411,18 +411,18 @@ public class W_MetasequoiaObject extends W_ModelCustom {
             lineCnt++;
             if (lineCnt > maxLine)
               return; 
-            builder.func_181662_b(v1.x, v1.y, v1.z).func_181675_d();
-            builder.func_181662_b(v2.x, v2.y, v2.z).func_181675_d();
+            builder.pos(v1.x, v1.y, v1.z).endVertex();
+            builder.pos(v2.x, v2.y, v2.z).endVertex();
             lineCnt++;
             if (lineCnt > maxLine)
               return; 
-            builder.func_181662_b(v2.x, v2.y, v2.z).func_181675_d();
-            builder.func_181662_b(v3.x, v3.y, v3.z).func_181675_d();
+            builder.pos(v2.x, v2.y, v2.z).endVertex();
+            builder.pos(v3.x, v3.y, v3.z).endVertex();
             lineCnt++;
             if (lineCnt > maxLine)
               return; 
-            builder.func_181662_b(v3.x, v3.y, v3.z).func_181675_d();
-            builder.func_181662_b(v1.x, v1.y, v1.z).func_181675_d();
+            builder.pos(v3.x, v3.y, v3.z).endVertex();
+            builder.pos(v1.x, v1.y, v1.z).endVertex();
           } 
         }  
     } 
@@ -439,11 +439,11 @@ public class W_MetasequoiaObject extends W_ModelCustom {
   public void renderAll(int startFace, int maxFace) {
     if (startFace < 0)
       startFace = 0; 
-    Tessellator tessellator = Tessellator.func_178181_a();
-    BufferBuilder builder = tessellator.func_178180_c();
-    builder.func_181668_a(4, DefaultVertexFormats.field_181710_j);
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder builder = tessellator.getBuffer();
+    builder.begin(4, DefaultVertexFormats.POSITION_TEX_NORMAL);
     renderAll(tessellator, startFace, maxFace);
-    tessellator.func_78381_a();
+    tessellator.draw();
   }
   
   public void renderAll(Tessellator tessellator, int startFace, int maxLine) {

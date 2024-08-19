@@ -14,7 +14,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class MetasequoiaModelLoader implements IVertexModelLoader {
   public _IModelCustom load(IResourceManager resourceManager, ResourceLocation location) throws IOException, _ModelFormatException {
     ResourceLocation modelLocation = withExtension(location);
-    IResource resource = resourceManager.func_110536_a(modelLocation);
+    IResource resource = resourceManager.getResource(modelLocation);
     return (_IModelCustom)new W_MetasequoiaObject(modelLocation, resource);
   }
   

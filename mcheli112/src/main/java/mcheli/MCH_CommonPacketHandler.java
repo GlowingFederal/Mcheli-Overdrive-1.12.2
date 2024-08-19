@@ -14,49 +14,49 @@ import net.minecraftforge.fml.relauncher.Side;
 public class MCH_CommonPacketHandler {
   @HandleSide({Side.CLIENT})
   public static void onPacketEffectExplosion(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (!player.field_70170_p.field_72995_K)
+    if (!player.world.isRemote)
       return; 
     MCH_PacketEffectExplosion pkt = new MCH_PacketEffectExplosion();
     pkt.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           Entity exploder = null;
-          if (player.func_70092_e(pkt.prm.posX, pkt.prm.posY, pkt.prm.posZ) <= 40000.0D)
+          if (player.getDistanceSq(pkt.prm.posX, pkt.prm.posY, pkt.prm.posZ) <= 40000.0D)
             if (!pkt.prm.inWater) {
               if (!MCH_Config.DefaultExplosionParticle.prmBool) {
-                MCH_Explosion.effectExplosion(player.field_70170_p, exploder, pkt.prm.posX, pkt.prm.posY, pkt.prm.posZ, pkt.prm.size, true, pkt.prm.getAffectedBlockPositions());
+                MCH_Explosion.effectExplosion(player.world, exploder, pkt.prm.posX, pkt.prm.posY, pkt.prm.posZ, pkt.prm.size, true, pkt.prm.getAffectedBlockPositions());
               } else {
-                MCH_Explosion.DEF_effectExplosion(player.field_70170_p, exploder, pkt.prm.posX, pkt.prm.posY, pkt.prm.posZ, pkt.prm.size, true, pkt.prm.getAffectedBlockPositions());
+                MCH_Explosion.DEF_effectExplosion(player.world, exploder, pkt.prm.posX, pkt.prm.posY, pkt.prm.posZ, pkt.prm.size, true, pkt.prm.getAffectedBlockPositions());
               } 
             } else {
-              MCH_Explosion.effectExplosionInWater(player.field_70170_p, exploder, pkt.prm.posX, pkt.prm.posY, pkt.prm.posZ, pkt.prm.size, true);
+              MCH_Explosion.effectExplosionInWater(player.world, exploder, pkt.prm.posX, pkt.prm.posY, pkt.prm.posZ, pkt.prm.size, true);
             }  
         });
   }
   
   @HandleSide({Side.SERVER})
   public static void onPacketIndOpenScreen(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_PacketIndOpenScreen pkt = new MCH_PacketIndOpenScreen();
     pkt.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           if (pkt.guiID == 3) {
             MCH_EntityAircraft ac = MCH_EntityAircraft.getAircraft_RiddenOrControl((Entity)player);
             if (ac != null)
               ac.displayInventory(player); 
           } else {
-            player.openGui(MCH_MOD.instance, pkt.guiID, player.field_70170_p, (int)player.field_70165_t, (int)player.field_70163_u, (int)player.field_70161_v);
+            player.openGui(MCH_MOD.instance, pkt.guiID, player.world, (int)player.posX, (int)player.posY, (int)player.posZ);
           } 
         });
   }
   
   @HandleSide({Side.CLIENT})
   public static void onPacketNotifyServerSettings(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (!player.field_70170_p.field_72995_K)
+    if (!player.world.isRemote)
       return; 
     MCH_PacketNotifyServerSettings pkt = new MCH_PacketNotifyServerSettings();
     pkt.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           MCH_Lib.DbgLog(false, "onPacketNotifyServerSettings:" + player, new Object[0]);
           if (!pkt.enableCamDistChange)
             W_Reflection.setThirdPersonDistance(4.0F); 
@@ -77,10 +77,10 @@ public class MCH_CommonPacketHandler {
   public static void onPacketNotifyLock(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
     MCH_PacketNotifyLock pkt = new MCH_PacketNotifyLock();
     pkt.readData(data);
-    if (!player.field_70170_p.field_72995_K) {
+    if (!player.world.isRemote) {
       if (pkt.entityID >= 0)
-        scheduler.func_152344_a(() -> {
-              Entity target = player.field_70170_p.func_73045_a(pkt.entityID);
+        scheduler.addScheduledTask(() -> {
+              Entity target = player.world.getEntityByID(pkt.entityID);
               if (target != null) {
                 MCH_EntityAircraft ac = null;
                 if (target instanceof MCH_EntityAircraft) {
@@ -96,14 +96,14 @@ public class MCH_CommonPacketHandler {
                     if (entity instanceof net.minecraft.entity.player.EntityPlayerMP)
                       MCH_PacketNotifyLock.sendToPlayer((EntityPlayer)entity); 
                   } 
-                } else if (target.func_184187_bx() != null) {
+                } else if (target.getRidingEntity() != null) {
                   if (target instanceof net.minecraft.entity.player.EntityPlayerMP)
                     MCH_PacketNotifyLock.sendToPlayer((EntityPlayer)target); 
                 } 
               } 
             }); 
     } else {
-      scheduler.func_152344_a(() -> MCH_MOD.proxy.clientLocked());
+      scheduler.addScheduledTask(() -> MCH_MOD.proxy.clientLocked());
     } 
   }
 }

@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class W_Reflection {
   public static RenderManager getRenderManager(Render<?> render) {
-    return render.func_177068_d();
+    return render.getRenderManager();
   }
   
   public static void restoreDefaultThirdPersonDistance() {
@@ -40,8 +40,8 @@ public class W_Reflection {
   
   public static void setCameraZoom(float zoom) {
     try {
-      Minecraft mc = Minecraft.func_71410_x();
-      ObfuscationReflectionHelper.setPrivateValue(EntityRenderer.class, mc.field_71460_t, Float.valueOf(zoom), "field_78503_V");
+      Minecraft mc = Minecraft.getMinecraft();
+      ObfuscationReflectionHelper.setPrivateValue(EntityRenderer.class, mc.entityRenderer, Float.valueOf(zoom), "cameraZoom");
       MCH_CameraManager.setCameraZoom(zoom);
     } catch (Exception e) {
       e.printStackTrace();
@@ -53,20 +53,20 @@ public class W_Reflection {
   
   public static void setCreativeDigSpeed(int n) {
     try {
-      Minecraft mc = Minecraft.func_71410_x();
-      ObfuscationReflectionHelper.setPrivateValue(PlayerControllerMP.class, mc.field_71442_b, Integer.valueOf(n), "field_78781_i");
+      Minecraft mc = Minecraft.getMinecraft();
+      ObfuscationReflectionHelper.setPrivateValue(PlayerControllerMP.class, mc.playerController, Integer.valueOf(n), "blockHitDelay");
     } catch (Exception e) {
       e.printStackTrace();
     } 
   }
   
   public static ItemRenderer getItemRenderer() {
-    return (Minecraft.func_71410_x()).field_71460_t.field_78516_c;
+    return (Minecraft.getMinecraft()).entityRenderer.itemRenderer;
   }
   
   public static void setItemRendererMainHand(ItemStack itemToRender) {
     try {
-      ObfuscationReflectionHelper.setPrivateValue(ItemRenderer.class, getItemRenderer(), itemToRender, "field_187467_d");
+      ObfuscationReflectionHelper.setPrivateValue(ItemRenderer.class, getItemRenderer(), itemToRender, "itemStackMainHand");
     } catch (Exception e) {
       e.printStackTrace();
     } 
@@ -75,7 +75,7 @@ public class W_Reflection {
   @Nonnull
   public static ItemStack getItemRendererMainHand() {
     try {
-      return (ItemStack)ObfuscationReflectionHelper.getPrivateValue(ItemRenderer.class, getItemRenderer(), "field_187467_d");
+      return (ItemStack)ObfuscationReflectionHelper.getPrivateValue(ItemRenderer.class, getItemRenderer(), "itemStackMainHand");
     } catch (Exception e) {
       e.printStackTrace();
       return ItemStack.field_190927_a;
@@ -84,7 +84,7 @@ public class W_Reflection {
   
   public static void setItemRendererMainProgress(float equippedProgress) {
     try {
-      ObfuscationReflectionHelper.setPrivateValue(ItemRenderer.class, getItemRenderer(), Float.valueOf(equippedProgress), "field_187469_f");
+      ObfuscationReflectionHelper.setPrivateValue(ItemRenderer.class, getItemRenderer(), Float.valueOf(equippedProgress), "equippedProgressMainHand");
     } catch (Exception e) {
       e.printStackTrace();
     } 

@@ -28,14 +28,14 @@ public class MCH_GuiSlider extends W_GuiButton {
     setSliderValue(defaultSliderPos);
   }
   
-  public int func_146114_a(boolean mouseOver) {
+  public int getHoverState(boolean mouseOver) {
     return 0;
   }
   
-  protected void func_146119_b(Minecraft mc, int x, int y) {
+  protected void mouseDragged(Minecraft mc, int x, int y) {
     if (isVisible()) {
       if (this.isMousePress) {
-        this.currentSlider = (x - this.field_146128_h + 4) / (this.field_146120_f - 8);
+        this.currentSlider = (x - this.xPosition + 4) / (this.width - 8);
         if (this.currentSlider < 0.0F)
           this.currentSlider = 0.0F; 
         if (this.currentSlider > 1.0F)
@@ -44,15 +44,15 @@ public class MCH_GuiSlider extends W_GuiButton {
         updateDisplayString();
       } 
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      func_73729_b(this.field_146128_h + (int)(this.currentSlider * (this.field_146120_f - 8)), this.field_146129_i, 0, 66, 4, 20);
-      func_73729_b(this.field_146128_h + (int)(this.currentSlider * (this.field_146120_f - 8)) + 4, this.field_146129_i, 196, 66, 4, 20);
+      drawTexturedModalRect(this.xPosition + (int)(this.currentSlider * (this.width - 8)), this.yPosition, 0, 66, 4, 20);
+      drawTexturedModalRect(this.xPosition + (int)(this.currentSlider * (this.width - 8)) + 4, this.yPosition, 196, 66, 4, 20);
       if (!MCH_Key.isKeyDown(-100))
-        func_146118_a(x, y); 
+        mouseReleased(x, y); 
     } 
   }
   
   public void updateDisplayString() {
-    this.field_146126_j = String.format(this.stringFormat, new Object[] { Float.valueOf(denormalizeValue(this.currentSlider)) });
+    this.displayString = String.format(this.stringFormat, new Object[] { Float.valueOf(denormalizeValue(this.currentSlider)) });
   }
   
   public void setSliderValue(float f) {
@@ -75,16 +75,16 @@ public class MCH_GuiSlider extends W_GuiButton {
   }
   
   public float normalizeValue(float f) {
-    return MathHelper.func_76131_a((snapToStepClamp(f) - this.valueMin) / (this.valueMax - this.valueMin), 0.0F, 1.0F);
+    return MathHelper.clamp((snapToStepClamp(f) - this.valueMin) / (this.valueMax - this.valueMin), 0.0F, 1.0F);
   }
   
   public float denormalizeValue(float f) {
-    return snapToStepClamp(this.valueMin + (this.valueMax - this.valueMin) * MathHelper.func_76131_a(f, 0.0F, 1.0F));
+    return snapToStepClamp(this.valueMin + (this.valueMax - this.valueMin) * MathHelper.clamp(f, 0.0F, 1.0F));
   }
   
   public float snapToStepClamp(float f) {
     f = snapToStep(f);
-    return MathHelper.func_76131_a(f, this.valueMin, this.valueMax);
+    return MathHelper.clamp(f, this.valueMin, this.valueMax);
   }
   
   protected float snapToStep(float f) {
@@ -93,9 +93,9 @@ public class MCH_GuiSlider extends W_GuiButton {
     return f;
   }
   
-  public boolean func_146116_c(Minecraft mc, int x, int y) {
-    if (super.func_146116_c(mc, x, y)) {
-      this.currentSlider = (x - this.field_146128_h + 4) / (this.field_146120_f - 8);
+  public boolean mousePressed(Minecraft mc, int x, int y) {
+    if (super.mousePressed(mc, x, y)) {
+      this.currentSlider = (x - this.xPosition + 4) / (this.width - 8);
       if (this.currentSlider < 0.0F)
         this.currentSlider = 0.0F; 
       if (this.currentSlider > 1.0F)
@@ -107,7 +107,7 @@ public class MCH_GuiSlider extends W_GuiButton {
     return false;
   }
   
-  public void func_146118_a(int mouseX, int mouseY) {
+  public void mouseReleased(int mouseX, int mouseY) {
     this.isMousePress = false;
   }
 }

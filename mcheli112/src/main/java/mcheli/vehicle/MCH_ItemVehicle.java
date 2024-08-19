@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 public class MCH_ItemVehicle extends MCH_ItemAircraft {
   public MCH_ItemVehicle(int par1) {
     super(par1);
-    this.field_77777_bU = 1;
+    this.maxStackSize = 1;
   }
   
   @Nullable
@@ -24,17 +24,17 @@ public class MCH_ItemVehicle extends MCH_ItemAircraft {
   public MCH_EntityVehicle createAircraft(World world, double x, double y, double z, ItemStack item) {
     MCH_VehicleInfo info = MCH_VehicleInfoManager.getFromItem((Item)this);
     if (info == null) {
-      MCH_Lib.Log(world, "##### MCH_ItemVehicle Vehicle info null %s", new Object[] { func_77658_a() });
+      MCH_Lib.Log(world, "##### MCH_ItemVehicle Vehicle info null %s", new Object[] { getUnlocalizedName() });
       return null;
     } 
     MCH_EntityVehicle vehicle = new MCH_EntityVehicle(world);
-    vehicle.func_70107_b(x, y, z);
-    vehicle.field_70169_q = x;
-    vehicle.field_70167_r = y;
-    vehicle.field_70166_s = z;
+    vehicle.setPosition(x, y, z);
+    vehicle.prevPosX = x;
+    vehicle.prevPosY = y;
+    vehicle.prevPosZ = z;
     vehicle.camera.setPosition(x, y, z);
     vehicle.setTypeName(info.name);
-    if (!world.field_72995_K)
+    if (!world.isRemote)
       vehicle.setTextureName(info.getTextureName()); 
     return vehicle;
   }

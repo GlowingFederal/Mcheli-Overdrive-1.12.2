@@ -22,13 +22,13 @@ public class MCH_GuiVehicle extends MCH_AircraftCommonGui {
   }
   
   public boolean isDrawGui(EntityPlayer player) {
-    return (player.func_184187_bx() != null && player.func_184187_bx() instanceof MCH_EntityVehicle);
+    return (player.getRidingEntity() != null && player.getRidingEntity() instanceof MCH_EntityVehicle);
   }
   
   public void drawGui(EntityPlayer player, boolean isThirdPersonView) {
-    if (player.func_184187_bx() == null || !(player.func_184187_bx() instanceof MCH_EntityVehicle))
+    if (player.getRidingEntity() == null || !(player.getRidingEntity() instanceof MCH_EntityVehicle))
       return; 
-    MCH_EntityVehicle vehicle = (MCH_EntityVehicle)player.func_184187_bx();
+    MCH_EntityVehicle vehicle = (MCH_EntityVehicle)player.getRidingEntity();
     if (vehicle.isDestroyed())
       return; 
     int seatID = vehicle.getSeatIdByEntity((Entity)player);
@@ -62,8 +62,8 @@ public class MCH_GuiVehicle extends MCH_AircraftCommonGui {
     } 
     String msg = "Gunner " + (vehicle.getGunnerStatus() ? "ON" : "OFF") + " : " + MCH_KeyName.getDescOrName(MCH_Config.KeyFreeLook.prmInt) + " + " + MCH_KeyName.getDescOrName(MCH_Config.KeyCameraMode.prmInt);
     drawString(msg, LX, this.centerY - 40, colorActive);
-    if (vehicle.func_70302_i_() <= 0 || (vehicle
-      .getTowChainEntity() != null && !(vehicle.getTowChainEntity()).field_70128_L)) {
+    if (vehicle.getSizeInventory() <= 0 || (vehicle
+      .getTowChainEntity() != null && !(vehicle.getTowChainEntity()).isDead)) {
       msg = "Drop  : " + MCH_KeyName.getDescOrName(MCH_Config.KeyExtra.prmInt);
       drawString(msg, RX, this.centerY - 30, colorActive);
     } 

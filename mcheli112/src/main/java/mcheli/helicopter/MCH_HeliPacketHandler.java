@@ -18,19 +18,19 @@ import net.minecraftforge.fml.relauncher.Side;
 public class MCH_HeliPacketHandler {
   @HandleSide({Side.SERVER})
   public static void onPacket_PlayerControl(EntityPlayer player, ByteArrayDataInput data, IThreadListener scheduler) {
-    if (player.field_70170_p.field_72995_K)
+    if (player.world.isRemote)
       return; 
     MCH_HeliPacketPlayerControl pc = new MCH_HeliPacketPlayerControl();
     pc.readData(data);
-    scheduler.func_152344_a(() -> {
+    scheduler.addScheduledTask(() -> {
           MCH_EntityHeli heli = null;
-          if (player.func_184187_bx() instanceof MCH_EntityHeli) {
-            heli = (MCH_EntityHeli)player.func_184187_bx();
-          } else if (player.func_184187_bx() instanceof MCH_EntitySeat) {
-            if (((MCH_EntitySeat)player.func_184187_bx()).getParent() instanceof MCH_EntityHeli)
-              heli = (MCH_EntityHeli)((MCH_EntitySeat)player.func_184187_bx()).getParent(); 
-          } else if (player.func_184187_bx() instanceof MCH_EntityUavStation) {
-            MCH_EntityUavStation uavStation = (MCH_EntityUavStation)player.func_184187_bx();
+          if (player.getRidingEntity() instanceof MCH_EntityHeli) {
+            heli = (MCH_EntityHeli)player.getRidingEntity();
+          } else if (player.getRidingEntity() instanceof MCH_EntitySeat) {
+            if (((MCH_EntitySeat)player.getRidingEntity()).getParent() instanceof MCH_EntityHeli)
+              heli = (MCH_EntityHeli)((MCH_EntitySeat)player.getRidingEntity()).getParent(); 
+          } else if (player.getRidingEntity() instanceof MCH_EntityUavStation) {
+            MCH_EntityUavStation uavStation = (MCH_EntityUavStation)player.getRidingEntity();
             if (uavStation.getControlAircract() instanceof MCH_EntityHeli)
               heli = (MCH_EntityHeli)uavStation.getControlAircract(); 
           } 
@@ -78,13 +78,13 @@ public class MCH_HeliPacketHandler {
             if (pc.useFlareType > 0)
               ac.useFlare(pc.useFlareType); 
             if (pc.unhitchChainId >= 0) {
-              Entity e = player.field_70170_p.func_73045_a(pc.unhitchChainId);
+              Entity e = player.world.getEntityByID(pc.unhitchChainId);
               if (e instanceof MCH_EntityChain) {
                 if (((MCH_EntityChain)e).towedEntity instanceof mcheli.container.MCH_EntityContainer)
                   if (MCH_Lib.getBlockIdY((Entity)heli, 3, -20) == 0)
                     if (player instanceof EntityPlayerMP)
                       MCH_CriteriaTriggers.RELIEF_SUPPLIES.trigger((EntityPlayerMP)player);   
-                e.func_70106_y();
+                e.setDead();
               } 
             } 
             if (pc.openGui)
