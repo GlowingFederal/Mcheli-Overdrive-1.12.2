@@ -78,7 +78,7 @@ public class MCH_Command extends CommandBase {
     return (player instanceof EntityPlayer) ? instance.canCommandSenderUseCommand((ICommandSender)player) : false;
   }
   
-  public String getCommandName() {
+  public String getName() {
     return "mcheli";
   }
   
@@ -109,7 +109,7 @@ public class MCH_Command extends CommandBase {
       event.setCanceled(true);
       TextComponentTranslation c = new TextComponentTranslation("commands.generic.permission", new Object[0]);
       c.getStyle().setColor(TextFormatting.RED);
-      event.getSender().addChatMessage((ITextComponent)c);
+      event.getSender().sendMessage((ITextComponent)c);
     } 
   }
   
@@ -117,7 +117,7 @@ public class MCH_Command extends CommandBase {
     return true;
   }
   
-  public String getCommandUsage(ICommandSender sender) {
+  public String getUsage(ICommandSender sender) {
     return "commands.mcheli.usage";
   }
   
@@ -127,7 +127,7 @@ public class MCH_Command extends CommandBase {
     if (!checkCommandPermission(server, sender, prm[0])) {
       TextComponentTranslation c = new TextComponentTranslation("commands.generic.permission", new Object[0]);
       c.getStyle().setColor(TextFormatting.RED);
-      sender.addChatMessage((ITextComponent)c);
+      sender.sendMessage((ITextComponent)c);
       return;
     } 
     if (prm[0].equalsIgnoreCase("sendss")) {
@@ -156,9 +156,9 @@ public class MCH_Command extends CommandBase {
           if (!(sender.getEntityWorld()).isRemote)
             MCH_PacketNotifyServerSettings.sendAll();  
         if (MCH_MOD.proxy.isSinglePlayer()) {
-          sender.addChatMessage((ITextComponent)new TextComponentString("Reload mcheli.cfg"));
+          sender.sendMessage((ITextComponent)new TextComponentString("Reload mcheli.cfg"));
         } else {
-          sender.addChatMessage((ITextComponent)new TextComponentString("Reload server side mcheli.cfg"));
+          sender.sendMessage((ITextComponent)new TextComponentString("Reload server side mcheli.cfg"));
         } 
       } else {
         throw new CommandException("Parameter error! : /mcheli reconfig", new Object[0]);
@@ -202,27 +202,27 @@ public class MCH_Command extends CommandBase {
       if (!parseBoolean(prm[1])) {
         MCH_Config.EnableDebugBoundingBox.prmBool = false;
         MCH_PacketNotifyServerSettings.sendAll();
-        sender.addChatMessage((ITextComponent)new TextComponentString("Disabled bounding box"));
+        sender.sendMessage((ITextComponent)new TextComponentString("Disabled bounding box"));
       } else {
         MCH_Config.EnableDebugBoundingBox.prmBool = true;
         MCH_PacketNotifyServerSettings.sendAll();
-        sender.addChatMessage((ITextComponent)new TextComponentString("Enabled bounding box [F3 + b]"));
+        sender.sendMessage((ITextComponent)new TextComponentString("Enabled bounding box [F3 + b]"));
       } 
       MCH_MOD.proxy.save();
     } else if (prm[0].equalsIgnoreCase("list")) {
       String msg = "";
       for (String s : ALL_COMMAND)
         msg = msg + s + ", "; 
-      sender.addChatMessage((ITextComponent)new TextComponentString("/mcheli command list : " + msg));
+      sender.sendMessage((ITextComponent)new TextComponentString("/mcheli command list : " + msg));
     } else if (prm[0].equalsIgnoreCase("delayhitbox")) {
       if (prm.length == 1) {
-        sender.addChatMessage((ITextComponent)new TextComponentString("Current delay of hitbox = " + MCH_Config.HitBoxDelayTick.prmInt + " [0 ~ 50]"));
+        sender.sendMessage((ITextComponent)new TextComponentString("Current delay of hitbox = " + MCH_Config.HitBoxDelayTick.prmInt + " [0 ~ 50]"));
       } else if (prm.length == 2) {
         MCH_Config.HitBoxDelayTick.prmInt = parseInt(prm[1]);
         if (MCH_Config.HitBoxDelayTick.prmInt > 50)
           MCH_Config.HitBoxDelayTick.prmInt = 50; 
         MCH_MOD.proxy.save();
-        sender.addChatMessage((ITextComponent)new TextComponentString("Current delay of hitbox = " + MCH_Config.HitBoxDelayTick.prmInt + " [0 ~ 50]"));
+        sender.sendMessage((ITextComponent)new TextComponentString("Current delay of hitbox = " + MCH_Config.HitBoxDelayTick.prmInt + " [0 ~ 50]"));
       } else {
         throw new CommandException("Parameter error! : /mcheli delayhitbox 0 ~ 50", new Object[0]);
       } 
@@ -237,37 +237,37 @@ public class MCH_Command extends CommandBase {
     String className = args[1].toLowerCase();
     float damage = Float.valueOf(args[2]).floatValue();
     String damageName = (args.length >= 4) ? args[3].toLowerCase() : "";
-    DamageSource ds = DamageSource.generic;
+    DamageSource ds = DamageSource.GENERIC;
     if (!damageName.isEmpty())
       if (damageName.equals("player")) {
         if (sender instanceof EntityPlayer)
           ds = DamageSource.causePlayerDamage((EntityPlayer)sender); 
       } else if (damageName.equals("anvil")) {
-        ds = DamageSource.anvil;
+        ds = DamageSource.ANVIL;
       } else if (damageName.equals("cactus")) {
-        ds = DamageSource.cactus;
+        ds = DamageSource.CACTUS;
       } else if (damageName.equals("drown")) {
-        ds = DamageSource.drown;
+        ds = DamageSource.DROWN;
       } else if (damageName.equals("fall")) {
-        ds = DamageSource.fall;
+        ds = DamageSource.FALL;
       } else if (damageName.equals("fallingblock")) {
-        ds = DamageSource.fallingBlock;
+        ds = DamageSource.FALLING_BLOCK;
       } else if (damageName.equals("generic")) {
-        ds = DamageSource.generic;
+        ds = DamageSource.GENERIC;
       } else if (damageName.equals("infire")) {
-        ds = DamageSource.inFire;
+        ds = DamageSource.IN_FIRE;
       } else if (damageName.equals("inwall")) {
-        ds = DamageSource.inWall;
+        ds = DamageSource.IN_WALL;
       } else if (damageName.equals("lava")) {
-        ds = DamageSource.lava;
+        ds = DamageSource.LAVA;
       } else if (damageName.equals("magic")) {
-        ds = DamageSource.magic;
+        ds = DamageSource.MAGIC;
       } else if (damageName.equals("onfire")) {
-        ds = DamageSource.onFire;
+        ds = DamageSource.ON_FIRE;
       } else if (damageName.equals("starve")) {
-        ds = DamageSource.starve;
+        ds = DamageSource.STARVE;
       } else if (damageName.equals("wither")) {
-        ds = DamageSource.wither;
+        ds = DamageSource.WITHER;
       }  
     int attacked = 0;
     List<Entity> list = (sender.getEntityWorld()).loadedEntityList;
@@ -278,7 +278,7 @@ public class MCH_Command extends CommandBase {
           attacked++;
         }  
     } 
-    sender.addChatMessage((ITextComponent)new TextComponentString(attacked + " entity attacked(" + args[1] + ", damage=" + damage + ")."));
+    sender.sendMessage((ITextComponent)new TextComponentString(attacked + " entity attacked(" + args[1] + ", damage=" + damage + ")."));
   }
   
   private void executeKillEntity(ICommandSender sender, String[] args) throws WrongUsageException {
@@ -294,7 +294,7 @@ public class MCH_Command extends CommandBase {
           killed++;
         }  
     } 
-    sender.addChatMessage((ITextComponent)new TextComponentString(killed + " entity killed(" + args[1] + ")."));
+    sender.sendMessage((ITextComponent)new TextComponentString(killed + " entity killed(" + args[1] + ")."));
   }
   
   private void executeRemoveEntity(ICommandSender sender, String[] args) throws WrongUsageException {
@@ -310,7 +310,7 @@ public class MCH_Command extends CommandBase {
           removed++;
         }  
     } 
-    sender.addChatMessage((ITextComponent)new TextComponentString(removed + " entity removed(" + args[1] + ")."));
+    sender.sendMessage((ITextComponent)new TextComponentString(removed + " entity removed(" + args[1] + ")."));
   }
   
   private void executeStatus(ICommandSender sender, String[] args) throws WrongUsageException {
@@ -342,18 +342,18 @@ public class MCH_Command extends CommandBase {
           }
         });
     boolean send = false;
-    sender.addChatMessage((ITextComponent)new TextComponentString("--- " + title + " ---"));
+    sender.sendMessage((ITextComponent)new TextComponentString("--- " + title + " ---"));
     for (Map.Entry<String, Integer> s : entries) {
       if (((Integer)s.getValue()).intValue() >= minNum) {
         String msg = " " + (String)s.getKey() + " : " + s.getValue();
         System.out.println(msg);
-        sender.addChatMessage((ITextComponent)new TextComponentString(msg));
+        sender.sendMessage((ITextComponent)new TextComponentString(msg));
         send = true;
       } 
     } 
     if (!send) {
       System.out.println("none");
-      sender.addChatMessage((ITextComponent)new TextComponentString("none"));
+      sender.sendMessage((ITextComponent)new TextComponentString("none"));
     } 
   }
   
@@ -375,7 +375,7 @@ public class MCH_Command extends CommandBase {
     Block block = CommandBase.getBlockByText(sender, args[7]);
     IBlockState iblockstate = block.getDefaultState();
     if (args.length >= 9)
-      iblockstate = func_190794_a(block, args[8]); 
+      iblockstate = convertArgToBlockState(block, args[8]); 
     World world = sender.getEntityWorld();
     if (x1 > x2) {
       int t = x1;
@@ -431,7 +431,7 @@ public class MCH_Command extends CommandBase {
                 for (int i = 0; i < ii.getSizeInventory(); i++) {
                   ItemStack is = ii.removeStackFromSlot(i);
                   if (!is.isEmpty())
-                    is.func_190920_e(0); 
+                    is.setCount(0); 
                 } 
               } 
               if (world.setBlockState(blockpos, iblockstate, 3)) {
@@ -457,17 +457,17 @@ public class MCH_Command extends CommandBase {
     } 
   }
   
-  public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] prm, BlockPos targetPos) {
+  public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] prm, BlockPos targetPos) {
     if (!MCH_Config.EnableCommand.prmBool)
-      return super.getTabCompletionOptions(server, sender, prm, targetPos); 
+      return super.getTabCompletions(server, sender, prm, targetPos); 
     if (prm.length <= 1)
       return getListOfStringsMatchingLastWord(prm, ALL_COMMAND); 
     if (prm[0].equalsIgnoreCase("sendss")) {
       if (prm.length == 2)
-        return getListOfStringsMatchingLastWord(prm, server.getAllUsernames()); 
+        return getListOfStringsMatchingLastWord(prm, server.getOnlinePlayerNames()); 
     } else if (prm[0].equalsIgnoreCase("modlist")) {
       if (prm.length >= 2)
-        return getListOfStringsMatchingLastWord(prm, server.getAllUsernames()); 
+        return getListOfStringsMatchingLastWord(prm, server.getOnlinePlayerNames()); 
     } else {
       if (prm[0].equalsIgnoreCase("fill")) {
         if ((prm.length == 2 || prm.length == 5) && sender instanceof Entity) {
@@ -495,6 +495,6 @@ public class MCH_Command extends CommandBase {
           return getListOfStringsMatchingLastWord(prm, new String[] { "true", "false" }); 
       } 
     } 
-    return super.getTabCompletionOptions(server, sender, prm, targetPos);
+    return super.getTabCompletions(server, sender, prm, targetPos);
   }
 }

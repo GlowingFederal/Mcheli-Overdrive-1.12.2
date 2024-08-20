@@ -93,7 +93,7 @@ public class MCH_EntityASMissile extends MCH_EntityBaseBullet {
       e.motionY = this.motionY * 0.5D / 2.0D + ((this.rand.nextFloat() - 0.5F) * RANDOM / 2.0F);
       e.motionZ = this.motionZ * 0.5D + ((this.rand.nextFloat() - 0.5F) * RANDOM);
       e.setBomblet();
-      this.world.spawnEntityInWorld((Entity)e);
+      this.world.spawnEntity((Entity)e);
     } 
   }
   

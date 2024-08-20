@@ -58,12 +58,12 @@ public class MCH_EntityWheel extends W_Entity {
   
   protected void writeEntityToNBT(NBTTagCompound compound) {}
   
-  public void moveEntity(MoverType type, double x, double y, double z) {
-    this.world.theProfiler.startSection("move");
+  public void move(MoverType type, double x, double y, double z) {
+    this.world.profiler.startSection("move");
     double d2 = x;
     double d3 = y;
     double d4 = z;
-    List<AxisAlignedBB> list1 = getCollisionBoxes((Entity)this, getEntityBoundingBox().addCoord(x, y, z));
+    List<AxisAlignedBB> list1 = getCollisionBoxes((Entity)this, getEntityBoundingBox().expand(x, y, z));
     AxisAlignedBB axisalignedbb = getEntityBoundingBox();
     if (y != 0.0D) {
       for (int k = 0; k < list1.size(); k++)
@@ -90,9 +90,9 @@ public class MCH_EntityWheel extends W_Entity {
       AxisAlignedBB axisalignedbb1 = getEntityBoundingBox();
       setEntityBoundingBox(axisalignedbb);
       y = this.stepHeight;
-      List<AxisAlignedBB> list = getCollisionBoxes((Entity)this, getEntityBoundingBox().addCoord(d2, y, d4));
+      List<AxisAlignedBB> list = getCollisionBoxes((Entity)this, getEntityBoundingBox().expand(d2, y, d4));
       AxisAlignedBB axisalignedbb2 = getEntityBoundingBox();
-      AxisAlignedBB axisalignedbb3 = axisalignedbb2.addCoord(d2, 0.0D, d4);
+      AxisAlignedBB axisalignedbb3 = axisalignedbb2.expand(d2, 0.0D, d4);
       double d8 = y;
       for (int j1 = 0; j1 < list.size(); j1++)
         d8 = ((AxisAlignedBB)list.get(j1)).calculateYOffset(axisalignedbb3, d8); 
@@ -141,13 +141,13 @@ public class MCH_EntityWheel extends W_Entity {
         setEntityBoundingBox(axisalignedbb1);
       } 
     } 
-    this.world.theProfiler.endSection();
-    this.world.theProfiler.startSection("rest");
+    this.world.profiler.endSection();
+    this.world.profiler.startSection("rest");
     resetPositionToBB();
-    this.isCollidedHorizontally = (d2 != x || d4 != z);
-    this.isCollidedVertically = (d3 != y);
-    this.onGround = (this.isCollidedVertically && d3 < 0.0D);
-    this.isCollided = (this.isCollidedHorizontally || this.isCollidedVertically);
+    this.collidedHorizontally = (d2 != x || d4 != z);
+    this.collidedVertically = (d3 != y);
+    this.onGround = (this.collidedVertically && d3 < 0.0D);
+    this.collided = (this.collidedHorizontally || this.collidedVertically);
     int j6 = MathHelper.floor(this.posX);
     int i1 = MathHelper.floor(this.posY - 0.20000000298023224D);
     int k6 = MathHelper.floor(this.posZ);
@@ -178,22 +178,22 @@ public class MCH_EntityWheel extends W_Entity {
       addEntityCrashInfo(crashreportcategory);
       throw new ReportedException(crashreport);
     } 
-    this.world.theProfiler.endSection();
+    this.world.profiler.endSection();
   }
   
   public List<AxisAlignedBB> getCollisionBoxes(Entity entityIn, AxisAlignedBB aabb) {
     ArrayList<AxisAlignedBB> collidingBoundingBoxes = new ArrayList<>();
     getCollisionBoxes(entityIn, aabb, collidingBoundingBoxes);
     double d0 = 0.25D;
-    List<Entity> list = entityIn.world.getEntitiesWithinAABBExcludingEntity(entityIn, aabb.expand(d0, d0, d0));
+    List<Entity> list = entityIn.world.getEntitiesWithinAABBExcludingEntity(entityIn, aabb.grow(d0, d0, d0));
     for (int j2 = 0; j2 < list.size(); j2++) {
       Entity entity = list.get(j2);
       if (!W_Lib.isEntityLivingBase(entity) && !(entity instanceof mcheli.aircraft.MCH_EntitySeat) && !(entity instanceof mcheli.aircraft.MCH_EntityHitBox) && entity != this.parents) {
         AxisAlignedBB axisalignedbb1 = entity.getCollisionBoundingBox();
-        if (axisalignedbb1 != null && axisalignedbb1.intersectsWith(aabb))
+        if (axisalignedbb1 != null && axisalignedbb1.intersects(aabb))
           collidingBoundingBoxes.add(axisalignedbb1); 
         axisalignedbb1 = entityIn.getCollisionBox(entity);
-        if (axisalignedbb1 != null && axisalignedbb1.intersectsWith(aabb))
+        if (axisalignedbb1 != null && axisalignedbb1.intersects(aabb))
           collidingBoundingBoxes.add(axisalignedbb1); 
       } 
     } 
@@ -209,7 +209,7 @@ public class MCH_EntityWheel extends W_Entity {
     int j1 = MathHelper.ceil(aabb.maxZ) + 1;
     WorldBorder worldborder = entityIn.world.getWorldBorder();
     boolean flag = (entityIn != null && entityIn.isOutsideBorder());
-    boolean flag1 = (entityIn != null && entityIn.world.func_191503_g(entityIn));
+    boolean flag1 = (entityIn != null && entityIn.world.isInsideWorldBorder(entityIn));
     IBlockState iblockstate = Blocks.STONE.getDefaultState();
     BlockPos.PooledMutableBlockPos blockpos = BlockPos.PooledMutableBlockPos.retain();
     try {

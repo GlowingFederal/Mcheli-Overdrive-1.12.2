@@ -101,7 +101,7 @@ public class MCH_Multiplay {
   }
   
   public static boolean canAttackEntity(DamageSource ds, Entity target) {
-    return canAttackEntity(ds.getEntity(), target);
+    return canAttackEntity(ds.getTrueSource(), target);
   }
   
   public static boolean canAttackEntity(Entity attacker, Entity target) {
@@ -133,14 +133,14 @@ public class MCH_Multiplay {
     CommandTeleport cmd = new CommandTeleport();
     if (cmd.checkPermission(MCH_Utils.getServer(), (ICommandSender)player)) {
       MinecraftServer minecraftServer = MCH_Utils.getServer();
-      for (String playerName : minecraftServer.getPlayerList().getAllUsernames()) {
+      for (String playerName : minecraftServer.getPlayerList().getOnlinePlayerNames()) {
         try {
           EntityPlayerMP jumpPlayer = CommandTeleport.getPlayer(minecraftServer, (ICommandSender)player, playerName);
           BlockPos cc = null;
           if (jumpPlayer != null && jumpPlayer.dimension == player.dimension) {
             cc = jumpPlayer.getBedLocation(jumpPlayer.dimension);
             if (cc != null)
-              cc = EntityPlayer.getBedSpawnLocation((World)minecraftServer.worldServerForDimension(jumpPlayer.dimension), cc, true); 
+              cc = EntityPlayer.getBedSpawnLocation((World)minecraftServer.getWorld(jumpPlayer.dimension), cc, true); 
             if (cc == null)
               cc = jumpPlayer.world.provider.getRandomizedSpawnPoint(); 
           } 
@@ -162,12 +162,12 @@ public class MCH_Multiplay {
     if (teamNum > 0) {
       CommandScoreboard cmd = new CommandScoreboard();
       if (cmd.checkPermission(MCH_Utils.getServer(), (ICommandSender)player)) {
-        List<String> list = Arrays.asList(MCH_Utils.getServer().getPlayerList().getAllUsernames());
+        List<String> list = Arrays.asList(MCH_Utils.getServer().getPlayerList().getOnlinePlayerNames());
         Collections.shuffle(list);
         ArrayList<String> listTeam = new ArrayList<>();
         for (ScorePlayerTeam o : teams) {
           ScorePlayerTeam team = o;
-          listTeam.add(team.getRegisteredName());
+          listTeam.add(team.getName());
         } 
         Collections.shuffle(listTeam);
         int i = 0;
@@ -204,7 +204,7 @@ public class MCH_Multiplay {
       double tx = vv.x;
       double tz = vv.z;
       List<Entity> list = player.world.getEntitiesWithinAABBExcludingEntity((Entity)player, player
-          .getEntityBoundingBox().expand(spotLength, spotLength, spotLength));
+          .getEntityBoundingBox().grow(spotLength, spotLength, spotLength));
       List<Integer> entityList = new ArrayList<>();
       Vec3d pos = new Vec3d(posX, posY, posZ);
       for (int i = 0; i < list.size(); i++) {
@@ -241,7 +241,7 @@ public class MCH_Multiplay {
   
   public static void sendSpotedEntityListToSameTeam(EntityLivingBase player, int count, int[] entityId) {
     PlayerList svCnf = MCH_Utils.getServer().getPlayerList();
-    for (EntityPlayer notifyPlayer : svCnf.getPlayerList()) {
+    for (EntityPlayer notifyPlayer : svCnf.getPlayers()) {
       if (player == notifyPlayer || player.isOnSameTeam((Entity)notifyPlayer))
         MCH_PacketNotifySpotedEntity.send(notifyPlayer, count, entityId); 
     } 
@@ -263,7 +263,7 @@ public class MCH_Multiplay {
   
   public static void sendMarkPointToSameTeam(EntityPlayer player, int x, int y, int z) {
     PlayerList svCnf = MCH_Utils.getServer().getPlayerList();
-    for (EntityPlayer notifyPlayer : svCnf.getPlayerList()) {
+    for (EntityPlayer notifyPlayer : svCnf.getPlayers()) {
       if (player == notifyPlayer || player.isOnSameTeam((Entity)notifyPlayer))
         MCH_PacketNotifyMarkPoint.send(notifyPlayer, x, y, z); 
     } 

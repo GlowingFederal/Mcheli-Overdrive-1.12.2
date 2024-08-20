@@ -96,7 +96,6 @@ public class MCH_GuiTitle extends MCH_Gui {
       for (String sLine : splitLine) {
         String s = formatColors(ichatcomponent1.getStyle().getFormattingCode() + sLine);
         int j1 = this.mc.fontRenderer.getStringWidth(s);
-        //fontRendererObj.getStringWidth(s);
         TextComponentString chatcomponenttext1 = new TextComponentString(s);
         chatcomponenttext1.setStyle(ichatcomponent1.getStyle().createShallowCopy());
         boolean flag1 = false;

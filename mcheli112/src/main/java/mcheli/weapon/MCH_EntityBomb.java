@@ -31,7 +31,7 @@ public class MCH_EntityBomb extends MCH_EntityBaseBullet {
       float dist = (getInfo()).proximityFuseDist;
       if (dist > 0.1F && getCountOnUpdate() % 10 == 0) {
         List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, 
-            getEntityBoundingBox().expand(dist, dist, dist));
+            getEntityBoundingBox().grow(dist, dist, dist));
         if (list != null)
           for (int i = 0; i < list.size(); i++) {
             Entity entity = list.get(i);
@@ -56,7 +56,7 @@ public class MCH_EntityBomb extends MCH_EntityBaseBullet {
       e.motionY = this.motionY * 1.0D / 2.0D + ((this.rand.nextFloat() - 0.5F) * RANDOM / 2.0F);
       e.motionZ = this.motionZ * 1.0D + ((this.rand.nextFloat() - 0.5F) * RANDOM);
       e.setBomblet();
-      this.world.spawnEntityInWorld((Entity)e);
+      this.world.spawnEntity((Entity)e);
     } 
   }
   

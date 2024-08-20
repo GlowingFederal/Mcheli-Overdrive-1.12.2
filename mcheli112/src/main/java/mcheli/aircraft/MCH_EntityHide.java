@@ -234,7 +234,7 @@ public class MCH_EntityHide extends W_Entity implements IEntitySinglePassenger {
       onGroundAndDead();
       return;
     } 
-    moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+    move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
     this.motionY *= 0.9D;
     this.motionX *= 0.95D;
     this.motionZ *= 0.95D;
@@ -258,7 +258,7 @@ public class MCH_EntityHide extends W_Entity implements IEntitySinglePassenger {
     int j1 = MathHelper.ceil(aabb.maxZ) + 1;
     WorldBorder worldborder = this.world.getWorldBorder();
     boolean flag = (entityIn != null && entityIn.isOutsideBorder());
-    boolean flag1 = (entityIn != null && this.world.func_191503_g(entityIn));
+    boolean flag1 = (entityIn != null && this.world.isInsideWorldBorder(entityIn));
     IBlockState iblockstate = Blocks.STONE.getDefaultState();
     BlockPos.PooledMutableBlockPos blockpos$pooledmutableblockpos = BlockPos.PooledMutableBlockPos.retain();
     try {
@@ -295,15 +295,15 @@ public class MCH_EntityHide extends W_Entity implements IEntitySinglePassenger {
     getCollisionBoxes(par1Entity, par2AxisAlignedBB, list);
     if (par1Entity != null) {
       List<Entity> list1 = this.world.getEntitiesWithinAABBExcludingEntity(par1Entity, par2AxisAlignedBB
-          .expandXyz(0.25D));
+          .grow(0.25D));
       for (int i = 0; i < list1.size(); i++) {
         Entity entity = list1.get(i);
         if (!W_Lib.isEntityLivingBase(entity) && !(entity instanceof MCH_EntitySeat) && !(entity instanceof MCH_EntityHitBox)) {
           AxisAlignedBB axisalignedbb = entity.getCollisionBoundingBox();
-          if (axisalignedbb != null && axisalignedbb.intersectsWith(par2AxisAlignedBB))
+          if (axisalignedbb != null && axisalignedbb.intersects(par2AxisAlignedBB))
             list.add(axisalignedbb); 
           axisalignedbb = par1Entity.getCollisionBox(entity);
-          if (axisalignedbb != null && axisalignedbb.intersectsWith(par2AxisAlignedBB))
+          if (axisalignedbb != null && axisalignedbb.intersects(par2AxisAlignedBB))
             list.add(axisalignedbb); 
         } 
       } 
@@ -311,12 +311,12 @@ public class MCH_EntityHide extends W_Entity implements IEntitySinglePassenger {
     return list;
   }
   
-  public void moveEntity(MoverType type, double x, double y, double z) {
-    this.world.theProfiler.startSection("move");
+  public void move(MoverType type, double x, double y, double z) {
+    this.world.profiler.startSection("move");
     double d2 = x;
     double d3 = y;
     double d4 = z;
-    List<AxisAlignedBB> list1 = getCollidingBoundingBoxes((Entity)this, getEntityBoundingBox().addCoord(x, y, z));
+    List<AxisAlignedBB> list1 = getCollidingBoundingBoxes((Entity)this, getEntityBoundingBox().expand(x, y, z));
     AxisAlignedBB axisalignedbb = getEntityBoundingBox();
     if (y != 0.0D) {
       int k = 0;
@@ -347,9 +347,9 @@ public class MCH_EntityHide extends W_Entity implements IEntitySinglePassenger {
       AxisAlignedBB axisalignedbb1 = getEntityBoundingBox();
       setEntityBoundingBox(axisalignedbb);
       List<AxisAlignedBB> list = getCollidingBoundingBoxes((Entity)this, 
-          getEntityBoundingBox().addCoord(d2, y, d4));
+          getEntityBoundingBox().expand(d2, y, d4));
       AxisAlignedBB axisalignedbb2 = getEntityBoundingBox();
-      AxisAlignedBB axisalignedbb3 = axisalignedbb2.addCoord(d2, 0.0D, d4);
+      AxisAlignedBB axisalignedbb3 = axisalignedbb2.expand(d2, 0.0D, d4);
       double d8 = y;
       for (int j1 = 0; j1 < list.size(); j1++)
         d8 = ((AxisAlignedBB)list.get(j1)).calculateYOffset(axisalignedbb3, d8); 
@@ -398,13 +398,13 @@ public class MCH_EntityHide extends W_Entity implements IEntitySinglePassenger {
         setEntityBoundingBox(axisalignedbb1);
       } 
     } 
-    this.world.theProfiler.endSection();
-    this.world.theProfiler.startSection("rest");
+    this.world.profiler.endSection();
+    this.world.profiler.startSection("rest");
     resetPositionToBB();
-    this.isCollidedHorizontally = (d2 != x || d4 != z);
-    this.isCollidedVertically = (d3 != y);
-    this.onGround = (this.isCollidedVertically && d3 < 0.0D);
-    this.isCollided = (this.isCollidedHorizontally || this.isCollidedVertically);
+    this.collidedHorizontally = (d2 != x || d4 != z);
+    this.collidedVertically = (d3 != y);
+    this.onGround = (this.collidedVertically && d3 < 0.0D);
+    this.collided = (this.collidedHorizontally || this.collidedVertically);
     int j6 = MathHelper.floor(this.posX);
     int i1 = MathHelper.floor(this.posY - 0.20000000298023224D);
     int k6 = MathHelper.floor(this.posZ);
@@ -435,7 +435,7 @@ public class MCH_EntityHide extends W_Entity implements IEntitySinglePassenger {
       addEntityCrashInfo(crashreportcategory);
       throw new ReportedException(crashreport);
     } 
-    this.world.theProfiler.endSection();
+    this.world.profiler.endSection();
   }
   
   public void onGroundAndDead() {

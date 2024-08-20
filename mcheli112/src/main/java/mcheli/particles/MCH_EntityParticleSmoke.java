@@ -58,7 +58,7 @@ public class MCH_EntityParticleSmoke extends MCH_EntityParticleBase {
     } else {
       this.motionY += this.gravity;
     } 
-    moveEntity(this.motionX, this.motionY, this.motionZ);
+    move(this.motionX, this.motionY, this.motionZ);
     if (this.diffusible) {
       this.motionX *= 0.96D;
       this.motionZ *= 0.96D;
@@ -87,8 +87,8 @@ public class MCH_EntityParticleSmoke extends MCH_EntityParticleBase {
   
   public void effectWind() {
     if (this.isEffectedWind) {
-      List<MCH_EntityAircraft> list = this.worldObj.getEntitiesWithinAABB(MCH_EntityAircraft.class, 
-          getCollisionBoundingBox().expand(15.0D, 15.0D, 15.0D));
+      List<MCH_EntityAircraft> list = this.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, 
+          getCollisionBoundingBox().grow(15.0D, 15.0D, 15.0D));
       for (int i = 0; i < list.size(); i++) {
         MCH_EntityAircraft ac = list.get(i);
         if (ac.getThrottle() > 0.10000000149011612D) {
@@ -108,10 +108,10 @@ public class MCH_EntityParticleSmoke extends MCH_EntityParticleBase {
   }
   
   @SideOnly(Side.CLIENT)
-  public int getBrightnessForRender(float partialTicks) {
+  public int getBrightnessForRender(float p_70070_1_) {
     double y = this.posY;
     this.posY += 3000.0D;
-    int i = super.getBrightnessForRender(partialTicks);
+    int i = super.getBrightnessForRender(p_70070_1_);
     this.posY = y;
     return i;
   }

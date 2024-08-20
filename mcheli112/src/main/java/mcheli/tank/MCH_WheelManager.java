@@ -86,9 +86,9 @@ public class MCH_WheelManager {
     } 
     for (MCH_EntityWheel wheel : this.wheels) {
       wheel.motionY *= 0.15D;
-      wheel.moveEntity(MoverType.SELF, wheel.motionX, wheel.motionY, wheel.motionZ);
+      wheel.move(MoverType.SELF, wheel.motionX, wheel.motionY, wheel.motionZ);
       double f = 1.0D;
-      wheel.moveEntity(MoverType.SELF, 0.0D, -0.1D * f, 0.0D);
+      wheel.move(MoverType.SELF, 0.0D, -0.1D * f, 0.0D);
     } 
     int zmog = -1;
     int i;

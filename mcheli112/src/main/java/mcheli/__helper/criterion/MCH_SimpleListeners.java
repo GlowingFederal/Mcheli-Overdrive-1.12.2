@@ -30,7 +30,7 @@ public class MCH_SimpleListeners {
   
   public void trigger() {
     for (ICriterionTrigger.Listener<SimpleInstance> listener : this.listeners)
-      listener.func_192159_a(this.playerAdvancements); 
+      listener.grantCriterion(this.playerAdvancements); 
   }
   
   static class SimpleInstance extends AbstractCriterionInstance {

@@ -46,7 +46,7 @@ public class MCH_GuiSliderVertical extends W_GuiButton {
   protected void mouseDragged(Minecraft mc, int x, int y) {
     if (isVisible()) {
       if (this.isMousePress) {
-        this.currentSlider = (y - this.yPosition + 4) / (this.height - 8);
+        this.currentSlider = (y - this.y + 4) / (this.height - 8);
         if (this.currentSlider < 0.0F)
           this.currentSlider = 0.0F; 
         if (this.currentSlider > 1.0F)
@@ -54,8 +54,8 @@ public class MCH_GuiSliderVertical extends W_GuiButton {
         this.currentSlider = normalizeValue(denormalizeValue(this.currentSlider));
       } 
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      drawTexturedModalRect(this.xPosition, this.yPosition + (int)(this.currentSlider * (this.height - 8)), 66, 0, 20, 4);
-      drawTexturedModalRect(this.xPosition, this.yPosition + (int)(this.currentSlider * (this.height - 8)) + 4, 66, 196, 20, 4);
+      drawTexturedModalRect(this.x, this.y + (int)(this.currentSlider * (this.height - 8)), 66, 0, 20, 4);
+      drawTexturedModalRect(this.x, this.y + (int)(this.currentSlider * (this.height - 8)) + 4, 66, 196, 20, 4);
       if (!MCH_Key.isKeyDown(-100))
         mouseReleased(x, y); 
     } 
@@ -100,7 +100,7 @@ public class MCH_GuiSliderVertical extends W_GuiButton {
   
   public boolean mousePressed(Minecraft mc, int x, int y) {
     if (super.mousePressed(mc, x, y)) {
-      this.currentSlider = (y - this.yPosition + 4) / (this.height - 8);
+      this.currentSlider = (y - this.y + 4) / (this.height - 8);
       if (this.currentSlider < 0.0F)
         this.currentSlider = 0.0F; 
       if (this.currentSlider > 1.0F)
@@ -115,16 +115,16 @@ public class MCH_GuiSliderVertical extends W_GuiButton {
     this.isMousePress = false;
   }
   
-  public void func_191745_a(Minecraft mc, int x, int y, float partialTicks) {
+  public void drawButton(Minecraft mc, int x, int y, float partialTicks) {
     if (isVisible()) {
-      FontRenderer fontrenderer = mc.fontRendererObj;
+      FontRenderer fontrenderer = mc.fontRenderer;
       mc.getTextureManager().bindTexture(new ResourceLocation("mcheli", "textures/gui/widgets.png"));
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      setOnMouseOver((x >= this.xPosition && y >= this.yPosition && x < this.xPosition + this.width && y < this.yPosition + this.height));
+      setOnMouseOver((x >= this.x && y >= this.y && x < this.x + this.width && y < this.y + this.height));
       int k = getHoverState(isOnMouseOver());
       enableBlend();
-      drawTexturedModalRect(this.xPosition, this.yPosition, 46 + k * 20, 0, this.width, this.height / 2);
-      drawTexturedModalRect(this.xPosition, this.yPosition + this.height / 2, 46 + k * 20, 200 - this.height / 2, this.width, this.height / 2);
+      drawTexturedModalRect(this.x, this.y, 46 + k * 20, 0, this.width, this.height / 2);
+      drawTexturedModalRect(this.x, this.y + this.height / 2, 46 + k * 20, 200 - this.height / 2, this.width, this.height / 2);
       mouseDragged(mc, x, y);
       int l = 14737632;
       if (this.packedFGColour != 0) {
@@ -134,7 +134,7 @@ public class MCH_GuiSliderVertical extends W_GuiButton {
       } else if (isOnMouseOver()) {
         l = 16777120;
       } 
-      drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, l);
+      drawCenteredString(fontrenderer, this.displayString, this.x + this.width / 2, this.y + (this.height - 8) / 2, l);
       mc.getTextureManager().bindTexture(BUTTON_TEXTURES);
     } 
   }

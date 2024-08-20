@@ -19,11 +19,11 @@ public class MCH_SimpleTrigger implements ICriterionTrigger<MCH_SimpleListeners.
     this.id = id;
   }
   
-  public ResourceLocation func_192163_a() {
+  public ResourceLocation getId() {
     return this.id;
   }
   
-  public void func_192165_a(PlayerAdvancements playerAdvancementsIn, ICriterionTrigger.Listener<MCH_SimpleListeners.SimpleInstance> listener) {
+  public void addListener(PlayerAdvancements playerAdvancementsIn, ICriterionTrigger.Listener<MCH_SimpleListeners.SimpleInstance> listener) {
     MCH_SimpleListeners listeners = this.listeners.get(playerAdvancementsIn);
     if (listeners == null) {
       listeners = new MCH_SimpleListeners(playerAdvancementsIn);
@@ -32,7 +32,7 @@ public class MCH_SimpleTrigger implements ICriterionTrigger<MCH_SimpleListeners.
     listeners.add(listener);
   }
   
-  public void func_192164_b(PlayerAdvancements playerAdvancementsIn, ICriterionTrigger.Listener<MCH_SimpleListeners.SimpleInstance> listener) {
+  public void removeListener(PlayerAdvancements playerAdvancementsIn, ICriterionTrigger.Listener<MCH_SimpleListeners.SimpleInstance> listener) {
     MCH_SimpleListeners listeners = this.listeners.get(playerAdvancementsIn);
     if (listeners != null) {
       listeners.remove(listener);
@@ -41,7 +41,7 @@ public class MCH_SimpleTrigger implements ICriterionTrigger<MCH_SimpleListeners.
     } 
   }
   
-  public void func_192167_a(PlayerAdvancements playerAdvancementsIn) {
+  public void removeAllListeners(PlayerAdvancements playerAdvancementsIn) {
     this.listeners.remove(playerAdvancementsIn);
   }
   
@@ -50,7 +50,7 @@ public class MCH_SimpleTrigger implements ICriterionTrigger<MCH_SimpleListeners.
   }
   
   public void trigger(EntityPlayerMP player) {
-    MCH_SimpleListeners listener = this.listeners.get(player.func_192039_O());
+    MCH_SimpleListeners listener = this.listeners.get(player.getAdvancements());
     if (listener != null)
       listener.trigger(); 
   }

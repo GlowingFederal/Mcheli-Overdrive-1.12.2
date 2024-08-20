@@ -493,7 +493,7 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
       } else if (item.equalsIgnoreCase("DamageFactor")) {
         String[] s = splitParam(data);
         if (s.length >= 2) {
-          Class<MCH_EntityVehicle> clazz = null;
+          Class<MCH_EntityVehicle> clazz;
           Class<? extends Entity> c = null;
           String className = s[0].toLowerCase();
           if (className.equals("player")) {

@@ -38,7 +38,7 @@ public class MCH_WeaponBomb extends MCH_WeaponBase {
       e.motionX = prm.entity.motionX;
       e.motionY = prm.entity.motionY;
       e.motionZ = prm.entity.motionZ;
-      this.worldObj.spawnEntityInWorld((Entity)e);
+      this.worldObj.spawnEntity((Entity)e);
     } 
     return true;
   }

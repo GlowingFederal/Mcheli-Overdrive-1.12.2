@@ -129,7 +129,7 @@ public class MCH_EntityContainer extends W_EntityContainer implements MCH_IEntit
     damage = MCH_Config.applyDamageByExternal((Entity)this, ds, damage);
     if (!MCH_Multiplay.canAttackEntity(ds, (Entity)this))
       return false; 
-    if (ds.getEntity() instanceof EntityPlayer && ds.getDamageType().equalsIgnoreCase("player")) {
+    if (ds.getTrueSource() instanceof EntityPlayer && ds.getDamageType().equalsIgnoreCase("player")) {
       MCH_Lib.DbgLog(this.world, "MCH_EntityContainer.attackEntityFrom:damage=%.1f:%s", new Object[] { Float.valueOf(damage), ds.getDamageType() });
       W_WorldFunc.MOD_playSoundAtEntity((Entity)this, "hit", 1.0F, 1.3F);
       setDamageTaken(getDamageTaken() + (int)(damage * 20.0F));
@@ -138,8 +138,8 @@ public class MCH_EntityContainer extends W_EntityContainer implements MCH_IEntit
     } 
     setForwardDirection(-getForwardDirection());
     setTimeSinceHit(10);
-    setBeenAttacked();
-    boolean flag = (ds.getEntity() instanceof EntityPlayer && ((EntityPlayer)ds.getEntity()).capabilities.isCreativeMode);
+    markVelocityChanged();
+    boolean flag = (ds.getTrueSource() instanceof EntityPlayer && ((EntityPlayer)ds.getTrueSource()).capabilities.isCreativeMode);
     if (flag || getDamageTaken() > 40.0F) {
       if (!flag)
         dropItemWithOffset((Item)MCH_MOD.itemContainer, 1, 0.0F); 
@@ -256,7 +256,7 @@ public class MCH_EntityContainer extends W_EntityContainer implements MCH_IEntit
         this.motionX *= 0.8999999761581421D;
         this.motionZ *= 0.8999999761581421D;
       } 
-      moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+      move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
       this.motionX *= 0.99D;
       this.motionY *= 0.95D;
       this.motionZ *= 0.99D;
@@ -275,7 +275,7 @@ public class MCH_EntityContainer extends W_EntityContainer implements MCH_IEntit
       setRotation(this.rotationYaw, this.rotationPitch);
       if (!this.world.isRemote) {
         List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, 
-            getEntityBoundingBox().expand(0.2D, 0.0D, 0.2D));
+            getEntityBoundingBox().grow(0.2D, 0.0D, 0.2D));
         if (list != null && !list.isEmpty())
           for (int l = 0; l < list.size(); l++) {
             Entity entity = list.get(l);

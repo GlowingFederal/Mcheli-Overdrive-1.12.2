@@ -197,8 +197,8 @@ public class MCH_ItemRecipe implements MCH_IRecipeList {
       return null;
     } 
     for (int k = 0; k < r.recipeItems.size(); k++) {
-      if (r.recipeItems.get(k) != Ingredient.field_193370_a)
-        if (Arrays.<ItemStack>stream(((Ingredient)r.recipeItems.get(k)).func_193365_a()).anyMatch(stack -> (stack.getItem() == null)))
+      if (r.recipeItems.get(k) != Ingredient.EMPTY)
+        if (Arrays.<ItemStack>stream(((Ingredient)r.recipeItems.get(k)).getMatchingStacks()).anyMatch(stack -> (stack.getItem() == null)))
           throw new RuntimeException("Error: Invalid ShapedRecipes! " + item + " : " + data);  
     } 
     return (IRecipe)r;
@@ -249,7 +249,7 @@ public class MCH_ItemRecipe implements MCH_IRecipeList {
     ShapelessRecipes r = getShapelessRecipe(new ItemStack(item, createNum), recipe);
     for (int j = 0; j < r.recipeItems.size(); j++) {
       Ingredient ingredient = (Ingredient)r.recipeItems.get(j);
-      if (Arrays.<ItemStack>stream(ingredient.func_193365_a()).anyMatch(stack -> (stack.getItem() == null)))
+      if (Arrays.<ItemStack>stream(ingredient.getMatchingStacks()).anyMatch(stack -> (stack.getItem() == null)))
         throw new RuntimeException("Error: Invalid ShapelessRecipes! " + item + " : " + data); 
     } 
     MCH_Recipes.register(name, (IRecipe)r);
@@ -257,19 +257,19 @@ public class MCH_ItemRecipe implements MCH_IRecipeList {
   }
   
   public static ShapelessRecipes getShapelessRecipe(ItemStack par1ItemStack, Object... par2ArrayOfObj) {
-    NonNullList<Ingredient> list = NonNullList.func_191196_a();
+    NonNullList<Ingredient> list = NonNullList.create();
     Object[] aobject = par2ArrayOfObj;
     int i = par2ArrayOfObj.length;
     for (int j = 0; j < i; j++) {
       Object object1 = aobject[j];
       if (object1 instanceof ItemStack) {
-        list.add(Ingredient.func_193369_a(new ItemStack[] { ((ItemStack)object1).copy() }));
+        list.add(Ingredient.fromStacks(new ItemStack[] { ((ItemStack)object1).copy() }));
       } else if (object1 instanceof Item) {
-        list.add(Ingredient.func_193369_a(new ItemStack[] { new ItemStack((Item)object1) }));
+        list.add(Ingredient.fromStacks(new ItemStack[] { new ItemStack((Item)object1) }));
       } else {
         if (!(object1 instanceof Block))
           throw new RuntimeException("Invalid shapeless recipy!"); 
-        list.add(Ingredient.func_193369_a(new ItemStack[] { new ItemStack((Block)object1) }));
+        list.add(Ingredient.fromStacks(new ItemStack[] { new ItemStack((Block)object1) }));
       } 
     } 
     return new ShapelessRecipes("", par1ItemStack, list);

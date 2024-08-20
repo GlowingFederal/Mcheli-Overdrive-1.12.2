@@ -205,7 +205,7 @@ public class MCH_MultiplayPacketHandler {
               MCH_Lib.Log(TextFormatting.RED + "###### " + player.getDisplayName() + " ######", new Object[0]); 
             for (String s : pc.list) {
               MCH_Lib.Log(s, new Object[0]);
-              player.addChatMessage((ITextComponent)new TextComponentString(s));
+              player.sendMessage((ITextComponent)new TextComponentString(s));
             } 
           });
     } else if (pc.id == playerInfoId) {

@@ -12,9 +12,9 @@ public class MCH_DummyEntityPlayer extends W_EntityPlayer {
     super(worldIn, player);
   }
   
-  public void addChatMessage(ITextComponent var1) {}
+  public void sendMessage(ITextComponent var1) {}
   
-  public boolean canCommandSenderUseCommand(int var1, String var2) {
+  public boolean canUseCommand(int var1, String var2) {
     return false;
   }
   

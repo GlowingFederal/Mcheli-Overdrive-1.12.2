@@ -47,7 +47,7 @@ public class MCH_DraftingTableRenderer extends TileEntitySpecialRenderer<MCH_Dra
   }
   
   private float getYawAngle(MCH_DraftingTableTileEntity tile) {
-    if (tile.hasWorldObj())
+    if (tile.hasWorld())
       return -tile.getBlockMetadata() * 45.0F + 180.0F; 
     return 0.0F;
   }
@@ -56,8 +56,8 @@ public class MCH_DraftingTableRenderer extends TileEntitySpecialRenderer<MCH_Dra
   private static class DraftingTableStackRenderer extends TileEntityItemStackRenderer {
     private MCH_DraftingTableTileEntity draftingTable = new MCH_DraftingTableTileEntity();
     
-    public void func_192838_a(ItemStack p_192838_1_, float partialTicks) {
-      TileEntityRendererDispatcher.instance.func_192855_a(this.draftingTable, 0.0D, 0.0D, 0.0D, partialTicks, 0.0F);
+    public void renderByItem(ItemStack p_192838_1_, float partialTicks) {
+      TileEntityRendererDispatcher.instance.render(this.draftingTable, 0.0D, 0.0D, 0.0D, partialTicks, 0.0F);
     }
     
     private DraftingTableStackRenderer() {}

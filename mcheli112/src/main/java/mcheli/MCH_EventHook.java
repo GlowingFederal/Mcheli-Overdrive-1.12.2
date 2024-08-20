@@ -73,7 +73,7 @@ public class MCH_EventHook extends W_EventHook {
       return; 
     if ((ac.getAcInfo()).damageFactor > 0.0F)
       return; 
-    Entity attackEntity = event.getSource().getEntity();
+    Entity attackEntity = event.getSource().getTrueSource();
     if (attackEntity == null) {
       event.setCanceled(true);
     } else if (W_Entity.isEqual(attackEntity, event.getEntity())) {
@@ -95,7 +95,7 @@ public class MCH_EventHook extends W_EventHook {
       return; 
     if (ac.isDestroyed())
       return; 
-    Entity attackEntity = event.getSource().getEntity();
+    Entity attackEntity = event.getSource().getTrueSource();
     float f = event.getAmount();
     if (attackEntity == null) {
       ac.attackEntityFrom(event.getSource(), f * 2.0F);
@@ -129,7 +129,7 @@ public class MCH_EventHook extends W_EventHook {
     } 
     if (ac == null) {
       List<MCH_EntityAircraft> list = entity.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, entity
-          .getEntityBoundingBox().expand(50.0D, 50.0D, 50.0D));
+          .getEntityBoundingBox().grow(50.0D, 50.0D, 50.0D));
       if (list != null)
         for (int i = 0; i < list.size(); i++) {
           MCH_EntityAircraft tmp = list.get(i);

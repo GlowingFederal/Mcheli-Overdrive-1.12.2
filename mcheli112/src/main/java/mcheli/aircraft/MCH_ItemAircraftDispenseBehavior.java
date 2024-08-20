@@ -21,7 +21,7 @@ public class MCH_ItemAircraftDispenseBehavior extends BehaviorDefaultDispenseIte
         if (!ac.isUAV()) {
           if (!(bs.getWorld()).isRemote) {
             ac.getAcDataFromItem(itemStack);
-            bs.getWorld().spawnEntityInWorld((Entity)ac);
+            bs.getWorld().spawnEntity((Entity)ac);
           } 
           itemStack.splitStack(1);
           MCH_Lib.DbgLog(bs.getWorld(), "dispenseStack:x=%.1f,y=%.1f,z=%.1f;dir=%s:item=" + itemStack

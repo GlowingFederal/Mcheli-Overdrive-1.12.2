@@ -33,6 +33,6 @@ public class W_EntityRenderer {
   }
   
   public static void renderEntityWithPosYaw(RenderManager rm, Entity par1Entity, double par2, double par4, double par6, float par8, float par9, boolean b) {
-    rm.doRenderEntity(par1Entity, par2, par4, par6, par8, par9, b);
+    rm.renderEntity(par1Entity, par2, par4, par6, par8, par9, b);
   }
 }

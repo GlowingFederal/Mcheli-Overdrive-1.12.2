@@ -53,7 +53,7 @@ public abstract class W_EntityContainer extends W_Entity implements IInventory {
     return numUsingSlot;
   }
   
-  public boolean func_191420_l() {
+  public boolean isEmpty() {
     for (ItemStack itemstack : this.containerItems) {
       if (!itemstack.isEmpty())
         return false; 
@@ -88,7 +88,7 @@ public abstract class W_EntityContainer extends W_Entity implements IInventory {
   public void setInventorySlotContents(int par1, ItemStack par2ItemStack) {
     this.containerItems[par1] = par2ItemStack;
     if (!par2ItemStack.isEmpty() && par2ItemStack.getCount() > getInventoryStackLimit())
-      par2ItemStack.setCount(getInventoryStackLimit());
+      par2ItemStack.setCount(getInventoryStackLimit()); 
     markDirty();
   }
   
@@ -145,7 +145,7 @@ public abstract class W_EntityContainer extends W_Entity implements IInventory {
             itemstack.shrink(j);
             EntityItem entityitem = new EntityItem(this.world, this.posX + x, this.posY + y, this.posZ + z, new ItemStack(itemstack.getItem(), j, itemstack.getMetadata()));
             if (itemstack.hasTagCompound())
-              entityitem.getItem().setTagCompound(itemstack.getTagCompound().copy());
+              entityitem.getItem().setTagCompound(itemstack.getTagCompound().copy()); 
             float f3 = 0.05F;
             entityitem.motionX = ((float)this.rand.nextGaussian() * f3);
             entityitem.motionY = ((float)this.rand.nextGaussian() * f3 + 0.2F);

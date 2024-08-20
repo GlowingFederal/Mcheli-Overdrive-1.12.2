@@ -22,7 +22,7 @@ public abstract class W_GuiContainer extends GuiContainer {
       return; 
     FontRenderer font = item.getItem().getFontRenderer(item);
     if (font == null)
-      font = this.fontRendererObj; 
+      font = this.fontRenderer; 
     GlStateManager.enableDepth();
     GlStateManager.disableLighting();
     this.itemRender.renderItemAndEffectIntoGUI(item, x, y);
@@ -32,23 +32,23 @@ public abstract class W_GuiContainer extends GuiContainer {
   }
   
   public void drawIngredient(Ingredient ingredient, int x, int y) {
-    if (ingredient != Ingredient.field_193370_a) {
-      ItemStack[] itemstacks = ingredient.func_193365_a();
+    if (ingredient != Ingredient.EMPTY) {
+      ItemStack[] itemstacks = ingredient.getMatchingStacks();
       int index = MathHelper.floor(this.time / 20.0F) % itemstacks.length;
       drawItemStack(itemstacks[index], x, y);
     } 
   }
   
   public void drawString(String s, int x, int y, int color) {
-    drawString(this.fontRendererObj, s, x, y, color);
+    drawString(this.fontRenderer, s, x, y, color);
   }
   
   public void drawCenteredString(String s, int x, int y, int color) {
-    drawCenteredString(this.fontRendererObj, s, x, y, color);
+    drawCenteredString(this.fontRenderer, s, x, y, color);
   }
   
   public int getStringWidth(String s) {
-    return this.fontRendererObj.getStringWidth(s);
+    return this.fontRenderer.getStringWidth(s);
   }
   
   public void drawScreen(int mouseX, int mouseY, float partialTicks) {

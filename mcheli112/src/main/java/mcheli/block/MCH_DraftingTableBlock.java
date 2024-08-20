@@ -94,7 +94,7 @@ public class MCH_DraftingTableBlock extends W_BlockContainer implements ITileEnt
     return EnumPushReaction.DESTROY;
   }
   
-  public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+  public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
     return getDefaultState().withProperty((IProperty)DIRECTION8, 
         (Comparable)EnumDirection8.fromAngle(MCH_Lib.getRotate360(placer.rotationYaw)));
   }

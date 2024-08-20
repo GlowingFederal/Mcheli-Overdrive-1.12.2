@@ -99,7 +99,7 @@ public class MCH_EntityGunner extends EntityLivingBase {
     Team team = getTeam();
     if (team != null) {
       String name = MCH_MOD.isTodaySep01() ? "'s EMB4" : " Gunner";
-      return (ITextComponent)new TextComponentString(ScorePlayerTeam.formatPlayerName(team, team.getRegisteredName() + name));
+      return (ITextComponent)new TextComponentString(ScorePlayerTeam.formatPlayerName(team, team.getName() + name));
     } 
     return (ITextComponent)new TextComponentString("");
   }
@@ -122,14 +122,14 @@ public class MCH_EntityGunner extends EntityLivingBase {
       return true;
     } 
     if (this.isCreative) {
-      player.addChatMessage((ITextComponent)new TextComponentString("Creative mode only."));
+      player.sendMessage((ITextComponent)new TextComponentString("Creative mode only."));
       return false;
     } 
     if (getTeam() == null || isOnSameTeam((Entity)player)) {
       removeFromAircraft(player);
       return true;
     } 
-    player.addChatMessage((ITextComponent)new TextComponentString("You are other team."));
+    player.sendMessage((ITextComponent)new TextComponentString("You are other team."));
     return false;
   }
   
@@ -148,9 +148,9 @@ public class MCH_EntityGunner extends EntityLivingBase {
         name = " on " + (ac.getAcInfo()).displayName + " seat " + (ac.getSeatIdByEntity((Entity)this) + 1); 
       String playerName = ScorePlayerTeam.formatPlayerName(player.getTeam(), player.getDisplayName().getFormattedText());
       if (MCH_MOD.isTodaySep01()) {
-        player.addChatMessage((ITextComponent)new TextComponentTranslation("chat.type.text", new Object[] { "EMB4", new TextComponentString("Bye " + playerName + "! Good vehicle" + name) }));
+        player.sendMessage((ITextComponent)new TextComponentTranslation("chat.type.text", new Object[] { "EMB4", new TextComponentString("Bye " + playerName + "! Good vehicle" + name) }));
       } else {
-        player.addChatMessage((ITextComponent)new TextComponentString("Remove gunner" + name + " by " + playerName + "."));
+        player.sendMessage((ITextComponent)new TextComponentString("Remove gunner" + name + " by " + playerName + "."));
       } 
       dismountRidingEntity();
     } 
@@ -221,18 +221,18 @@ public class MCH_EntityGunner extends EntityLivingBase {
         int rh = MCH_Config.RangeOfGunner_VsMonster_Horizontal.prmInt;
         int rv = MCH_Config.RangeOfGunner_VsMonster_Vertical.prmInt;
         list = this.world.getEntitiesWithinAABB(EntityLivingBase.class, 
-            getEntityBoundingBox().expand(rh, rv, rh), IMob.MOB_SELECTOR);
+            getEntityBoundingBox().grow(rh, rv, rh), IMob.MOB_SELECTOR);
       } else {
         int rh = MCH_Config.RangeOfGunner_VsPlayer_Horizontal.prmInt;
         int rv = MCH_Config.RangeOfGunner_VsPlayer_Vertical.prmInt;
         list = this.world.getEntitiesWithinAABB(EntityPlayer.class, 
-            getEntityBoundingBox().expand(rh, rv, rh));
+            getEntityBoundingBox().grow(rh, rv, rh));
       } 
       for (int i = 0; i < list.size(); i++) {
         EntityLivingBase entity = list.get(i);
         if (canAttackEntity(entity, ac, ws))
           if (checkPitch(entity, ac, pos))
-            if ((nextTarget == null || getDistanceToEntity((Entity)entity) < getDistanceToEntity((Entity)nextTarget)) && 
+            if ((nextTarget == null || getDistance((Entity)entity) < getDistance((Entity)nextTarget)) && 
               canEntityBeSeen((Entity)entity))
               if (isInAttackable(entity, ac, ws, pos)) {
                 nextTarget = entity;
@@ -252,7 +252,7 @@ public class MCH_EntityGunner extends EntityLivingBase {
         rotSpeed = (ac.getAcInfo()).cameraRotationSpeed / 10.0F; 
       this.rotationPitch = MathHelper.wrapDegrees(this.rotationPitch);
       this.rotationYaw = MathHelper.wrapDegrees(this.rotationYaw);
-      double dist = getDistanceToEntity(this.targetEntity);
+      double dist = getDistance(this.targetEntity);
       double tick = 1.0D;
       if (dist >= 10.0D && (ws.getInfo()).acceleration > 1.0F)
         tick = dist / (ws.getInfo()).acceleration; 
@@ -399,7 +399,7 @@ public class MCH_EntityGunner extends EntityLivingBase {
   }
   
   public boolean attackEntityFrom(DamageSource ds, float amount) {
-    if (ds == DamageSource.outOfWorld)
+    if (ds == DamageSource.OUT_OF_WORLD)
       setDead(); 
     return super.attackEntityFrom(ds, amount);
   }

@@ -107,7 +107,7 @@ public abstract class MCH_Gui extends GuiScreen {
   }
   
   public void drawString(String s, int x, int y, int color) {
-    drawString(this.mc.fontRendererObj, s, x, y, color);
+    drawString(this.mc.fontRenderer, s, x, y, color);
   }
   
   public void drawDigit(String s, int x, int y, int interval, int color) {
@@ -129,7 +129,7 @@ public abstract class MCH_Gui extends GuiScreen {
   }
   
   public void drawCenteredString(String s, int x, int y, int color) {
-    drawCenteredString(this.mc.fontRendererObj, s, x, y, color);
+    drawCenteredString(this.mc.fontRenderer, s, x, y, color);
   }
   
   public void drawLine(double[] line, int color, int mode) {

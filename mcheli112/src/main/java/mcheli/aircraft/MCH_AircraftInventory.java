@@ -65,13 +65,8 @@ public class MCH_AircraftInventory implements IInventory {
   public int getSizeInventory() {
     return 10;
   }
-
-  @Override
+  
   public boolean isEmpty() {
-    return false;
-  }
-
-  public boolean func_191420_l() {
     for (ItemStack itemstack : this.containerItems) {
       if (!itemstack.isEmpty())
         return false; 
@@ -99,7 +94,7 @@ public class MCH_AircraftInventory implements IInventory {
             itemstack.shrink(j);
             EntityItem entityitem = new EntityItem(this.aircraft.world, this.aircraft.posX + x, this.aircraft.posY + y, this.aircraft.posZ + z, new ItemStack(itemstack.getItem(), j, itemstack.getMetadata()));
             if (itemstack.hasTagCompound())
-              entityitem.getItem().setTagCompound(itemstack.getTagCompound().copy());
+              entityitem.getItem().setTagCompound(itemstack.getTagCompound().copy()); 
             float f3 = 0.05F;
             entityitem.motionX = ((float)rand.nextGaussian() * f3);
             entityitem.motionY = ((float)rand.nextGaussian() * f3 + 0.2F);
@@ -137,7 +132,7 @@ public class MCH_AircraftInventory implements IInventory {
   public void setInventorySlotContents(int par1, ItemStack par2ItemStack) {
     this.containerItems[par1] = par2ItemStack;
     if (!par2ItemStack.isEmpty() && par2ItemStack.getCount() > getInventoryStackLimit())
-      par2ItemStack.setCount(getInventoryStackLimit());
+      par2ItemStack.setCount(getInventoryStackLimit()); 
   }
   
   public String getInventoryName() {

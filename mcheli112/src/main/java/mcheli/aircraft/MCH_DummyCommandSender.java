@@ -23,9 +23,9 @@ public class MCH_DummyCommandSender implements ICommandSender {
     return null;
   }
   
-  public void addChatMessage(ITextComponent component) {}
+  public void sendMessage(ITextComponent component) {}
   
-  public boolean canCommandSenderUseCommand(int permLevel, String commandName) {
+  public boolean canUseCommand(int permLevel, String commandName) {
     return true;
   }
   

@@ -63,7 +63,7 @@ public abstract class MCH_GuiScoreboard_Base extends W_GuiContainer {
   public void initGui(List<GuiButton> buttonList, GuiScreen parents) {
     this.listGui = new ArrayList<>();
     this.mc = Minecraft.getMinecraft();
-    this.fontRendererObj = this.mc.fontRendererObj;
+    this.fontRenderer = this.mc.fontRenderer;
     this.width = parents.width;
     this.height = parents.height;
     initGui();
@@ -161,7 +161,7 @@ public abstract class MCH_GuiScoreboard_Base extends W_GuiContainer {
               return -1; 
             if (o2 == null)
               return 1; 
-            return o1.getRegisteredName().compareTo(o2.getRegisteredName());
+            return o1.getName().compareTo(o2.getName());
           }
         });
     for (int i = 0; i < teamList.size(); i++) {
@@ -187,7 +187,7 @@ public abstract class MCH_GuiScoreboard_Base extends W_GuiContainer {
     int listLeft = getScoreBoardLeft(mc, teamNum, teamIndex);
     int listTop = ScaledHeight / 2 - (MaxPlayers * 9 + 10) / 2;
     drawRect(listLeft - 1, listTop - 1 - 18, listLeft + width, listTop + 9 * MaxPlayers, -2147483648);
-    String teamName = ScorePlayerTeam.formatPlayerName((Team)team, (team == null) ? "No team" : team.getRegisteredName());
+    String teamName = ScorePlayerTeam.formatPlayerName((Team)team, (team == null) ? "No team" : team.getName());
     int teamNameX = listLeft + width / 2 - fontRendererObj.getStringWidth(teamName) / 2;
     fontRendererObj.drawStringWithShadow(teamName, teamNameX, (listTop - 18), -1);
     String ff_onoff = "FriendlyFire : " + ((team == null) ? "ON" : (team.getAllowFriendlyFire() ? "ON" : "OFF"));

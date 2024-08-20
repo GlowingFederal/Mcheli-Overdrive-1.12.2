@@ -63,7 +63,7 @@ public class MCH_EntityThrowable extends EntityThrowable implements IThrowableEn
     this.posY -= 0.10000000149011612D;
     this.posZ -= (MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
     setPosition(this.posX, this.posY, this.posZ);
-    setHeadingFromThrower((Entity)null, pitch, yaw, 0.0F, 1.5F, 1.0F);
+    shoot((Entity)null, pitch, yaw, 0.0F, 1.5F, 1.0F);
   }
   
   public void init() {
@@ -74,14 +74,14 @@ public class MCH_EntityThrowable extends EntityThrowable implements IThrowableEn
     this.dataManager.register(INFO_NAME, "");
   }
   
-  public void setHeadingFromThrower(Entity entityThrower, float rotationPitchIn, float rotationYawIn, float pitchOffset, float velocity, float inaccuracy) {
+  public void shoot(Entity entityThrower, float rotationPitchIn, float rotationYawIn, float pitchOffset, float velocity, float inaccuracy) {
     float f = 0.4F;
     this
       .motionX = (-MathHelper.sin(rotationYawIn / 180.0F * 3.1415927F) * MathHelper.cos(rotationPitchIn / 180.0F * 3.1415927F) * f);
     this
       .motionZ = (MathHelper.cos(rotationYawIn / 180.0F * 3.1415927F) * MathHelper.cos(rotationPitchIn / 180.0F * 3.1415927F) * f);
     this.motionY = (-MathHelper.sin((rotationPitchIn + pitchOffset) / 180.0F * 3.1415927F) * f);
-    setThrowableHeading(this.motionX, this.motionY, this.motionZ, velocity, 1.0F);
+    shoot(this.motionX, this.motionY, this.motionZ, velocity, 1.0F);
   }
   
   public void setDead() {

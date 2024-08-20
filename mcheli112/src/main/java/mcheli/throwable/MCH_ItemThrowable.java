@@ -57,9 +57,9 @@ public class MCH_ItemThrowable extends W_Item {
           } 
           MCH_Lib.DbgLog(world, "MCH_ItemThrowable.onPlayerStoppedUsing(%d)", new Object[] { Integer.valueOf(par4) });
           MCH_EntityThrowable entity = new MCH_EntityThrowable(world, (EntityLivingBase)player, acceleration);
-          entity.setHeadingFromThrower((Entity)player, player.rotationPitch, player.rotationYaw, 0.0F, acceleration, 1.0F);
+          entity.shoot((Entity)player, player.rotationPitch, player.rotationYaw, 0.0F, acceleration, 1.0F);
           entity.setInfo(info);
-          world.spawnEntityInWorld((Entity)entity);
+          world.spawnEntity((Entity)entity);
         } 
       } 
     } 

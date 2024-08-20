@@ -30,7 +30,7 @@ public class MCH_ViewEntityDummy extends EntityPlayerSP {
         if ((Minecraft.getMinecraft()).player != null)
           instance.movementInput = (Minecraft.getMinecraft()).player.movementInput; 
         instance.setPosition(0.0D, -4.0D, 0.0D);
-        w.spawnEntityInWorld((Entity)instance);
+        w.spawnEntity((Entity)instance);
       }  
     return instance;
   }

@@ -253,7 +253,7 @@ public class MCH_EntityParachute extends W_Entity implements IEntitySinglePassen
         return;
       } 
     } 
-    moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+    move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
     if (getType() == 2 && this.ticksExisted < 20) {
       this.motionY *= 0.95D;
     } else {
@@ -284,7 +284,7 @@ public class MCH_EntityParachute extends W_Entity implements IEntitySinglePassen
       setRotation(this.rotationYaw, this.rotationPitch);
     } 
     List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, 
-        getEntityBoundingBox().expand(0.2D, 0.0D, 0.2D));
+        getEntityBoundingBox().grow(0.2D, 0.0D, 0.2D));
     if (list != null && !list.isEmpty())
       for (int l = 0; l < list.size(); l++) {
         Entity entity = list.get(l);
@@ -342,7 +342,7 @@ public class MCH_EntityParachute extends W_Entity implements IEntitySinglePassen
     if (countWater > 37) {
       EntityBoat entityboat = new EntityBoat(this.world, px, (py + 1.0F), pz);
       entityboat.rotationYaw = this.rotationYaw - 90.0F;
-      this.world.spawnEntityInWorld((Entity)entityboat);
+      this.world.spawnEntity((Entity)entityboat);
       getRiddenByEntity().startRiding((Entity)entityboat);
     } 
   }

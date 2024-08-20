@@ -49,7 +49,7 @@ public class MCH_ItemChain extends W_Item {
       } else {
         if (W_Entity.isEqual(entityTowed, entity))
           return; 
-        double diff = entity.getDistanceToEntity(entityTowed);
+        double diff = entity.getDistance(entityTowed);
         if (diff < 2.0D || diff > 16.0D)
           return; 
         MCH_EntityChain chain = new MCH_EntityChain(world, (entityTowed.posX + entity.posX) / 2.0D, (entityTowed.posY + entity.posY) / 2.0D, (entityTowed.posZ + entity.posZ) / 2.0D);
@@ -58,7 +58,7 @@ public class MCH_ItemChain extends W_Item {
         chain.prevPosX = chain.posX;
         chain.prevPosY = chain.posY;
         chain.prevPosZ = chain.posZ;
-        world.spawnEntityInWorld((Entity)chain);
+        world.spawnEntity((Entity)chain);
         playConnectTowingEntity(entity);
         setTowedEntity(item, (Entity)null);
       } 
@@ -78,7 +78,7 @@ public class MCH_ItemChain extends W_Item {
   @Nullable
   public static MCH_EntityChain getTowedEntityChain(Entity entity) {
     List<MCH_EntityChain> list = entity.world.getEntitiesWithinAABB(MCH_EntityChain.class, entity
-        .getEntityBoundingBox().expand(25.0D, 25.0D, 25.0D));
+        .getEntityBoundingBox().grow(25.0D, 25.0D, 25.0D));
     if (list == null)
       return null; 
     for (int i = 0; i < list.size(); i++) {

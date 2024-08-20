@@ -83,7 +83,7 @@ public class MCH_DraftingTableGuiContainer extends Container {
       } 
       if (itemstack1.getCount() == itemstack.getCount())
         return ItemStack.EMPTY; 
-      slot.func_190901_a(player, itemstack1);
+      slot.onTake(player, itemstack1);
     } 
     return itemstack;
   }

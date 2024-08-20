@@ -56,7 +56,7 @@ public class MCH_WeaponASMissile extends MCH_WeaponBase {
         e.targetPosX = m.hitVec.x;
         e.targetPosY = m.hitVec.y;
         e.targetPosZ = m.hitVec.z;
-        this.worldObj.spawnEntityInWorld((Entity)e);
+        this.worldObj.spawnEntity((Entity)e);
         playSound(prm.entity);
       } 
       return true;

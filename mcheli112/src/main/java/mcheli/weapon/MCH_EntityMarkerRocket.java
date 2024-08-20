@@ -84,7 +84,7 @@ public class MCH_EntityMarkerRocket extends MCH_EntityBaseBullet {
           e.piercing = 0;
           e.shootingAircraft = this.shootingAircraft;
           e.shootingEntity = this.shootingEntity;
-          this.world.spawnEntityInWorld((Entity)e);
+          this.world.spawnEntity((Entity)e);
         } 
       } 
     } else {

@@ -20,7 +20,7 @@ public class MCH_RecipeFuel extends IForgeRegistryEntry.Impl<IRecipe> implements
           jcnt++;
           if (jcnt > 1)
             return false; 
-        } else if (is.getItem() instanceof net.minecraft.item.ItemCoal && is.getMaxStackSize() > 0) {
+        } else if (is.getItem() instanceof net.minecraft.item.ItemCoal && is.getCount() > 0) {
           ccnt++;
         } else {
           return false;
@@ -54,17 +54,12 @@ public class MCH_RecipeFuel extends IForgeRegistryEntry.Impl<IRecipe> implements
     } 
     return output;
   }
-
-  @Override
+  
   public boolean canFit(int width, int height) {
-    return false;
-  }
-
-  public boolean func_194133_a(int width, int height) {
     return (width >= 3 && height >= 3);
   }
-
+  
   public ItemStack getRecipeOutput() {
-    return null;
+    return ItemStack.EMPTY;
   }
 }

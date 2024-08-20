@@ -200,7 +200,7 @@ public class MCH_EntityA10 extends W_Entity {
     e.setPower(this.power);
     e.shootingEntity = this.shootingEntity;
     e.shootingAircraft = this.shootingAircraft;
-    this.world.spawnEntityInWorld((Entity)e);
+    this.world.spawnEntity((Entity)e);
   }
   
   protected void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {

@@ -29,7 +29,7 @@ public class MCH_ItemThrowableDispenseBehavior extends BehaviorDefaultDispenseIt
           entity.motionY = (enumfacing.getFrontOffsetY() * info.dispenseAcceleration);
           entity.motionZ = (enumfacing.getFrontOffsetZ() * info.dispenseAcceleration);
           entity.setInfo(info);
-          bs.getWorld().spawnEntityInWorld((Entity)entity);
+          bs.getWorld().spawnEntity((Entity)entity);
           itemStack.splitStack(1);
         } 
       } 

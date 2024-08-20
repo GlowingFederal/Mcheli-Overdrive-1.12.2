@@ -378,7 +378,7 @@ public class MCH_EntityVehicle extends MCH_EntityAircraft {
       this.motionX *= 0.5D;
       this.motionZ *= 0.5D;
     } 
-    moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+    move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
     this.motionY *= 0.95D;
     this.motionX *= 0.99D;
     this.motionZ *= 0.99D;

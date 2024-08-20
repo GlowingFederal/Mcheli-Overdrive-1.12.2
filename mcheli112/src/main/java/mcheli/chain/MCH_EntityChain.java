@@ -144,7 +144,7 @@ public class MCH_EntityChain extends W_Entity {
       !this.towEntityUUID.isEmpty() && getEntityBoundingBox() != null) {
       List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, 
           
-          getEntityBoundingBox().expand(32.0D, 32.0D, 32.0D));
+          getEntityBoundingBox().grow(32.0D, 32.0D, 32.0D));
       if (list != null)
         for (int i = 0; i < list.size(); i++) {
           Entity entity = list.get(i);

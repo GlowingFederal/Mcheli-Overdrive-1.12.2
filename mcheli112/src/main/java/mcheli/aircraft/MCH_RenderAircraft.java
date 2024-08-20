@@ -921,7 +921,7 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
     if (gs == null || !gs.canLockEntity(entity))
       return; 
     RenderManager rm = Minecraft.getMinecraft().getRenderManager();
-    double dist = entity.getDistanceSqToEntity(rm.renderViewEntity);
+    double dist = entity.getDistanceSq(rm.renderViewEntity);
     double x = entity.posX - TileEntityRendererDispatcher.staticPlayerX;
     double y = entity.posY - TileEntityRendererDispatcher.staticPlayerY;
     double z = entity.posZ - TileEntityRendererDispatcher.staticPlayerZ;

@@ -24,7 +24,7 @@ public class GuiMODConfigTop extends GuiScreen {
   
   public void initGui() {
     String doneText = I18n.format("gui.done", new Object[0]);
-    int doneWidth = Math.max(this.mc.fontRendererObj.getStringWidth(doneText) + 20, 100);
+    int doneWidth = Math.max(this.mc.fontRenderer.getStringWidth(doneText) + 20, 100);
     addButton((GuiButton)new GuiButtonExt(1, this.width - 20 - doneWidth, this.height - 29, doneWidth, 20, doneText));
     GuiButtonExt configBtn = new GuiButtonExt(16, this.width / 2 - 100, 32, 200, 20, "Game config (in progress...)");
     configBtn.enabled = false;
@@ -36,10 +36,10 @@ public class GuiMODConfigTop extends GuiScreen {
   
   public void drawScreen(int mouseX, int mouseY, float partialTicks) {
     drawDefaultBackground();
-    drawCenteredString(this.fontRendererObj, "MC Helicopter MOD Config", this.width / 2, 8, 16777215);
+    drawCenteredString(this.fontRenderer, "MC Helicopter MOD Config", this.width / 2, 8, 16777215);
     if (this.genAnimationTicks > 0) {
       float f = (this.genAnimationTicks > 10) ? 1.0F : (this.genAnimationTicks / 10.0F);
-      drawString(this.fontRendererObj, "Generate Done!", this.width / 2 - 100, 92, 0xFF2222 | (int)(255.0F * f) << 24);
+      drawString(this.fontRenderer, "Generate Done!", this.width / 2 - 100, 92, 0xFF2222 | (int)(255.0F * f) << 24);
     } 
     super.drawScreen(mouseX, mouseY, partialTicks);
     if (this.assistHoverChecker.checkHover(mouseX, mouseY))
@@ -70,6 +70,6 @@ public class GuiMODConfigTop extends GuiScreen {
   }
   
   private void drawToolTip(List<String> stringList, int x, int y) {
-    GuiUtils.drawHoveringText(stringList, x, y, this.width, this.height, 300, this.fontRendererObj);
+    GuiUtils.drawHoveringText(stringList, x, y, this.width, this.height, 300, this.fontRenderer);
   }
 }

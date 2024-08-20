@@ -47,13 +47,13 @@ public class MCH_ItemGLTD extends W_Item {
     boolean flag = false;
     float f9 = 1.0F;
     List<Entity> list = par2World.getEntitiesWithinAABBExcludingEntity((Entity)par3EntityPlayer, par3EntityPlayer
-        .getEntityBoundingBox().addCoord(vec32.x * d3, vec32.y * d3, vec32.z * d3).expand(f9, f9, f9));
+        .getEntityBoundingBox().expand(vec32.x * d3, vec32.y * d3, vec32.z * d3).grow(f9, f9, f9));
     for (int i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
       if (entity.canBeCollidedWith()) {
         float f10 = entity.getCollisionBorderSize();
-        AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expand(f10, f10, f10);
-        if (axisalignedbb.isVecInside(vec3))
+        AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().grow(f10, f10, f10);
+        if (axisalignedbb.contains(vec3))
           flag = true; 
       } 
     } 
@@ -66,10 +66,10 @@ public class MCH_ItemGLTD extends W_Item {
       int k = blockpos.getZ();
       MCH_EntityGLTD entityboat = new MCH_EntityGLTD(par2World, (m + 0.5F), (j + 1.0F), (k + 0.5F));
       entityboat.rotationYaw = par3EntityPlayer.rotationYaw;
-      if (!par2World.getCollisionBoxes((Entity)entityboat, entityboat.getEntityBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty())
+      if (!par2World.getCollisionBoxes((Entity)entityboat, entityboat.getEntityBoundingBox().grow(-0.1D, -0.1D, -0.1D)).isEmpty())
         return ActionResult.newResult(EnumActionResult.FAIL, itemstack); 
       if (!par2World.isRemote)
-        par2World.spawnEntityInWorld((Entity)entityboat); 
+        par2World.spawnEntity((Entity)entityboat); 
       if (!par3EntityPlayer.capabilities.isCreativeMode)
         itemstack.shrink(1); 
     } 

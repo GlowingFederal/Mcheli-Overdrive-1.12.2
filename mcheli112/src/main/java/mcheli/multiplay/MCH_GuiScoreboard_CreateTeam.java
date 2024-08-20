@@ -41,7 +41,7 @@ public class MCH_GuiScoreboard_CreateTeam extends MCH_GuiScoreboard_Base {
     this.buttonCreateTeamFF = new GuiButton(560, x - 80, y + 20, 160, 20, "");
     this.buttonCreateTeamOK = new GuiButton(528, x - 80, y + 60, 80, 20, "OK");
     GuiButton buttonCTCancel = new GuiButton(544, x + 0, y + 60, 80, 20, "Cancel");
-    this.editCreateTeamName = new GuiTextField(599, this.fontRendererObj, x - 80, y - 55, 160, 20);
+    this.editCreateTeamName = new GuiTextField(599, this.fontRenderer, x - 80, y - 55, 160, 20);
     this.editCreateTeamName.setText("");
     this.editCreateTeamName.setTextColor(-1);
     this.editCreateTeamName.setMaxStringLength(16);
@@ -113,7 +113,7 @@ public class MCH_GuiScoreboard_CreateTeam extends MCH_GuiScoreboard_Base {
   }
   
   protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3) {
-    drawList(this.mc, this.fontRendererObj, true);
+    drawList(this.mc, this.fontRenderer, true);
     W_ScaledResolution w_ScaledResolution = new W_ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
     int factor = (w_ScaledResolution.getScaleFactor() > 0) ? w_ScaledResolution.getScaleFactor() : 1;
     W_McClient.MOD_bindTexture("textures/gui/mp_new_team.png");

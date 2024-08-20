@@ -17,15 +17,15 @@ class _Face implements DebugInfoObject {
   
   private _Vertex faceNormal;
   
-  _Face(int[] ids, _Vertex[] verts, _TextureCoord[] texs) {
-    this(ids, verts, verts, texs);
+  _Face(int[] ids, _Vertex[] verts, _TextureCoord[] texCoords) {
+    this(ids, verts, verts, texCoords);
   }
   
-  _Face(int[] ids, _Vertex[] verts, _Vertex[] normals, _TextureCoord[] texs) {
+  _Face(int[] ids, _Vertex[] verts, _Vertex[] normals, _TextureCoord[] texCoords) {
     this.verticesID = ids;
     this.vertices = verts;
     this.vertexNormals = normals;
-    this.textureCoordinates = texs;
+    this.textureCoordinates = texCoords;
     this.faceNormal = calculateFaceNormal(verts);
   }
   

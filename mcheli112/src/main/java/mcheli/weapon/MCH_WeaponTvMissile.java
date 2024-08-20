@@ -85,7 +85,7 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
     e.setParameterFromWeapon(this, prm.entity, prm.user);
     this.lastShotEntity = prm.entity;
     this.lastShotTvMissile = e;
-    this.worldObj.spawnEntityInWorld((Entity)e);
+    this.worldObj.spawnEntity((Entity)e);
     playSound(prm.entity);
     return true;
   }

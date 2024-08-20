@@ -44,7 +44,7 @@ public class MCH_ItemWrench extends W_Item {
     this.toolMaterial = material;
     this.maxStackSize = 1;
     setMaxDamage(material.getMaxUses());
-    this.damageVsEntity = 4.0F + material.getDamageVsEntity();
+    this.damageVsEntity = 4.0F + material.getAttackDamage();
   }
   
   public boolean canHarvestBlock(IBlockState blockIn) {
@@ -56,7 +56,7 @@ public class MCH_ItemWrench extends W_Item {
     return false;
   }
   
-  public float getStrVsBlock(ItemStack stack, IBlockState state) {
+  public float getDestroySpeed(ItemStack stack, IBlockState state) {
     Material material = state.getMaterial();
     if (material == Material.IRON)
       return 20.5F; 
@@ -182,15 +182,15 @@ public class MCH_ItemWrench extends W_Item {
     Vec3d vec33 = null;
     float f1 = 1.0F;
     List<Entity> list = user.world.getEntitiesWithinAABBExcludingEntity((Entity)user, user
-        .getEntityBoundingBox().addCoord(vec31.x * d0, vec31.y * d0, vec31.z * d0).expand(f1, f1, f1));
+        .getEntityBoundingBox().expand(vec31.x * d0, vec31.y * d0, vec31.z * d0).grow(f1, f1, f1));
     double d2 = d1;
     for (int i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
       if (entity.canBeCollidedWith()) {
         float f2 = entity.getCollisionBorderSize();
-        AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expand(f2, f2, f2);
+        AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().grow(f2, f2, f2);
         RayTraceResult movingobjectposition = axisalignedbb.calculateIntercept(vec3, vec32);
-        if (axisalignedbb.isVecInside(vec3)) {
+        if (axisalignedbb.contains(vec3)) {
           if (0.0D < d2 || d2 == 0.0D) {
             pointedEntity = entity;
             vec33 = (movingobjectposition == null) ? vec3 : movingobjectposition.hitVec;
@@ -259,7 +259,7 @@ public class MCH_ItemWrench extends W_Item {
   public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
     Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(equipmentSlot);
     if (equipmentSlot == EntityEquipmentSlot.MAINHAND)
-      multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", this.damageVsEntity, 0)); 
+      multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", this.damageVsEntity, 0)); 
     return multimap;
   }
 }

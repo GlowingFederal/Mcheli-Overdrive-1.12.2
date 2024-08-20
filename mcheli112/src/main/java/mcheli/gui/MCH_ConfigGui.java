@@ -524,12 +524,12 @@ public class MCH_ConfigGui extends W_GuiContainer {
       drawSampleHitMark(40, 105, color);
       double size = this.sliderEntityMarkerSize.getSliderValue();
       double x = 170.0D + (30.0D - size) / 2.0D;
-      double y = (this.sliderEntityMarkerSize.yPosition - this.sliderEntityMarkerSize.getHeight());
+      double y = (this.sliderEntityMarkerSize.y - this.sliderEntityMarkerSize.getHeight());
       double[] ls = { x + size, y, x, y, x + size / 2.0D, y + size };
       drawLine(ls, -65536, 4);
       size = this.sliderBlockMarkerSize.getSliderValue();
       x = 185.0D;
-      y = this.sliderBlockMarkerSize.yPosition;
+      y = this.sliderBlockMarkerSize.y;
       color = -65536;
       GL11.glPushMatrix();
       GL11.glEnable(3042);

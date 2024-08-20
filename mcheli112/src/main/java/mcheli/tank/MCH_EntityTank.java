@@ -22,9 +22,6 @@ import mcheli.wrapper.W_Entity;
 import mcheli.wrapper.W_Lib;
 import mcheli.wrapper.W_WorldFunc;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFence;
-import net.minecraft.block.BlockFenceGate;
-import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.crash.CrashReport;
@@ -242,7 +239,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     return new ClacAxisBB(z, bb.offset(0.0D, 0.0D, z));
   }
   
-  public void moveEntity(MoverType type, double x, double y, double z) {
+  public void move(MoverType type, double x, double y, double z) {
     this.world.profiler.startSection("move");
     double d2 = x;
     double d3 = y;
@@ -343,7 +340,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       BlockPos blockpos1 = blockpos.down();
       IBlockState iblockstate1 = this.world.getBlockState(blockpos1);
       Block block1 = iblockstate1.getBlock();
-      if (block1 instanceof BlockFence || block1 instanceof BlockWall || block1 instanceof BlockFenceGate) {
+      if (block1 instanceof net.minecraft.block.BlockFence || block1 instanceof net.minecraft.block.BlockWall || block1 instanceof net.minecraft.block.BlockFenceGate) {
         iblockstate = iblockstate1;
         blockpos = blockpos1;
       } 
@@ -729,7 +726,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
         applyOnGroundPitch(0.8F); 
     } 
     updateWheels();
-    moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+    move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
     this.motionY *= 0.95D;
     this.motionX *= (getAcInfo()).motionFactor;
     this.motionZ *= (getAcInfo()).motionFactor;
@@ -749,7 +746,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     Entity rider = getRiddenByEntity();
     float damage = (float)(speed * 15.0D);
     MCH_EntityAircraft rideAc = (getRidingEntity() instanceof MCH_EntitySeat) ? ((MCH_EntitySeat)getRidingEntity()).getParent() : ((getRidingEntity() instanceof MCH_EntityAircraft) ? (MCH_EntityAircraft)getRidingEntity() : null);
-    List<Entity> list = this.world.getEntitiesInAABBexcluding((Entity)this, bb.expand(0.3D, 0.3D, 0.3D), e -> {
+    List<Entity> list = this.world.getEntitiesInAABBexcluding((Entity)this, bb.grow(0.3D, 0.3D, 0.3D), e -> {
           if (e == rideAc || e instanceof net.minecraft.entity.item.EntityItem || e instanceof net.minecraft.entity.item.EntityXPOrb || e instanceof mcheli.weapon.MCH_EntityBaseBullet || e instanceof mcheli.chain.MCH_EntityChain || e instanceof MCH_EntitySeat)
             return false; 
           if (e instanceof MCH_EntityTank) {
@@ -972,13 +969,13 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       } 
       player.rotationYaw = getRotYaw() + fixYaw;
     } else {
-      player.rotationYaw += deltaX;
+      player.turn(deltaX, 0.0F);
     } 
     if (isOverridePlayerPitch() || fixRot) {
       player.prevRotationPitch = getRotPitch() + fixPitch;
       player.rotationPitch = getRotPitch() + fixPitch;
     } else {
-      player.rotationYaw += deltaY;
+      player.turn(0.0F, deltaY);
     } 
     float playerYaw = MathHelper.wrapDegrees(getRotYaw() - player.rotationYaw);
     float playerPitch = getRotPitch() * MathHelper.cos((float)(playerYaw * Math.PI / 180.0D)) + -getRotRoll() * MathHelper.sin((float)(playerYaw * Math.PI / 180.0D));
@@ -1054,12 +1051,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   public float getUnfoldLandingGearThrottle() {
     return 0.7F;
   }
-
-  @Override
-  public boolean isEmpty() {
-    return false;
-  }
-
+  
   private static class ClacAxisBB {
     public final double value;
     

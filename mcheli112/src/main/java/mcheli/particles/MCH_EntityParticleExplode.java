@@ -83,7 +83,7 @@ public class MCH_EntityParticleExplode extends MCH_EntityParticleBase {
     } 
   }
   
-  public int getBrightnessForRender(float partialTicks) {
+  public int getBrightnessForRender(float p_70070_1_) {
     return 15728880;
   }
   

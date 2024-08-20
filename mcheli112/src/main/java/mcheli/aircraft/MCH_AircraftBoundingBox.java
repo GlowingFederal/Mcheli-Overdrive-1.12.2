@@ -33,7 +33,7 @@ public class MCH_AircraftBoundingBox extends AxisAlignedBB {
     return dx * dx + dy * dy + dz * dz;
   }
   
-  public boolean intersectsWith(AxisAlignedBB aabb) {
+  public boolean intersects(AxisAlignedBB aabb) {
     boolean ret = false;
     double dist = 1.0E7D;
     this.ac.lastBBDamageFactor = 1.0F;
@@ -54,7 +54,7 @@ public class MCH_AircraftBoundingBox extends AxisAlignedBB {
     return ret;
   }
   
-  public AxisAlignedBB expand(double x, double y, double z) {
+  public AxisAlignedBB grow(double x, double y, double z) {
     double d3 = this.minX - x;
     double d4 = this.minY - y;
     double d5 = this.minZ - z;
@@ -74,7 +74,7 @@ public class MCH_AircraftBoundingBox extends AxisAlignedBB {
     return NewAABB(d0, d1, d2, d3, d4, d5);
   }
   
-  public AxisAlignedBB addCoord(double x, double y, double z) {
+  public AxisAlignedBB expand(double x, double y, double z) {
     double d3 = this.minX;
     double d4 = this.minY;
     double d5 = this.minZ;
@@ -96,7 +96,7 @@ public class MCH_AircraftBoundingBox extends AxisAlignedBB {
     return NewAABB(d3, d4, d5, d6, d7, d8);
   }
   
-  public AxisAlignedBB func_191195_a(double x, double y, double z) {
+  public AxisAlignedBB contract(double x, double y, double z) {
     double d3 = this.minX + x;
     double d4 = this.minY + y;
     double d5 = this.minZ + z;

@@ -71,7 +71,7 @@ public class MCH_AircraftGui extends W_GuiContainer {
     this.buttonList.add(this.buttonPrev);
     if (this.aircraft != null && this.aircraft.getSizeInventory() > 0)
       this.buttonList.add(this.buttonInventory); 
-    this.editCommand = new GuiTextField(0, this.fontRendererObj, this.guiLeft + 25, this.guiTop + 215, 160, 15);
+    this.editCommand = new GuiTextField(0, this.fontRenderer, this.guiLeft + 25, this.guiTop + 215, 160, 15);
     this.editCommand.setText(this.aircraft.getCommand());
     this.editCommand.setMaxStringLength(512);
     this.currentWeaponId = 0;

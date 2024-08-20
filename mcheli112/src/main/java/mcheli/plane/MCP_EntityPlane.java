@@ -675,7 +675,7 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
       if (MathHelper.abs(getRotPitch()) < 40.0F)
         applyOnGroundPitch(0.8F); 
     } 
-    moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+    move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
     this.motionY *= 0.95D;
     this.motionX *= (getAcInfo()).motionFactor;
     this.motionZ *= (getAcInfo()).motionFactor;

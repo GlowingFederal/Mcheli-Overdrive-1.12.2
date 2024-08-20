@@ -24,7 +24,7 @@ public class MCH_WeaponMarkerRocket extends MCH_WeaponBase {
       e.setName(this.name);
       e.setParameterFromWeapon(this, prm.entity, prm.user);
       e.setMarkerStatus(1);
-      this.worldObj.spawnEntityInWorld((Entity)e);
+      this.worldObj.spawnEntity((Entity)e);
     } else {
       this.optionParameter1 = getCurrentMode();
     } 

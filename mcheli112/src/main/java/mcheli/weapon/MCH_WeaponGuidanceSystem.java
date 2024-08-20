@@ -138,7 +138,7 @@ public class MCH_WeaponGuidanceSystem {
     boolean result = false;
     if (this.lockCount == 0) {
       List<Entity> list = this.worldObj.getEntitiesWithinAABBExcludingEntity(user, user
-          .getEntityBoundingBox().expand(this.lockRange, this.lockRange, this.lockRange));
+          .getEntityBoundingBox().grow(this.lockRange, this.lockRange, this.lockRange));
       Entity tgtEnt = null;
       double dist = this.lockRange * this.lockRange * 2.0D;
       for (int i = 0; i < list.size(); i++) {

@@ -122,7 +122,7 @@ public class MCH_EntityDispensedItem extends MCH_EntityBaseBullet {
       e.motionY = this.motionY * 1.0D / 2.0D + ((this.rand.nextFloat() - 0.5F) * RANDOM / 2.0F);
       e.motionZ = this.motionZ * 1.0D + ((this.rand.nextFloat() - 0.5F) * RANDOM);
       e.setBomblet();
-      this.world.spawnEntityInWorld((Entity)e);
+      this.world.spawnEntity((Entity)e);
     } 
   }
   

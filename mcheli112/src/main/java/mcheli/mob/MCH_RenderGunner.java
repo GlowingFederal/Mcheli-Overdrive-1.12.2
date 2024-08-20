@@ -85,7 +85,7 @@ public class MCH_RenderGunner extends RenderLivingBase<MCH_EntityGunner> {
   protected void _renderEquippedItems(MCH_EntityGunner p_77029_1_, float p_77029_2_) {}
   
   protected void _rotateCorpse(MCH_EntityGunner entityLiving, float p_77043_2_, float rotationYaw, float partialTicks) {
-    rotateCorpse(entityLiving, p_77043_2_, rotationYaw, partialTicks);
+    applyRotations(entityLiving, p_77043_2_, rotationYaw, partialTicks);
   }
   
   protected void _renderLivingAt(MCH_EntityGunner entityLivingBaseIn, double x, double y, double z) {

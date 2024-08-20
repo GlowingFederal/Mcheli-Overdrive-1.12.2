@@ -70,7 +70,7 @@ public class MCH_MissileDetector {
   public boolean destroyMissile() {
     List<MCH_EntityBaseBullet> list = this.world.getEntitiesWithinAABB(MCH_EntityBaseBullet.class, this.ac
         
-        .getEntityBoundingBox().expand(60.0D, 60.0D, 60.0D));
+        .getEntityBoundingBox().grow(60.0D, 60.0D, 60.0D));
     if (list != null)
       for (int i = 0; i < list.size(); i++) {
         MCH_EntityBaseBullet msl = list.get(i);
@@ -86,7 +86,7 @@ public class MCH_MissileDetector {
   public boolean isLockedByMissile() {
     List<MCH_EntityBaseBullet> list = this.world.getEntitiesWithinAABB(MCH_EntityBaseBullet.class, this.ac
         
-        .getEntityBoundingBox().expand(60.0D, 60.0D, 60.0D));
+        .getEntityBoundingBox().grow(60.0D, 60.0D, 60.0D));
     if (list != null)
       for (int i = 0; i < list.size(); i++) {
         MCH_EntityBaseBullet msl = list.get(i);

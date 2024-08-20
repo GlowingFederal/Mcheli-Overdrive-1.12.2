@@ -349,7 +349,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
         } 
       } 
       if (ac.getAcInfo() == null) {
-        entityPlayerSP.setAngles((float)mouseDeltaX, (float)mouseDeltaY);
+        entityPlayerSP.turn((float)mouseDeltaX, (float)mouseDeltaY);
       } else {
         ac.setAngles((Entity)entityPlayerSP, fixRot, fixYaw, fixPitch, (float)(mouseDeltaX + prevMouseDeltaX) / 2.0F, (float)(mouseDeltaY + prevMouseDeltaY) / 2.0F, (float)mouseRollDeltaX, (float)mouseRollDeltaY, partialTicks - prevTick);
       } 
@@ -385,7 +385,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
         v = W_Vec3.rotateRoll((float)((ac.calcRotRoll(partialTicks) / 180.0F) * Math.PI), v);
         MCH_WeaponSet ws = ac.getCurrentWeapon((Entity)entityPlayerSP);
         mouseDeltaY *= (ws != null && ws.getInfo() != null) ? (ws.getInfo()).cameraRotationSpeedPitch : 1.0D;
-        entityPlayerSP.setAngles((float)mouseDeltaX, (float)mouseDeltaY);
+        entityPlayerSP.turn((float)mouseDeltaX, (float)mouseDeltaY);
         float y = ac.getRotYaw();
         float p = ac.getRotPitch();
         float r = ac.getRotRoll();
@@ -502,7 +502,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
       drawGui(this.gui_SwnGnr, partialTicks);
       drawGui(this.gui_EMarker, partialTicks);
       if (isDrawScoreboard)
-        MCH_GuiScoreboard.drawList(this.mc, this.mc.fontRendererObj, false); 
+        MCH_GuiScoreboard.drawList(this.mc, this.mc.fontRenderer, false); 
       drawGui(this.gui_Title, partialTicks);
     } 
   }

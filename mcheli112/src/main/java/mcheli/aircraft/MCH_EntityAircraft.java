@@ -984,14 +984,14 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     } 
     if (dmt.startsWith("explosion")) {
       this.timeSinceHit = 1;
-    } else if (isMountedEntity(damageSource.getImmediateSource())) {
+    } else if (isMountedEntity(damageSource.getTrueSource())) {
       return false;
     } 
     if (dmt.equalsIgnoreCase("onFire"))
       this.timeSinceHit = 10; 
     boolean isCreative = false;
     boolean isSneaking = false;
-    Entity entity = damageSource.getImmediateSource();
+    Entity entity = damageSource.getTrueSource();
     if (entity instanceof EntityLivingBase)
       this.lastAttackedEntity = entity; 
     boolean isDamegeSourcePlayer = false;
@@ -1036,7 +1036,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
           }  
         MCH_Lib.DbgLog(this.world, "MCH_EntityAircraft.attackEntityFrom:damage=%.1f(factor=%.2f):%s", new Object[] { Float.valueOf(damage), Float.valueOf(damageFactor), dmt });
         setDamageTaken(getDamageTaken() + (int)damage);
-      }
+      } 
       markVelocityChanged();
       if (getDamageTaken() >= getMaxHP() || isDamegeSourcePlayer)
         if (!isDamegeSourcePlayer) {
@@ -1119,7 +1119,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       return super.isUsableByPlayer(player); 
     if (!this.isDead) {
       if (getSeatIdByEntity((Entity)player) >= 0)
-        return (player.getDistanceSq((Entity)this) <= 4096.0D);
+        return (player.getDistanceSq((Entity)this) <= 4096.0D); 
       return (player.getDistanceSq((Entity)this) <= 64.0D);
     } 
     return false;
@@ -1314,7 +1314,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       setRotRoll(v.z);
     } 
     if (MathHelper.abs(getRotPitch()) > 90.0F)
-      MCH_Lib.DbgLog(true, "MCH_EntityAircraft.setAngles Error:Pitch=%.1f", new Object[] { Float.valueOf(getRotPitch()) });
+      MCH_Lib.DbgLog(true, "MCH_EntityAircraft.setAngles Error:Pitch=%.1f", new Object[] { Float.valueOf(getRotPitch()) }); 
     if (getRotRoll() > 180.0F)
       setRotRoll(getRotRoll() - 360.0F); 
     if (getRotRoll() < -180.0F)
@@ -1751,7 +1751,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
           if (this.serverNoMoveCount >= 20) {
             this.serverNoMoveCount = 0;
             if (this.world instanceof WorldServer)
-              ((WorldServer)this.world).getEntityTracker().sendToTracking((Entity)this, (Packet)new SPacketEntityVelocity(getEntityId(), 0.0D, 0.0D, 0.0D));
+              ((WorldServer)this.world).getEntityTracker().sendToTracking((Entity)this, (Packet)new SPacketEntityVelocity(getEntityId(), 0.0D, 0.0D, 0.0D)); 
           } 
         } 
       } else {
@@ -1855,7 +1855,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     hideEntity.motionY = entity.motionY = 0.0D;
     hideEntity.motionZ = entity.motionZ = 0.0D;
     hideEntity.fallDistance = entity.fallDistance = 0.0F;
-    this.world.spawnEntityInWorld((Entity)hideEntity);
+    this.world.spawnEntity((Entity)hideEntity);
   }
   
   private void onUpdate_UnmountCrew() {
@@ -2015,7 +2015,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
             dmg *= 0.4F;
           } 
           if (dmg > 1.0F && this.rand.nextInt(4) == 0)
-            attackEntityFrom(DamageSource.inWall, dmg); 
+            attackEntityFrom(DamageSource.IN_WALL, dmg); 
         } 
       }  
     if (getCountOnUpdate() % 30 == 0)
@@ -2024,7 +2024,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
           int hp = getMaxHP() / 10;
           if (hp <= 0)
             hp = 1; 
-          attackEntityFrom(DamageSource.inWall, hp);
+          attackEntityFrom(DamageSource.IN_WALL, hp);
         }   
   }
   
@@ -2082,7 +2082,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     if (range <= 0.0F)
       return; 
     if (!this.world.isRemote && getCountOnUpdate() % 20 == 0) {
-      List<MCH_EntityAircraft> list = this.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, getCollisionBoundingBox().expand(range, range, range));
+      List<MCH_EntityAircraft> list = this.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, getCollisionBoundingBox().grow(range, range, range));
       for (int i = 0; i < list.size(); i++) {
         MCH_EntityAircraft ac = list.get(i);
         if (!W_Entity.isEqual((Entity)this, (Entity)ac))
@@ -2176,7 +2176,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     if (range <= 0.0F)
       return; 
     if (!this.world.isRemote && getCountOnUpdate() % 10 == 0) {
-      List<MCH_EntityAircraft> list = this.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, getCollisionBoundingBox().expand(range, range, range));
+      List<MCH_EntityAircraft> list = this.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, getCollisionBoundingBox().grow(range, range, range));
       for (int i = 0; i < list.size(); i++) {
         MCH_EntityAircraft ac = list.get(i);
         if (!W_Entity.isEqual((Entity)this, (Entity)ac)) {
@@ -2283,7 +2283,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
                   num = 0;
                 } else {
                   num -= itemStack.getCount();
-                  itemStack.func_190920_e(0);
+                  itemStack.setCount(0);
                   player.inventory.mainInventory.set(i, ItemStack.EMPTY);
                 }  
               if (num <= 0)
@@ -2301,7 +2301,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     if (range <= 0.0F)
       return; 
     if (!this.world.isRemote && getCountOnUpdate() % 40 == 0) {
-      List<MCH_EntityAircraft> list = this.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, getCollisionBoundingBox().expand(range, range, range));
+      List<MCH_EntityAircraft> list = this.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, getCollisionBoundingBox().grow(range, range, range));
       for (int i = 0; i < list.size(); i++) {
         MCH_EntityAircraft ac = list.get(i);
         if (!W_Entity.isEqual((Entity)this, (Entity)ac))
@@ -2445,14 +2445,14 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     return this.entityRadar.getEnemyList();
   }
   
-  public void moveEntity(MoverType type, double x, double y, double z) {
+  public void move(MoverType type, double x, double y, double z) {
     if (getAcInfo() == null)
       return; 
-    this.world.theProfiler.startSection("move");
+    this.world.profiler.startSection("move");
     double d2 = x;
     double d3 = y;
     double d4 = z;
-    List<AxisAlignedBB> list1 = getCollisionBoxes((Entity)this, getEntityBoundingBox().addCoord(x, y, z));
+    List<AxisAlignedBB> list1 = getCollisionBoxes((Entity)this, getEntityBoundingBox().expand(x, y, z));
     AxisAlignedBB axisalignedbb = getEntityBoundingBox();
     if (y != 0.0D) {
       for (int k = 0; k < list1.size(); k++)
@@ -2479,9 +2479,9 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       AxisAlignedBB axisalignedbb1 = getEntityBoundingBox();
       setEntityBoundingBox(axisalignedbb);
       y = this.stepHeight;
-      List<AxisAlignedBB> list = getCollisionBoxes((Entity)this, getEntityBoundingBox().addCoord(d2, y, d4));
+      List<AxisAlignedBB> list = getCollisionBoxes((Entity)this, getEntityBoundingBox().expand(d2, y, d4));
       AxisAlignedBB axisalignedbb2 = getEntityBoundingBox();
-      AxisAlignedBB axisalignedbb3 = axisalignedbb2.addCoord(d2, 0.0D, d4);
+      AxisAlignedBB axisalignedbb3 = axisalignedbb2.expand(d2, 0.0D, d4);
       double d8 = y;
       for (int j1 = 0; j1 < list.size(); j1++)
         d8 = ((AxisAlignedBB)list.get(j1)).calculateYOffset(axisalignedbb3, d8); 
@@ -2530,13 +2530,13 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
         setEntityBoundingBox(axisalignedbb1);
       } 
     } 
-    this.world.theProfiler.endSection();
-    this.world.theProfiler.startSection("rest");
+    this.world.profiler.endSection();
+    this.world.profiler.startSection("rest");
     resetPositionToBB();
-    this.isCollidedHorizontally = (d2 != x || d4 != z);
-    this.isCollidedVertically = (d3 != y);
-    this.onGround = (this.isCollidedVertically && d3 < 0.0D);
-    this.isCollided = (this.isCollidedHorizontally || this.isCollidedVertically);
+    this.collidedHorizontally = (d2 != x || d4 != z);
+    this.collidedVertically = (d3 != y);
+    this.onGround = (this.collidedVertically && d3 < 0.0D);
+    this.collided = (this.collidedHorizontally || this.collidedVertically);
     int j6 = MathHelper.floor(this.posX);
     int i1 = MathHelper.floor(this.posY - 0.20000000298023224D);
     int k6 = MathHelper.floor(this.posZ);
@@ -2567,7 +2567,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       addEntityCrashInfo(crashreportcategory);
       throw new ReportedException(crashreport);
     } 
-    this.world.theProfiler.endSection();
+    this.world.profiler.endSection();
   }
   
   private static boolean getCollisionBoxes(@Nullable Entity entityIn, AxisAlignedBB aabb, List<AxisAlignedBB> outList) {
@@ -2579,7 +2579,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     int j1 = MathHelper.ceil(aabb.maxZ) + 1;
     WorldBorder worldborder = entityIn.world.getWorldBorder();
     boolean flag = (entityIn != null && entityIn.isOutsideBorder());
-    boolean flag1 = (entityIn != null && entityIn.world.func_191503_g(entityIn));
+    boolean flag1 = (entityIn != null && entityIn.world.isInsideWorldBorder(entityIn));
     IBlockState iblockstate = Blocks.STONE.getDefaultState();
     BlockPos.PooledMutableBlockPos blockpos = BlockPos.PooledMutableBlockPos.retain();
     try {
@@ -2614,15 +2614,15 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     List<AxisAlignedBB> list = new ArrayList<>();
     getCollisionBoxes(entityIn, aabb, list);
     if (entityIn != null) {
-      List<Entity> list1 = entityIn.world.getEntitiesWithinAABBExcludingEntity(entityIn, aabb.expandXyz(0.25D));
+      List<Entity> list1 = entityIn.world.getEntitiesWithinAABBExcludingEntity(entityIn, aabb.grow(0.25D));
       for (int i = 0; i < list1.size(); i++) {
         Entity entity = list1.get(i);
         if (!W_Lib.isEntityLivingBase(entity) && !(entity instanceof MCH_EntitySeat) && !(entity instanceof MCH_EntityHitBox)) {
           AxisAlignedBB axisalignedbb = entity.getCollisionBoundingBox();
-          if (axisalignedbb != null && axisalignedbb.intersectsWith(aabb))
+          if (axisalignedbb != null && axisalignedbb.intersects(aabb))
             list.add(axisalignedbb); 
           axisalignedbb = entityIn.getCollisionBox(entity);
-          if (axisalignedbb != null && axisalignedbb.intersectsWith(aabb))
+          if (axisalignedbb != null && axisalignedbb.intersects(aabb))
             list.add(axisalignedbb); 
         } 
       } 
@@ -3153,7 +3153,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       (this.seats[i]).parentUniqueID = getCommonUniqueId();
       (this.seats[i]).seatID = i;
       this.seats[i].setParent(this);
-      this.world.spawnEntityInWorld((Entity)this.seats[i]);
+      this.world.spawnEntity((Entity)this.seats[i]);
     } 
   }
   
@@ -3221,7 +3221,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     int d = 2;
     if (this.dismountedUserCtrl)
       d = 6; 
-    List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, getEntityBoundingBox().expand(d, d, d));
+    List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, getEntityBoundingBox().grow(d, d, d));
     if (list != null && !list.isEmpty())
       for (int i = 0; i < list.size(); i++) {
         Entity entity = list.get(i);
@@ -3290,7 +3290,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   }
   
   public void searchSeat() {
-    List<MCH_EntitySeat> list = this.world.getEntitiesWithinAABB(MCH_EntitySeat.class, getEntityBoundingBox().expand(60.0D, 60.0D, 60.0D));
+    List<MCH_EntitySeat> list = this.world.getEntitiesWithinAABB(MCH_EntitySeat.class, getEntityBoundingBox().grow(60.0D, 60.0D, 60.0D));
     for (int i = 0; i < list.size(); i++) {
       MCH_EntitySeat seat = list.get(i);
       if (!seat.isDead && seat.parentUniqueID.equals(getCommonUniqueId()))
@@ -3548,7 +3548,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     parachute.fallDistance = entity.fallDistance;
     parachute.user = entity;
     parachute.setType(2);
-    this.world.spawnEntityInWorld((Entity)parachute);
+    this.world.spawnEntity((Entity)parachute);
     if (getAcInfo().haveCanopy() && isCanopyClose())
       openCanopy_EjectSeat(); 
     W_WorldFunc.MOD_playSoundAtEntity(entity, "eject_seat", 5.0F, 1.0F);
@@ -3578,7 +3578,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   }
   
   public void mountMobToSeats() {
-    List<EntityLivingBase> list = this.world.getEntitiesWithinAABB(W_Lib.getEntityLivingBaseClass(), getEntityBoundingBox().expand(3.0D, 2.0D, 3.0D));
+    List<EntityLivingBase> list = this.world.getEntitiesWithinAABB(W_Lib.getEntityLivingBaseClass(), getEntityBoundingBox().grow(3.0D, 2.0D, 3.0D));
     for (int i = 0; i < list.size(); i++) {
       Entity entity = (Entity)list.get(i);
       if (!(entity instanceof EntityPlayer) && entity.getRidingEntity() == null) {
@@ -3612,7 +3612,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
         v = v.addVector(this.posX, this.posY, this.posZ);
         AxisAlignedBB bb = new AxisAlignedBB(v.x, v.y, v.z, v.x, v.y, v.z);
         float range = info.range;
-        List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, bb.expand(range, range, range));
+        List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, bb.grow(range, range, range));
         for (int i = 0; i < list.size(); i++) {
           Entity entity = list.get(i);
           if (canRideSeatOrRack(1 + sid, entity))
@@ -3683,14 +3683,14 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     parachute.fallDistance = entity.fallDistance;
     parachute.user = entity;
     parachute.setType(3);
-    this.world.spawnEntityInWorld((Entity)parachute);
+    this.world.spawnEntity((Entity)parachute);
   }
   
   public void rideRack() {
     if (getRidingEntity() != null)
       return; 
     AxisAlignedBB bb = getCollisionBoundingBox();
-    List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, bb.expand(60.0D, 60.0D, 60.0D));
+    List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, bb.grow(60.0D, 60.0D, 60.0D));
     for (int i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
       if (entity instanceof MCH_EntityAircraft) {
@@ -3745,7 +3745,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     if (getRidingEntity() != null)
       return; 
     AxisAlignedBB bb = getCollisionBoundingBox();
-    List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, bb.expand(60.0D, 60.0D, 60.0D));
+    List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, bb.grow(60.0D, 60.0D, 60.0D));
     for (int i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
       if (entity instanceof MCH_EntityAircraft) {
@@ -4702,7 +4702,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       if (udx * udx + udz * udz > 15129.0D) {
         this.uavStation.setControlAircract(null);
         setUavStation((MCH_EntityUavStation)null);
-        attackEntityFrom(DamageSource.outOfWorld, getMaxHP() + 10);
+        attackEntityFrom(DamageSource.OUT_OF_WORLD, getMaxHP() + 10);
       } 
     } 
     if (this.uavStation != null && this.uavStation.isDead)

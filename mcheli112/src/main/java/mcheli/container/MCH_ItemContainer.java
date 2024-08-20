@@ -46,14 +46,14 @@ public class MCH_ItemContainer extends W_Item {
     boolean flag = false;
     float f9 = 1.0F;
     List<Entity> list = worldIn.getEntitiesWithinAABBExcludingEntity((Entity)playerIn, playerIn
-        .getEntityBoundingBox().addCoord(vec32.x * d3, vec32.y * d3, vec32.z * d3).expand(f9, f9, f9));
+        .getEntityBoundingBox().expand(vec32.x * d3, vec32.y * d3, vec32.z * d3).grow(f9, f9, f9));
     int i;
     for (i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
       if (entity.canBeCollidedWith()) {
         float f10 = entity.getCollisionBorderSize();
-        AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expand(f10, f10, f10);
-        if (axisalignedbb.isVecInside(vec3))
+        AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().grow(f10, f10, f10);
+        if (axisalignedbb.contains(vec3))
           flag = true; 
       } 
     } 
@@ -65,10 +65,10 @@ public class MCH_ItemContainer extends W_Item {
       int k = movingobjectposition.getBlockPos().getZ();
       MCH_EntityContainer entityboat = new MCH_EntityContainer(worldIn, (i + 0.5F), (j + 1.0F), (k + 0.5F));
       entityboat.rotationYaw = (((MathHelper.floor((playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 0x3) - 1) * 90);
-      if (!worldIn.getCollisionBoxes((Entity)entityboat, entityboat.getEntityBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty())
+      if (!worldIn.getCollisionBoxes((Entity)entityboat, entityboat.getEntityBoundingBox().grow(-0.1D, -0.1D, -0.1D)).isEmpty())
         return ActionResult.newResult(EnumActionResult.FAIL, itemstack); 
       if (!worldIn.isRemote)
-        worldIn.spawnEntityInWorld((Entity)entityboat); 
+        worldIn.spawnEntity((Entity)entityboat); 
       if (!playerIn.capabilities.isCreativeMode)
         itemstack.shrink(1); 
     } 

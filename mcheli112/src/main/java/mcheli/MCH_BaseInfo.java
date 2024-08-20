@@ -55,7 +55,7 @@ public abstract class MCH_BaseInfo implements IContentData {
   }
   
   public int hex2dec(String s) {
-    if (!s.startsWith("0x") && !s.startsWith("0X") && s.indexOf(String.valueOf(false)) != 35)
+    if (!s.startsWith("0x") && !s.startsWith("0X") && s.indexOf(false) != 35)
       return (int)(Long.decode("0x" + s).longValue() & 0xFFFFFFFFFFFFFFFFL); 
     return (int)(Long.decode(s).longValue() & 0xFFFFFFFFFFFFFFFFL);
   }

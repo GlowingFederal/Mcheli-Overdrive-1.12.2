@@ -37,7 +37,7 @@ public class MCH_Radar {
     clear();
     List<Entity> list = centerEntity.world.getEntitiesWithinAABBExcludingEntity(centerEntity, centerEntity
         
-        .getEntityBoundingBox().expand(range, range, range));
+        .getEntityBoundingBox().grow(range, range, range));
     for (int i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
       if (entity instanceof net.minecraft.entity.EntityLiving) {

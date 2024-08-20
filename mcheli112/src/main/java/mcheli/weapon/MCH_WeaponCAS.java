@@ -110,7 +110,7 @@ public class MCH_WeaponCAS extends MCH_WeaponBase {
     a10.explosionPower = this.explosionPower;
     a10.power = this.power;
     a10.acceleration = this.acceleration;
-    this.worldObj.spawnEntityInWorld((Entity)a10);
+    this.worldObj.spawnEntity((Entity)a10);
     W_WorldFunc.MOD_playSoundEffect(this.worldObj, x, y, z, "a-10_snd", 150.0F, 1.0F);
   }
   

@@ -30,7 +30,7 @@ public class MCH_EntityRocket extends MCH_EntityBaseBullet {
       e.motionY += (this.rand.nextFloat() - 0.5D) * MOTION;
       e.motionZ += (this.rand.nextFloat() - 0.5D) * MOTION;
       e.setBomblet();
-      this.world.spawnEntityInWorld((Entity)e);
+      this.world.spawnEntity((Entity)e);
     } 
   }
   

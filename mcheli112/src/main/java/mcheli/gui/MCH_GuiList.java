@@ -22,15 +22,15 @@ public class MCH_GuiList extends W_GuiButton {
     this.lastPushItem = null;
   }
   
-  public void func_191745_a(Minecraft mc, int x, int y, float partialTicks) {
+  public void drawButton(Minecraft mc, int x, int y, float partialTicks) {
     if (isVisible()) {
-      drawRect(this.xPosition, this.yPosition, this.xPosition + this.width, this.yPosition + this.height, -2143272896);
-      this.scrollBar.func_191745_a(mc, x, y, partialTicks);
+      drawRect(this.x, this.y, this.x + this.width, this.y + this.height, -2143272896);
+      this.scrollBar.drawButton(mc, x, y, partialTicks);
       for (int i = 0; i < this.maxRowNum; i++) {
         if (i + getStartRow() >= this.listItems.size())
           break; 
         MCH_GuiListItem item = this.listItems.get(i + getStartRow());
-        item.draw(mc, x, y, this.xPosition, this.yPosition + 5 + 20 * i, partialTicks);
+        item.draw(mc, x, y, this.x, this.y + 5 + 20 * i, partialTicks);
       } 
     } 
   }

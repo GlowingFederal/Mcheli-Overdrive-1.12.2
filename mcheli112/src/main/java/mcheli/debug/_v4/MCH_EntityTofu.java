@@ -21,7 +21,7 @@ public class MCH_EntityTofu extends Entity {
   
   public void onUpdate() {
     super.onUpdate();
-    moveEntity(MoverType.SELF, 1.0D, 0.0D, 0.0D);
+    move(MoverType.SELF, 1.0D, 0.0D, 0.0D);
     if (!this.world.isRemote)
       if (this.ticksExisted > 100)
         setDead();  

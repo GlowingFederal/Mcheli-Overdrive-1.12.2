@@ -363,7 +363,7 @@ public class MCH_AircraftPacketHandler {
               ac = MCH_EntityAircraft.getAircraft_RiddenOrControl((Entity)player);
               if (ac != null && ac.getAcInfo() != null) {
                 String name = (ac.getAcInfo()).name;
-                for (WorldServer world : (MCH_Utils.getServer()).worldServers) {
+                for (WorldServer world : (MCH_Utils.getServer()).worlds) {
                   List<Entity> list = world.loadedEntityList;
                   for (int i = 0; i < list.size(); i++) {
                     if (list.get(i) instanceof MCH_EntityAircraft) {
@@ -380,7 +380,7 @@ public class MCH_AircraftPacketHandler {
               break;
             case 1:
               ContentRegistries.weapon().reloadAll();
-              for (WorldServer world : (MCH_Utils.getServer()).worldServers) {
+              for (WorldServer world : (MCH_Utils.getServer()).worlds) {
                 List<Entity> list = world.loadedEntityList;
                 for (int i = 0; i < list.size(); i++) {
                   if (list.get(i) instanceof MCH_EntityAircraft) {

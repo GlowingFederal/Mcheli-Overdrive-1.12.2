@@ -744,7 +744,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
       if (MathHelper.abs(getRotRoll()) < 40.0F)
         setRotRoll(getRotRoll() * 0.9F); 
     } 
-    moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+    move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
     this.motionY *= 0.95D;
     this.motionX *= 0.99D;
     this.motionZ *= 0.99D;

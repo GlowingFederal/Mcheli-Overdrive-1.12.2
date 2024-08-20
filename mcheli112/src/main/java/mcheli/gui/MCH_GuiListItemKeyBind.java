@@ -49,12 +49,12 @@ public class MCH_GuiListItemKeyBind extends MCH_GuiListItem {
   
   public void draw(Minecraft mc, int mouseX, int mouseY, int posX, int posY, float partialTicks) {
     int y = 6;
-    this.button.drawString(mc.fontRendererObj, this.displayString, posX + 10, posY + y, -1);
-    this.button.yPosition = posY;
-    this.button.func_191745_a(mc, mouseX, mouseY, partialTicks);
+    this.button.drawString(mc.fontRenderer, this.displayString, posX + 10, posY + y, -1);
+    this.button.y = posY;
+    this.button.drawButton(mc, mouseX, mouseY, partialTicks);
     this.buttonReset.enabled = (this.keycode != this.defaultKeycode);
-    this.buttonReset.yPosition = posY;
-    this.buttonReset.func_191745_a(mc, mouseX, mouseY, partialTicks);
+    this.buttonReset.y = posY;
+    this.buttonReset.drawButton(mc, mouseX, mouseY, partialTicks);
   }
   
   public void applyKeycode() {

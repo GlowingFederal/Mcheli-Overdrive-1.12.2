@@ -29,12 +29,12 @@ public abstract class W_EntityPlayer extends EntityPlayer {
   }
   
   public static boolean consumeInventoryItem(EntityPlayer player, Item item) {
-    int index = player.inventory.func_194014_c(new ItemStack(item));
+    int index = player.inventory.findSlotMatchingUnusedItem(new ItemStack(item));
     return (item != null && player.inventory.decrStackSize(index, 1).isEmpty());
   }
   
   public static void addChatMessage(EntityPlayer player, String s) {
-    player.addChatMessage((ITextComponent)new TextComponentString(s));
+    player.sendMessage((ITextComponent)new TextComponentString(s));
   }
   
   public static EntityItem dropPlayerItemWithRandomChoice(EntityPlayer player, ItemStack item, boolean b1, boolean b2) {

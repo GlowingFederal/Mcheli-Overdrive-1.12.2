@@ -108,7 +108,7 @@ public class MCH_GuiScoreboard extends W_GuiContainer implements MCH_IGuiScorebo
       if (o instanceof W_GuiButton) {
         W_GuiButton btn = (W_GuiButton)o;
         if (btn.isOnMouseOver() && btn.hoverStringList != null) {
-          drawHoveringText(btn.hoverStringList, x, y, this.fontRendererObj);
+          drawHoveringText(btn.hoverStringList, x, y, this.fontRenderer);
           break;
         } 
       } 

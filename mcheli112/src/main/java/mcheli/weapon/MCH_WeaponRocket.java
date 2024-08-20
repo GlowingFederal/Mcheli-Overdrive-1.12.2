@@ -29,7 +29,7 @@ public class MCH_WeaponRocket extends MCH_WeaponBase {
       e.setParameterFromWeapon(this, prm.entity, prm.user);
       if (prm.option1 == 0 && this.numMode > 1)
         e.piercing = 0; 
-      this.worldObj.spawnEntityInWorld((Entity)e);
+      this.worldObj.spawnEntity((Entity)e);
     } else {
       this.optionParameter1 = getCurrentMode();
     } 

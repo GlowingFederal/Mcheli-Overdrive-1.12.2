@@ -30,10 +30,10 @@ public class MCH_EntityBullet extends MCH_EntityBaseBullet {
         pDist++;
         float rng = pDist + MathHelper.abs((getInfo()).acceleration);
         List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, 
-            getEntityBoundingBox().expand(rng, rng, rng));
+            getEntityBoundingBox().grow(rng, rng, rng));
         for (int i = 0; i < list.size(); i++) {
           Entity entity1 = list.get(i);
-          if (canBeCollidedEntity(entity1) && entity1.getDistanceSqToEntity((Entity)this) < (pDist * pDist)) {
+          if (canBeCollidedEntity(entity1) && entity1.getDistanceSq((Entity)this) < (pDist * pDist)) {
             MCH_Lib.DbgLog(this.world, "MCH_EntityBullet.onUpdate:proximityFuse:" + entity1, new Object[0]);
             this.posX = (entity1.posX + this.posX) / 2.0D;
             this.posY = (entity1.posY + this.posY) / 2.0D;
@@ -83,13 +83,13 @@ public class MCH_EntityBullet extends MCH_EntityBaseBullet {
       vec31 = W_WorldFunc.getWorldVec3(this.world, m.hitVec.x, m.hitVec.y, m.hitVec.z); 
     Entity entity = null;
     List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, 
-        getEntityBoundingBox().addCoord(mx, my, mz).expand(21.0D, 21.0D, 21.0D));
+        getEntityBoundingBox().expand(mx, my, mz).grow(21.0D, 21.0D, 21.0D));
     double d0 = 0.0D;
     for (int j = 0; j < list.size(); j++) {
       Entity entity1 = list.get(j);
       if (canBeCollidedEntity(entity1)) {
         float f = 0.3F;
-        AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand(f, f, f);
+        AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(f, f, f);
         RayTraceResult m1 = axisalignedbb.calculateIntercept(vec3, vec31);
         if (m1 != null) {
           double d1 = vec3.distanceTo(m1.hitVec);

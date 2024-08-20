@@ -63,7 +63,7 @@ public class MCH_GuiUavStation extends W_GuiContainer {
         this.drawString("UAV Controller", 8, 6, 16777215);
       }
 
-      this.drawString(I18n.format("container.inventory"), 8, super.ySize - 96 + 2, 16777215);
+      this.drawString(StatCollector.translateToLocal("container.inventory"), 8, super.ySize - 96 + 2, 16777215);
       this.drawString(String.format("X.%+2d", new Object[]{Integer.valueOf(this.uavStation.posUavX)}), 58, 15, 16777215);
       this.drawString(String.format("Y.%+2d", new Object[]{Integer.valueOf(this.uavStation.posUavY)}), 58, 37, 16777215);
       this.drawString(String.format("Z.%+2d", new Object[]{Integer.valueOf(this.uavStation.posUavZ)}), 58, 59, 16777215);

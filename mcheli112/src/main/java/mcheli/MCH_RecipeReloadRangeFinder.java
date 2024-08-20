@@ -36,7 +36,7 @@ public class MCH_RecipeReloadRangeFinder extends IForgeRegistryEntry.Impl<IRecip
     return output;
   }
   
-  public boolean func_194133_a(int width, int height) {
+  public boolean canFit(int width, int height) {
     return (width >= 2 && height >= 2);
   }
   

@@ -23,7 +23,7 @@ public class MCH_WeaponMachineGun1 extends MCH_WeaponBase {
       e.posX += e.motionX * 0.5D;
       e.posY += e.motionY * 0.5D;
       e.posZ += e.motionZ * 0.5D;
-      this.worldObj.spawnEntityInWorld((Entity)e);
+      this.worldObj.spawnEntity((Entity)e);
       playSound(prm.entity);
     } 
     return true;

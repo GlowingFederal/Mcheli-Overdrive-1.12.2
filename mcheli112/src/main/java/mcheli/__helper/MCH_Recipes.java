@@ -37,8 +37,8 @@ public class MCH_Recipes {
   }
   
   public static boolean canCraft(EntityPlayer player, IRecipe recipe) {
-    for (Ingredient ingredient : recipe.func_192400_c()) {
-      if (ingredient == Ingredient.field_193370_a)
+    for (Ingredient ingredient : recipe.getIngredients()) {
+      if (ingredient == Ingredient.EMPTY)
         continue; 
       boolean flag = false;
       for (ItemStack itemstack : player.inventory.mainInventory) {
@@ -54,8 +54,8 @@ public class MCH_Recipes {
   }
   
   public static boolean consumeInventory(EntityPlayer player, IRecipe recipe) {
-    for (Ingredient ingredient : recipe.func_192400_c()) {
-      if (ingredient == Ingredient.field_193370_a)
+    for (Ingredient ingredient : recipe.getIngredients()) {
+      if (ingredient == Ingredient.EMPTY)
         continue; 
       int i = 0;
       boolean flag = false;

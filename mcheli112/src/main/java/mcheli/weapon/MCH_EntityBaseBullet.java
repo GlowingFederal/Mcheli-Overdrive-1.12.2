@@ -331,7 +331,7 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
   public boolean usingFlareOfTarget(Entity entity) {
     if (getCountOnUpdate() % 3 == 0) {
       List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, entity
-          .getEntityBoundingBox().expand(15.0D, 15.0D, 15.0D));
+          .getEntityBoundingBox().grow(15.0D, 15.0D, 15.0D));
       for (int i = 0; i < list.size(); i++) {
         if (((Entity)list.get(i)).getEntityData().getBoolean("FlareUsing"))
           return true; 
@@ -620,13 +620,13 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
       vec31 = W_WorldFunc.getWorldVec3(this.world, m.hitVec.x, m.hitVec.y, m.hitVec.z); 
     Entity entity = null;
     List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, 
-        getEntityBoundingBox().expand(mx, my, mz).expand(21.0D, 21.0D, 21.0D));
+        getEntityBoundingBox().expand(mx, my, mz).grow(21.0D, 21.0D, 21.0D));
     double d0 = 0.0D;
     for (int j = 0; j < list.size(); j++) {
       Entity entity1 = list.get(j);
       if (canBeCollidedEntity(entity1)) {
         float f = 0.3F;
-        AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand(f, f, f);
+        AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(f, f, f);
         RayTraceResult m1 = axisalignedbb.calculateIntercept(vec3, vec31);
         if (m1 != null) {
           double d1 = vec3.distanceTo(m1.hitVec);

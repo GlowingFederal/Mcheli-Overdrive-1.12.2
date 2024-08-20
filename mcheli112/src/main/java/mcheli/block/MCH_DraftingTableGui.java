@@ -395,10 +395,10 @@ public class MCH_DraftingTableGui extends W_GuiContainer {
           drawTexturedModalRect(210, 20, 170, 190, 0, 0, 340, 380);
         } else if (this.current.isCurrentPageAcInfo()) {
           for (int i = 0; i < this.current.infoItem.size(); i++) {
-            this.fontRendererObj.drawString(this.current.infoItem.get(i), 210, 40 + 10 * i, -9491968);
+            this.fontRenderer.drawString(this.current.infoItem.get(i), 210, 40 + 10 * i, -9491968);
             String data = this.current.infoData.get(i);
             if (!data.isEmpty())
-              this.fontRendererObj.drawString(data, 280, 40 + 10 * i, -9491968); 
+              this.fontRenderer.drawString(data, 280, 40 + 10 * i, -9491968); 
           } 
         } else {
           W_McClient.MOD_bindTexture("textures/gui/drafting_table.png");
@@ -415,7 +415,7 @@ public class MCH_DraftingTableGui extends W_GuiContainer {
       drawString(this.current.displayName, 120, 20, -1);
       drawItemRecipe(this.current.recipe, 121, 34);
       if (list.size() > 0)
-        drawHoveringText(list, mx - 30, my - 0, this.fontRendererObj); 
+        drawHoveringText(list, mx - 30, my - 0, this.fontRenderer); 
     } 
     if (getScreenId() == 1) {
       int index = 2 * (int)this.listSlider.getSliderValue();
@@ -475,7 +475,7 @@ public class MCH_DraftingTableGui extends W_GuiContainer {
     if (recipe.getRecipeOutput().getItem() == null)
       return; 
     RenderHelper.enableGUIStandardItemLighting();
-    NonNullList<Ingredient> ingredients = recipe.func_192400_c();
+    NonNullList<Ingredient> ingredients = recipe.getIngredients();
     for (int i = 0; i < ingredients.size(); i++)
       drawIngredient((Ingredient)ingredients.get(i), x + i % 3 * 18, y + i / 3 * 18); 
     drawItemStack(recipe.getRecipeOutput(), x + 54 + 3, y + 18);

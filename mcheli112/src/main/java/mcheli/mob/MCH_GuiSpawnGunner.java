@@ -64,11 +64,11 @@ public class MCH_GuiSpawnGunner extends MCH_Gui {
     Vec3d vec31 = vec3.addVector(f7 * d3, f6 * d3, f8 * d3);
     Entity target = null;
     List<MCH_EntityGunner> list = player.world.getEntitiesWithinAABB(MCH_EntityGunner.class, player
-        .getEntityBoundingBox().expand(5.0D, 5.0D, 5.0D));
+        .getEntityBoundingBox().grow(5.0D, 5.0D, 5.0D));
     for (int i = 0; i < list.size(); i++) {
       MCH_EntityGunner gunner = list.get(i);
       if (gunner.getEntityBoundingBox().calculateIntercept(vec3, vec31) != null)
-        if (target == null || player.getDistanceSqToEntity((Entity)gunner) < player.getDistanceSqToEntity(target))
+        if (target == null || player.getDistanceSq((Entity)gunner) < player.getDistanceSq(target))
           mCH_EntityGunner = gunner;  
     } 
     if (mCH_EntityGunner != null)
@@ -77,12 +77,12 @@ public class MCH_GuiSpawnGunner extends MCH_Gui {
     if (item.targetType == 1 && !player.world.isRemote && player.getTeam() == null)
       return null; 
     List<MCH_EntitySeat> list1 = player.world.getEntitiesWithinAABB(MCH_EntitySeat.class, player
-        .getEntityBoundingBox().expand(5.0D, 5.0D, 5.0D));
+        .getEntityBoundingBox().grow(5.0D, 5.0D, 5.0D));
     for (int j = 0; j < list1.size(); j++) {
       MCH_EntitySeat seat = list1.get(j);
       if (seat.getParent() != null && seat.getParent().getAcInfo() != null && seat
         .getEntityBoundingBox().calculateIntercept(vec3, vec31) != null)
-        if (mCH_EntityGunner == null || player.getDistanceSqToEntity((Entity)seat) < player.getDistanceSqToEntity((Entity)mCH_EntityGunner))
+        if (mCH_EntityGunner == null || player.getDistanceSq((Entity)seat) < player.getDistanceSq((Entity)mCH_EntityGunner))
           if (seat.getRiddenByEntity() instanceof MCH_EntityGunner) {
             Entity entity = seat.getRiddenByEntity();
           } else {
@@ -91,12 +91,12 @@ public class MCH_GuiSpawnGunner extends MCH_Gui {
     } 
     if (mCH_EntitySeat == null) {
       List<MCH_EntityAircraft> list2 = player.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, player
-          .getEntityBoundingBox().expand(5.0D, 5.0D, 5.0D));
+          .getEntityBoundingBox().grow(5.0D, 5.0D, 5.0D));
       for (int k = 0; k < list2.size(); k++) {
         MCH_EntityAircraft ac = list2.get(k);
         if (!ac.isUAV() && ac.getAcInfo() != null && ac
           .getEntityBoundingBox().calculateIntercept(vec3, vec31) != null)
-          if (mCH_EntitySeat == null || player.getDistanceSqToEntity((Entity)ac) < player.getDistanceSqToEntity((Entity)mCH_EntitySeat))
+          if (mCH_EntitySeat == null || player.getDistanceSq((Entity)ac) < player.getDistanceSq((Entity)mCH_EntitySeat))
             if (ac.getRiddenByEntity() instanceof MCH_EntityGunner) {
               Entity entity = ac.getRiddenByEntity();
             } else {

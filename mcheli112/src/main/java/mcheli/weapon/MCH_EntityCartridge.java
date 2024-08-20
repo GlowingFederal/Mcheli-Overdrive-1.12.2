@@ -53,7 +53,7 @@ public class MCH_EntityCartridge extends W_Entity {
         entityFX.motionY += tY * cartridge.acceleration / d;
         entityFX.motionZ += tZ * cartridge.acceleration / d;
       } 
-      world.spawnEntityInWorld((Entity)entityFX);
+      world.spawnEntity((Entity)entityFX);
     } 
   }
   

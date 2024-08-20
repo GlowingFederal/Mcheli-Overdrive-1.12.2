@@ -234,7 +234,7 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
     if (!MCH_Multiplay.canAttackEntity(damageSource, (Entity)this))
       return false; 
     boolean isCreative = false;
-    Entity entity = damageSource.getImmediateSource();
+    Entity entity = damageSource.getTrueSource();
     boolean isDamegeSourcePlayer = false;
     if (entity instanceof EntityPlayer) {
       isCreative = ((EntityPlayer)entity).capabilities.isCreativeMode;
@@ -243,7 +243,7 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
       W_WorldFunc.MOD_playSoundAtEntity((Entity)this, "hit", 1.0F, 1.0F);
     } else {
       W_WorldFunc.MOD_playSoundAtEntity((Entity)this, "helidmg", 1.0F, 0.9F + this.rand.nextFloat() * 0.1F);
-    }
+    } 
     markVelocityChanged();
     if (damage > 0.0F) {
       Entity riddenByEntity = getRiddenByEntity();
@@ -389,7 +389,7 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
     if (this.loadedLastControlAircraftGuid.isEmpty())
       return; 
     List<MCH_EntityAircraft> list = this.world.getEntitiesWithinAABB(MCH_EntityAircraft.class, 
-        getCollisionBoundingBox().expand(120.0D, 120.0D, 120.0D));
+        getCollisionBoundingBox().grow(120.0D, 120.0D, 120.0D));
     if (list == null)
       return; 
     for (int i = 0; i < list.size(); i++) {
@@ -505,42 +505,41 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
         } else {
           MCH_EntityHeli mCH_EntityHeli = ((MCH_ItemHeli)item).createAircraft(this.world, x, y, z, itemStack);
         }  
-    }
-    if(item instanceof MCH_ItemTank) {
-      MCH_TankInfo hi2 = MCH_TankInfoManager.getFromItem(item);
-      if(hi2 != null && hi2.isUAV) {
-        if(!hi2.isSmallUAV && this.getKind() == 2) {
+    } 
+    if (item instanceof MCH_ItemTank) {
+      MCH_TankInfo hi = MCH_TankInfoManager.getFromItem(item);
+      if (hi != null && hi.isUAV)
+        if (!hi.isSmallUAV && getKind() == 2) {
           ac = null;
         } else {
-          ac = ((MCH_ItemTank)item).createAircraft(super.world, x, y, z, itemStack);
-        }
-      }
-    }
-
-    //((MCH_EntityAircraft)mCH_EntityTank).rotationYaw = this.rotationYaw - 180.0F;
-    //((MCH_EntityAircraft)mCH_EntityTank).prevRotationYaw = ((MCH_EntityAircraft)mCH_EntityTank).rotationYaw;
+          mCH_EntityTank = ((MCH_ItemTank)item).createAircraft(this.world, x, y, z, itemStack);
+        }  
+    } 
+    if (mCH_EntityTank == null)
+      return; 
+    ((MCH_EntityAircraft)mCH_EntityTank).rotationYaw = this.rotationYaw - 180.0F;
+    ((MCH_EntityAircraft)mCH_EntityTank).prevRotationYaw = ((MCH_EntityAircraft)mCH_EntityTank).rotationYaw;
     user.rotationYaw = this.rotationYaw - 180.0F;
-    //if (this.world.getCollisionBoxes((Entity)mCH_EntityTank, mCH_EntityTank.getEntityBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty()) {
+    if (this.world.getCollisionBoxes((Entity)mCH_EntityTank, mCH_EntityTank.getEntityBoundingBox().grow(-0.1D, -0.1D, -0.1D)).isEmpty()) {
       itemStack.shrink(1);
       MCH_Lib.DbgLog(this.world, "Create UAV: %s : %s", new Object[] { item
             
             .getUnlocalizedName(), item });
       user.rotationYaw = this.rotationYaw - 180.0F;
-      //if (!mCH_EntityTank.isTargetDrone()) {
-      //  mCH_EntityTank.setUavStation(this);
-      //  setControlAircract((MCH_EntityAircraft)mCH_EntityTank);
-      //}
-      //this.world.spawnEntity((Entity)mCH_EntityTank);
-      //if (!mCH_EntityTank.isTargetDrone()) {
-      //  mCH_EntityTank.setFuel((int)(mCH_EntityTank.getMaxFuel() * 0.05F));
-      //  W_EntityPlayer.closeScreen(user);
-      //} else {
-      //  mCH_EntityTank.setFuel(mCH_EntityTank.getMaxFuel());
-      //}
-    //}
-  // else {
-  //   mCH_EntityTank.setDead();
-  // }
+      if (!mCH_EntityTank.isTargetDrone()) {
+        mCH_EntityTank.setUavStation(this);
+        setControlAircract((MCH_EntityAircraft)mCH_EntityTank);
+      } 
+      this.world.spawnEntity((Entity)mCH_EntityTank);
+      if (!mCH_EntityTank.isTargetDrone()) {
+        mCH_EntityTank.setFuel((int)(mCH_EntityTank.getMaxFuel() * 0.05F));
+        W_EntityPlayer.closeScreen(user);
+      } else {
+        mCH_EntityTank.setFuel(mCH_EntityTank.getMaxFuel());
+      } 
+    } else {
+      mCH_EntityTank.setDead();
+    } 
   }
   
   public void _setInventorySlotContents(int par1, ItemStack itemStack) {
@@ -575,12 +574,7 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
   public int getSizeInventory() {
     return 1;
   }
-
-  @Override
-  public boolean isEmpty() {
-    return false;
-  }
-
+  
   public int getInventoryStackLimit() {
     return 1;
   }

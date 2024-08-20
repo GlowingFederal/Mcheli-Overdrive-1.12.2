@@ -77,6 +77,6 @@ public class MCH_GuiScoreboard_Main extends MCH_GuiScoreboard_Base {
   }
   
   protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3) {
-    drawList(this.mc, this.fontRendererObj, true);
+    drawList(this.mc, this.fontRenderer, true);
   }
 }

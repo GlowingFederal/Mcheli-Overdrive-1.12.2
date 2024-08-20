@@ -35,7 +35,7 @@ public class MCH_GuiSlider extends W_GuiButton {
   protected void mouseDragged(Minecraft mc, int x, int y) {
     if (isVisible()) {
       if (this.isMousePress) {
-        this.currentSlider = (x - this.xPosition + 4) / (this.width - 8);
+        this.currentSlider = (x - this.x + 4) / (this.width - 8);
         if (this.currentSlider < 0.0F)
           this.currentSlider = 0.0F; 
         if (this.currentSlider > 1.0F)
@@ -44,8 +44,8 @@ public class MCH_GuiSlider extends W_GuiButton {
         updateDisplayString();
       } 
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      drawTexturedModalRect(this.xPosition + (int)(this.currentSlider * (this.width - 8)), this.yPosition, 0, 66, 4, 20);
-      drawTexturedModalRect(this.xPosition + (int)(this.currentSlider * (this.width - 8)) + 4, this.yPosition, 196, 66, 4, 20);
+      drawTexturedModalRect(this.x + (int)(this.currentSlider * (this.width - 8)), this.y, 0, 66, 4, 20);
+      drawTexturedModalRect(this.x + (int)(this.currentSlider * (this.width - 8)) + 4, this.y, 196, 66, 4, 20);
       if (!MCH_Key.isKeyDown(-100))
         mouseReleased(x, y); 
     } 
@@ -95,7 +95,7 @@ public class MCH_GuiSlider extends W_GuiButton {
   
   public boolean mousePressed(Minecraft mc, int x, int y) {
     if (super.mousePressed(mc, x, y)) {
-      this.currentSlider = (x - this.xPosition + 4) / (this.width - 8);
+      this.currentSlider = (x - this.x + 4) / (this.width - 8);
       if (this.currentSlider < 0.0F)
         this.currentSlider = 0.0F; 
       if (this.currentSlider > 1.0F)

@@ -28,24 +28,24 @@ public class MCH_EntityParticleSplash extends MCH_EntityParticleBase {
       setExpired();
     } 
     this.motionY -= 0.05999999865889549D;
-    Block block = W_WorldFunc.getBlock(this.worldObj, (int)(this.posX + 0.5D), (int)(this.posY + 0.5D), (int)(this.posZ + 0.5D));
+    Block block = W_WorldFunc.getBlock(this.world, (int)(this.posX + 0.5D), (int)(this.posY + 0.5D), (int)(this.posZ + 0.5D));
     boolean beforeInWater = W_Block.isEqualTo(block, W_Block.getWater());
-    moveEntity(this.motionX, this.motionY, this.motionZ);
-    block = W_WorldFunc.getBlock(this.worldObj, (int)(this.posX + 0.5D), (int)(this.posY + 0.5D), (int)(this.posZ + 0.5D));
+    move(this.motionX, this.motionY, this.motionZ);
+    block = W_WorldFunc.getBlock(this.world, (int)(this.posX + 0.5D), (int)(this.posY + 0.5D), (int)(this.posZ + 0.5D));
     boolean nowInWater = W_Block.isEqualTo(block, W_Block.getWater());
     if (this.motionY < -0.6D && !beforeInWater && nowInWater) {
       double p = -this.motionY * 10.0D;
       for (int i = 0; i < p; i++) {
-        this.worldObj.spawnParticle(EnumParticleTypes.WATER_SPLASH, this.posX + 0.5D + (this.rand
+        this.world.spawnParticle(EnumParticleTypes.WATER_SPLASH, this.posX + 0.5D + (this.rand
             .nextDouble() - 0.5D) * 2.0D, this.posY + this.rand.nextDouble(), this.posZ + 0.5D + (this.rand
             .nextDouble() - 0.5D) * 2.0D, (this.rand
             .nextDouble() - 0.5D) * 2.0D, 4.0D, (this.rand.nextDouble() - 0.5D) * 2.0D, new int[0]);
-        this.worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX + 0.5D + (this.rand
+        this.world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX + 0.5D + (this.rand
             .nextDouble() - 0.5D) * 2.0D, this.posY - this.rand.nextDouble(), this.posZ + 0.5D + (this.rand
             .nextDouble() - 0.5D) * 2.0D, (this.rand
             .nextDouble() - 0.5D) * 2.0D, -0.5D, (this.rand.nextDouble() - 0.5D) * 2.0D, new int[0]);
       } 
-    } else if (this.isCollided) {
+    } else if (this.onGround) {
       setExpired();
     } 
     this.motionX *= 0.9D;

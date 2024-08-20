@@ -157,8 +157,8 @@ public class MCH_EntityGLTD extends W_Entity implements IEntitySinglePassenger, 
       setForwardDirection(-getForwardDirection());
       setTimeSinceHit(10);
       setDamageTaken((int)(getDamageTaken() + damage * 100.0F));
-      setBeenAttacked();
-      boolean flag = (ds.getEntity() instanceof EntityPlayer && ((EntityPlayer)ds.getEntity()).capabilities.isCreativeMode);
+      markVelocityChanged();
+      boolean flag = (ds.getTrueSource() instanceof EntityPlayer && ((EntityPlayer)ds.getTrueSource()).capabilities.isCreativeMode);
       if (flag || getDamageTaken() > 40.0F) {
         Entity riddenByEntity = getRiddenByEntity();
         this.camera.initCamera(0, riddenByEntity);
@@ -271,7 +271,7 @@ public class MCH_EntityGLTD extends W_Entity implements IEntitySinglePassenger, 
         this.motionY *= 0.5D;
         this.motionZ *= 0.5D;
       } 
-      moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+      move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
       this.motionX *= 0.99D;
       this.motionY *= 0.95D;
       this.motionZ *= 0.99D;

@@ -67,7 +67,7 @@ public class MCH_WeaponATMissile extends MCH_WeaponEntitySeeker {
     e.setParameterFromWeapon(this, prm.entity, prm.user);
     e.setTargetEntity(tgtEnt);
     e.guidanceType = prm.option2;
-    this.worldObj.spawnEntityInWorld((Entity)e);
+    this.worldObj.spawnEntity((Entity)e);
     playSound(prm.entity);
     return true;
   }

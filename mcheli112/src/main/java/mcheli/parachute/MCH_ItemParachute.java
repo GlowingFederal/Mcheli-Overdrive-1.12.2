@@ -31,7 +31,7 @@ public class MCH_ItemParachute extends W_Item {
         player.fallDistance = 0.0F;
         entity.user = (Entity)player;
         entity.setType(1);
-        world.spawnEntityInWorld((Entity)entity);
+        world.spawnEntity((Entity)entity);
       }  
     if (!player.capabilities.isCreativeMode)
       itemstack.shrink(1); 
