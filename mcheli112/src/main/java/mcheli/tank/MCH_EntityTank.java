@@ -22,6 +22,9 @@ import mcheli.wrapper.W_Entity;
 import mcheli.wrapper.W_Lib;
 import mcheli.wrapper.W_WorldFunc;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFence;
+import net.minecraft.block.BlockFenceGate;
+import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.crash.CrashReport;
@@ -240,11 +243,11 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   }
   
   public void moveEntity(MoverType type, double x, double y, double z) {
-    this.world.theProfiler.startSection("move");
+    this.world.profiler.startSection("move");
     double d2 = x;
     double d3 = y;
     double d4 = z;
-    List<AxisAlignedBB> list1 = getCollisionBoxes((Entity)this, getEntityBoundingBox().addCoord(x, y, z));
+    List<AxisAlignedBB> list1 = getCollisionBoxes((Entity)this, getEntityBoundingBox().expand(x, y, z));
     AxisAlignedBB axisalignedbb = getEntityBoundingBox();
     if (y != 0.0D) {
       ClacAxisBB v = calculateYOffset(list1, getEntityBoundingBox(), y);
@@ -273,9 +276,9 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       AxisAlignedBB axisalignedbb1 = getEntityBoundingBox();
       setEntityBoundingBox(axisalignedbb);
       y = this.stepHeight;
-      List<AxisAlignedBB> list = getCollisionBoxes((Entity)this, getEntityBoundingBox().addCoord(d2, y, d4));
+      List<AxisAlignedBB> list = getCollisionBoxes((Entity)this, getEntityBoundingBox().expand(d2, y, d4));
       AxisAlignedBB axisalignedbb2 = getEntityBoundingBox();
-      AxisAlignedBB axisalignedbb3 = axisalignedbb2.addCoord(d2, 0.0D, d4);
+      AxisAlignedBB axisalignedbb3 = axisalignedbb2.expand(d2, 0.0D, d4);
       double d8 = y;
       ClacAxisBB v = calculateYOffset(list, axisalignedbb3, axisalignedbb2, d8);
       d8 = v.value;
@@ -324,13 +327,13 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
         setEntityBoundingBox(axisalignedbb1);
       } 
     } 
-    this.world.theProfiler.endSection();
-    this.world.theProfiler.startSection("rest");
+    this.world.profiler.endSection();
+    this.world.profiler.startSection("rest");
     resetPositionToBB();
-    this.isCollidedHorizontally = (d2 != x || d4 != z);
-    this.isCollidedVertically = (d3 != y);
-    this.onGround = (this.isCollidedVertically && d3 < 0.0D);
-    this.isCollided = (this.isCollidedHorizontally || this.isCollidedVertically);
+    this.collidedHorizontally = (d2 != x || d4 != z);
+    this.collidedVertically = (d3 != y);
+    this.onGround = (this.collidedVertically && d3 < 0.0D);
+    this.collided = (this.collidedHorizontally || this.collidedVertically);
     int j6 = MathHelper.floor(this.posX);
     int i1 = MathHelper.floor(this.posY - 0.20000000298023224D);
     int k6 = MathHelper.floor(this.posZ);
@@ -340,7 +343,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       BlockPos blockpos1 = blockpos.down();
       IBlockState iblockstate1 = this.world.getBlockState(blockpos1);
       Block block1 = iblockstate1.getBlock();
-      if (block1 instanceof net.minecraft.block.BlockFence || block1 instanceof net.minecraft.block.BlockWall || block1 instanceof net.minecraft.block.BlockFenceGate) {
+      if (block1 instanceof BlockFence || block1 instanceof BlockWall || block1 instanceof BlockFenceGate) {
         iblockstate = iblockstate1;
         blockpos = blockpos1;
       } 
@@ -361,7 +364,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       addEntityCrashInfo(crashreportcategory);
       throw new ReportedException(crashreport);
     } 
-    this.world.theProfiler.endSection();
+    this.world.profiler.endSection();
   }
   
   private void rotationByKey(float partialTicks) {
@@ -514,9 +517,9 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       } else {
         MCH_BoundingBox bb = (getTankInfo()).extraBoundingBox.get(ri);
         Vec3d pos = getTransformedPosition(bb.offsetX, bb.offsetY, bb.offsetZ);
-        double x = pos.xCoord;
-        double y = pos.yCoord;
-        double z = pos.zCoord;
+        double x = pos.x;
+        double y = pos.y;
+        double z = pos.z;
         onUpdate_Particle2SpawnSmoke(ri, x, y, z, 1.0F);
       } 
     } 
@@ -531,10 +534,10 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       double py = this.posY;
       double pz = this.posZ;
       if (getSeatInfo(0) != null && (getSeatInfo(0)).pos != null) {
-        Vec3d pos = MCH_Lib.RotVec3(0.0D, (getSeatInfo(0)).pos.yCoord, -2.0D, -yaw, -pitch, -roll);
-        px += pos.xCoord;
-        py += pos.yCoord;
-        pz += pos.zCoord;
+        Vec3d pos = MCH_Lib.RotVec3(0.0D, (getSeatInfo(0)).pos.y, -2.0D, -yaw, -pitch, -roll);
+        px += pos.x;
+        py += pos.y;
+        pz += pos.z;
       } 
       onUpdate_Particle2SpawnSmoke(bbNum, px, py, pz, (bbNum == 0) ? 2.0F : 1.0F);
     } 
@@ -562,9 +565,9 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     if (this.isFirstDamageSmoke)
       this.prevDamageSmokePos[ri] = new Vec3d(x, y, z); 
     Vec3d prev = this.prevDamageSmokePos[ri];
-    double dx = x - prev.xCoord;
-    double dy = y - prev.yCoord;
-    double dz = z - prev.zCoord;
+    double dx = x - prev.x;
+    double dy = y - prev.y;
+    double dz = z - prev.z;
     int num = (int)(MathHelper.sqrt(dx * dx + dy * dy + dz * dz) / 0.3D) + 1;
     for (int i = 0; i < num; i++) {
       float c = 0.2F + this.rand.nextFloat() * 0.3F;
@@ -605,12 +608,12 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     Vec3d v = getTransformedPosition(pos);
     v = v.addVector(this.rand.nextDouble() - 0.5D, (this.rand.nextDouble() - 0.5D) * 0.5D, this.rand
         .nextDouble() - 0.5D);
-    int x = (int)(v.xCoord + 0.5D);
-    int y = (int)(v.yCoord + 0.0D);
-    int z = (int)(v.zCoord + 0.5D);
+    int x = (int)(v.x + 0.5D);
+    int y = (int)(v.y + 0.0D);
+    int z = (int)(v.z + 0.5D);
     if (W_WorldFunc.isBlockWater(this.world, x, y, z)) {
       float c = this.rand.nextFloat() * 0.3F + 0.7F;
-      MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", v.xCoord, v.yCoord, v.zCoord);
+      MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", v.x, v.y, v.z);
       prm.motionX = mx + (this.rand.nextFloat() - 0.5D) * 0.7D;
       prm.motionY = my;
       prm.motionZ = mz + (this.rand.nextFloat() - 0.5D) * 0.7D;
@@ -688,7 +691,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     float throttle = (float)(getCurrentThrottle() / 10.0D);
     Vec3d v = MCH_Lib.Rot2Vec3(getRotYaw(), getRotPitch() - 10.0F);
     if (!levelOff)
-      this.motionY += v.yCoord * throttle / 8.0D; 
+      this.motionY += v.y * throttle / 8.0D; 
     boolean canMove = true;
     if (!(getAcInfo()).canMoveOnGround) {
       Block block = MCH_Lib.getBlockY((Entity)this, 3, -2, false);
@@ -697,11 +700,11 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     } 
     if (canMove)
       if ((getAcInfo()).enableBack && this.throttleBack > 0.0F) {
-        this.motionX -= v.xCoord * this.throttleBack;
-        this.motionZ -= v.zCoord * this.throttleBack;
+        this.motionX -= v.x * this.throttleBack;
+        this.motionZ -= v.z * this.throttleBack;
       } else {
-        this.motionX += v.xCoord * throttle;
-        this.motionZ += v.zCoord * throttle;
+        this.motionX += v.x * throttle;
+        this.motionZ += v.z * throttle;
       }  
     double motion = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
     float speedLimit = getMaxSpeed();
@@ -769,7 +772,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
         if (rider instanceof EntityLivingBase) {
           ds = DamageSource.causeMobDamage((EntityLivingBase)rider);
         } else {
-          ds = DamageSource.generic;
+          ds = DamageSource.GENERIC;
         } 
         MCH_Lib.applyEntityHurtResistantTimeConfig(e);
         e.attackEntityFrom(ds, damage);
@@ -786,7 +789,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
           if (e instanceof EntityLivingBase) {
             ds = DamageSource.causeMobDamage((EntityLivingBase)e);
           } else {
-            ds = DamageSource.generic;
+            ds = DamageSource.GENERIC;
           } 
           attackEntityFrom(ds, damage / 3.0F);
         } 
@@ -843,9 +846,9 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     for (int x = -ws; x <= ws; x++) {
       for (int z = -ws; z <= ws; z++) {
         for (int y = -hs; y <= hs + 1; y++) {
-          int bx = (int)(v.xCoord + x - 0.5D);
-          int by = (int)(v.yCoord + y - 1.0D);
-          int bz = (int)(v.zCoord + z - 0.5D);
+          int bx = (int)(v.x + x - 0.5D);
+          int by = (int)(v.y + y - 1.0D);
+          int bz = (int)(v.z + z - 0.5D);
           BlockPos blockpos = new BlockPos(bx, by, bz);
           IBlockState iblockstate = this.world.getBlockState(blockpos);
           Block block = (by >= 0 && by < 256) ? iblockstate.getBlock() : Blocks.AIR;
@@ -969,13 +972,13 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       } 
       player.rotationYaw = getRotYaw() + fixYaw;
     } else {
-      player.setAngles(deltaX, 0.0F);
+      player.rotationYaw += deltaX;
     } 
     if (isOverridePlayerPitch() || fixRot) {
       player.prevRotationPitch = getRotPitch() + fixPitch;
       player.rotationPitch = getRotPitch() + fixPitch;
     } else {
-      player.setAngles(0.0F, deltaY);
+      player.rotationYaw += deltaY;
     } 
     float playerYaw = MathHelper.wrapDegrees(getRotYaw() - player.rotationYaw);
     float playerPitch = getRotPitch() * MathHelper.cos((float)(playerYaw * Math.PI / 180.0D)) + -getRotRoll() * MathHelper.sin((float)(playerYaw * Math.PI / 180.0D));

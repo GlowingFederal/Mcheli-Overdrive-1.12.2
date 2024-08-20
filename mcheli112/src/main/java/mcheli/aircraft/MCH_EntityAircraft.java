@@ -757,7 +757,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       if (entity != null)
         ejectSeat(entity); 
       float dmg = MCH_Config.KillPassengersWhenDestroyed.prmBool ? 100000.0F : 0.001F;
-      DamageSource dse = DamageSource.generic;
+      DamageSource dse = DamageSource.GENERIC;
       if (this.world.getDifficulty() == EnumDifficulty.PEACEFUL) {
         if (this.lastAttackedEntity instanceof EntityPlayer)
           dse = DamageSource.causePlayerDamage((EntityPlayer)this.lastAttackedEntity); 
@@ -974,7 +974,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     damage = MCH_Config.applyDamageByExternal((Entity)this, damageSource, damage);
     if (getAcInfo() != null && (getAcInfo()).invulnerable)
       damage = 0.0F; 
-    if (damageSource == DamageSource.outOfWorld)
+    if (damageSource == DamageSource.OUT_OF_WORLD)
       setDead(); 
     if (!MCH_Multiplay.canAttackEntity(damageSource, (Entity)this))
       return false; 
@@ -984,14 +984,14 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     } 
     if (dmt.startsWith("explosion")) {
       this.timeSinceHit = 1;
-    } else if (isMountedEntity(damageSource.getEntity())) {
+    } else if (isMountedEntity(damageSource.getImmediateSource())) {
       return false;
     } 
     if (dmt.equalsIgnoreCase("onFire"))
       this.timeSinceHit = 10; 
     boolean isCreative = false;
     boolean isSneaking = false;
-    Entity entity = damageSource.getEntity();
+    Entity entity = damageSource.getImmediateSource();
     if (entity instanceof EntityLivingBase)
       this.lastAttackedEntity = entity; 
     boolean isDamegeSourcePlayer = false;
@@ -1006,7 +1006,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
         } else if (getAcInfo() != null && !(getAcInfo()).creativeOnly) {
           if (!MCH_Config.PreventingBroken.prmBool)
             if (MCH_Config.BreakableOnlyPickaxe.prmBool) {
-              if (!player.getHeldItemMainhand().func_190926_b() && player.getHeldItemMainhand().getItem() instanceof net.minecraft.item.ItemPickaxe)
+              if (!player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() instanceof net.minecraft.item.ItemPickaxe)
                 isDamegeSourcePlayer = true; 
             } else {
               isDamegeSourcePlayer = !isRidePlayer();
@@ -1036,8 +1036,8 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
           }  
         MCH_Lib.DbgLog(this.world, "MCH_EntityAircraft.attackEntityFrom:damage=%.1f(factor=%.2f):%s", new Object[] { Float.valueOf(damage), Float.valueOf(damageFactor), dmt });
         setDamageTaken(getDamageTaken() + (int)damage);
-      } 
-      setBeenAttacked();
+      }
+      markVelocityChanged();
       if (getDamageTaken() >= getMaxHP() || isDamegeSourcePlayer)
         if (!isDamegeSourcePlayer) {
           setDamageTaken(getMaxHP());
@@ -1086,7 +1086,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   
   @Nullable
   public EntityItem entityDropItem(ItemStack is, float par2) {
-    if (is.func_190916_E() == 0)
+    if (is.getCount() == 0)
       return null; 
     setAcDataToItem(is);
     return super.entityDropItem(is, par2);
@@ -1119,8 +1119,8 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       return super.isUsableByPlayer(player); 
     if (!this.isDead) {
       if (getSeatIdByEntity((Entity)player) >= 0)
-        return (player.getDistanceSqToEntity((Entity)this) <= 4096.0D); 
-      return (player.getDistanceSqToEntity((Entity)this) <= 64.0D);
+        return (player.getDistanceSq((Entity)this) <= 4096.0D);
+      return (player.getDistanceSq((Entity)this) <= 64.0D);
     } 
     return false;
   }
@@ -1314,7 +1314,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       setRotRoll(v.z);
     } 
     if (MathHelper.abs(getRotPitch()) > 90.0F)
-      MCH_Lib.DbgLog(true, "MCH_EntityAircraft.setAngles Error:Pitch=%.1f", new Object[] { Float.valueOf(getRotPitch()) }); 
+      MCH_Lib.DbgLog(true, "MCH_EntityAircraft.setAngles Error:Pitch=%.1f", new Object[] { Float.valueOf(getRotPitch()) });
     if (getRotRoll() > 180.0F)
       setRotRoll(getRotRoll() - 360.0F); 
     if (getRotRoll() < -180.0F)
@@ -1334,13 +1334,13 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       } 
       player.rotationYaw = getRotYaw() + (fixRot ? fixYaw : 0.0F);
     } else {
-      player.setAngles(deltaX, 0.0F);
+      player.turn(deltaX, 0.0F);
     } 
     if (isOverridePlayerPitch() || fixRot) {
       player.prevRotationPitch = getRotPitch() + (fixRot ? fixPitch : 0.0F);
       player.rotationPitch = getRotPitch() + (fixRot ? fixPitch : 0.0F);
     } else {
-      player.setAngles(0.0F, deltaY);
+      player.turn(0.0F, deltaY);
     } 
     if ((getRidingEntity() == null && ac_yaw != getRotYaw()) || ac_pitch != getRotPitch() || ac_roll != getRotRoll())
       this.aircraftRotChanged = true; 
@@ -1369,16 +1369,16 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     if (haveSearchLight() && isSearchLightON())
       for (MCH_AircraftInfo.SearchLight sl : (getAcInfo()).searchLights) {
         Vec3d pos = getTransformedPosition(sl.pos);
-        double dist = entity.getDistanceSq(pos.xCoord, pos.yCoord, pos.zCoord);
+        double dist = entity.getDistanceSq(pos.x, pos.y, pos.z);
         if (dist > 2.0D && dist < (sl.height * sl.height + 20.0F)) {
-          double cx = entity.posX - pos.xCoord;
-          double cy = entity.posY - pos.yCoord;
-          double cz = entity.posZ - pos.zCoord;
+          double cx = entity.posX - pos.x;
+          double cy = entity.posY - pos.y;
+          double cz = entity.posZ - pos.z;
           double h = 0.0D;
           double v = 0.0D;
           if (!sl.fixDir) {
             Vec3d vv = MCH_Lib.RotVec3(0.0D, 0.0D, 1.0D, -this.lastSearchLightYaw + sl.yaw, -this.lastSearchLightPitch + sl.pitch, -getRotRoll());
-            h = MCH_Lib.getPosAngle(vv.xCoord, vv.zCoord, cx, cz);
+            h = MCH_Lib.getPosAngle(vv.x, vv.z, cx, cz);
             v = Math.atan2(cy, Math.sqrt(cx * cx + cz * cz)) * 180.0D / Math.PI;
             v = Math.abs(v + this.lastSearchLightPitch + sl.pitch);
           } else {
@@ -1386,7 +1386,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
             if (sl.steering)
               stRot = this.rotYawWheel * sl.stRot; 
             Vec3d vv = MCH_Lib.RotVec3(0.0D, 0.0D, 1.0D, -getRotYaw() + sl.yaw + stRot, -getRotPitch() + sl.pitch, -getRotRoll());
-            h = MCH_Lib.getPosAngle(vv.xCoord, vv.zCoord, cx, cz);
+            h = MCH_Lib.getPosAngle(vv.x, vv.z, cx, cz);
             v = Math.atan2(cy, Math.sqrt(cx * cx + cz * cz)) * 180.0D / Math.PI;
             v = Math.abs(v + getRotPitch() + sl.pitch);
           } 
@@ -1429,7 +1429,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
         Entity entity = getEntityBySeatId(sid);
         if (entity != null)
           if (sid != 0 || !isUAV())
-            if (MCH_Config.applyDamageVsEntity(entity, DamageSource.inFire, 1.0F) > 0.0F)
+            if (MCH_Config.applyDamageVsEntity(entity, DamageSource.IN_FIRE, 1.0F) > 0.0F)
               entity.setFire(5);   
       }  
     if (this.aircraftRotChanged || this.aircraftRollRev)
@@ -1751,7 +1751,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
           if (this.serverNoMoveCount >= 20) {
             this.serverNoMoveCount = 0;
             if (this.world instanceof WorldServer)
-              ((WorldServer)this.world).getEntityTracker().sendToAllTrackingEntity((Entity)this, (Packet)new SPacketEntityVelocity(getEntityId(), 0.0D, 0.0D, 0.0D)); 
+              ((WorldServer)this.world).getEntityTracker().sendToTracking((Entity)this, (Packet)new SPacketEntityVelocity(getEntityId(), 0.0D, 0.0D, 0.0D));
           } 
         } 
       } else {
@@ -1833,9 +1833,9 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
             if (!(getSeatInfo(i + 1) instanceof MCH_SeatRackInfo)) {
               Entity entity = seat.getRiddenByEntity();
               Vec3d dropPos = getTransformedPosition(hook.pos, (Vec3d)this.prevPosition.oldest());
-              seat.posX = dropPos.xCoord;
-              seat.posY = dropPos.yCoord - 2.0D;
-              seat.posZ = dropPos.zCoord;
+              seat.posX = dropPos.x;
+              seat.posY = dropPos.y - 2.0D;
+              seat.posZ = dropPos.z;
               entity.dismountRidingEntity();
               unmountEntityRepelling(entity, dropPos, ropeIdx);
               this.lastUsedRopeIndex = ropeIdx;
@@ -1846,9 +1846,9 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   }
   
   public void unmountEntityRepelling(Entity entity, Vec3d dropPos, int ropeIdx) {
-    entity.posX = dropPos.xCoord;
-    entity.posY = dropPos.yCoord - 2.0D;
-    entity.posZ = dropPos.zCoord;
+    entity.posX = dropPos.x;
+    entity.posY = dropPos.y - 2.0D;
+    entity.posZ = dropPos.z;
     MCH_EntityHide hideEntity = new MCH_EntityHide(this.world, entity.posX, entity.posY, entity.posZ);
     hideEntity.setParent(this, entity, ropeIdx);
     hideEntity.motionX = entity.motionX = 0.0D;
@@ -1883,9 +1883,9 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     } else if (getRidingEntity() instanceof net.minecraft.entity.item.EntityMinecartEmpty) {
       this.dismountedUserCtrl = true;
     } 
-    setLocationAndAngles(v.xCoord, v.yCoord, v.zCoord, getRotYaw(), getRotPitch());
+    setLocationAndAngles(v.x, v.y, v.z, getRotYaw(), getRotPitch());
     dismountRidingEntity();
-    setLocationAndAngles(v.xCoord, v.yCoord, v.zCoord, getRotYaw(), getRotPitch());
+    setLocationAndAngles(v.x, v.y, v.z, getRotYaw(), getRotPitch());
   }
   
   public boolean canUnmount(Entity entity) {
@@ -1909,13 +1909,13 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
         this.lastUsedRopeIndex = (this.lastUsedRopeIndex + 1) % (getAcInfo()).repellingHooks.size();
         Vec3d dropPos = getTransformedPosition(((MCH_AircraftInfo.RepellingHook)(getAcInfo()).repellingHooks.get(this.lastUsedRopeIndex)).pos, (Vec3d)this.prevPosition.oldest());
         dropPos = dropPos.addVector(0.0D, -2.0D, 0.0D);
-        seat.posX = dropPos.xCoord;
-        seat.posY = dropPos.yCoord;
-        seat.posZ = dropPos.zCoord;
+        seat.posX = dropPos.x;
+        seat.posY = dropPos.y;
+        seat.posZ = dropPos.z;
         entity.dismountRidingEntity();
-        entity.posX = dropPos.xCoord;
-        entity.posY = dropPos.yCoord;
-        entity.posZ = dropPos.zCoord;
+        entity.posX = dropPos.x;
+        entity.posY = dropPos.y;
+        entity.posZ = dropPos.z;
         unmountEntityRepelling(entity, dropPos, this.lastUsedRopeIndex);
       } else {
         MCH_Lib.Log((Entity)this, "Error:MCH_EntityAircraft.unmount seat=null : " + entity, new Object[0]);
@@ -1924,13 +1924,13 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       MCH_EntitySeat seat = getSeatByEntity(entity);
       if (seat != null) {
         Vec3d dropPos = getTransformedPosition((getAcInfo()).mobDropOption.pos, (Vec3d)this.prevPosition.oldest());
-        seat.posX = dropPos.xCoord;
-        seat.posY = dropPos.yCoord;
-        seat.posZ = dropPos.zCoord;
+        seat.posX = dropPos.x;
+        seat.posY = dropPos.y;
+        seat.posZ = dropPos.z;
         entity.dismountRidingEntity();
-        entity.posX = dropPos.xCoord;
-        entity.posY = dropPos.yCoord;
-        entity.posZ = dropPos.zCoord;
+        entity.posX = dropPos.x;
+        entity.posY = dropPos.y;
+        entity.posZ = dropPos.z;
         dropEntityParachute(entity);
       } else {
         MCH_Lib.Log((Entity)this, "Error:MCH_EntityAircraft.unmount seat=null : " + entity, new Object[0]);
@@ -2214,7 +2214,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
         for (int i = 0; i < 3; i++) {
           if (curFuel < getMaxFuel()) {
             ItemStack fuel = getGuiInventory().getFuelSlotItemStack(i);
-            if (!fuel.func_190926_b() && fuel.getItem() instanceof MCH_ItemFuel)
+            if (!fuel.isEmpty() && fuel.getItem() instanceof MCH_ItemFuel)
               if (fuel.getMetadata() < fuel.getMaxDamage()) {
                 int fc = getMaxFuel() - curFuel;
                 if (fc > 100)
@@ -2272,19 +2272,19 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
             int num = ri.num;
             for (int i = 0; i < player.inventory.mainInventory.size(); i++) {
               ItemStack itemStack = (ItemStack)player.inventory.mainInventory.get(i);
-              if (!itemStack.func_190926_b() && itemStack.isItemEqual(ri.itemStack))
+              if (!itemStack.isEmpty() && itemStack.isItemEqual(ri.itemStack))
                 if (itemStack.getItem() == W_Item.getItemByName("water_bucket") || itemStack.getItem() == W_Item.getItemByName("lava_bucket")) {
-                  if (itemStack.func_190916_E() == 1) {
+                  if (itemStack.getCount() == 1) {
                     player.inventory.setInventorySlotContents(i, new ItemStack(W_Item.getItemByName("bucket"), 1));
                     num--;
                   } 
-                } else if (itemStack.func_190916_E() > num) {
-                  itemStack.func_190918_g(num);
+                } else if (itemStack.getCount() > num) {
+                  itemStack.shrink(num);
                   num = 0;
                 } else {
-                  num -= itemStack.func_190916_E();
+                  num -= itemStack.getCount();
                   itemStack.func_190920_e(0);
-                  player.inventory.mainInventory.set(i, ItemStack.field_190927_a);
+                  player.inventory.mainInventory.set(i, ItemStack.EMPTY);
                 }  
               if (num <= 0)
                 break; 
@@ -2337,8 +2337,8 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     for (MCH_WeaponInfo.RoundItem ri : (ws.getInfo()).roundItems) {
       int num = ri.num;
       for (ItemStack itemStack : player.inventory.mainInventory) {
-        if (!itemStack.func_190926_b() && itemStack.isItemEqual(ri.itemStack))
-          num -= itemStack.func_190916_E(); 
+        if (!itemStack.isEmpty() && itemStack.isItemEqual(ri.itemStack))
+          num -= itemStack.getCount(); 
         if (num <= 0)
           break; 
       } 
@@ -2668,14 +2668,14 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
           Vec3d rot = MCH_Lib.RotVec3(0.0D, 0.0D, 1.0D, -yaw - 180.0F + wb.fixRotationYaw, pitch - wb.fixRotationPitch, roll);
           if (this.rand.nextFloat() <= getCurrentThrottle() * 1.5D) {
             Vec3d pos = MCH_Lib.RotVec3(wb.position, -yaw, -pitch, -roll);
-            double x = this.posX + pos.xCoord + rot.xCoord;
-            double y = this.posY + pos.yCoord + rot.yCoord;
-            double z = this.posZ + pos.zCoord + rot.zCoord;
+            double x = this.posX + pos.x + rot.x;
+            double y = this.posY + pos.y + rot.y;
+            double z = this.posZ + pos.z + rot.z;
             for (int smk = 0; smk < wi.smokeNum; smk++) {
               float c = this.rand.nextFloat() * 0.05F;
               int maxAge = (int)(this.rand.nextDouble() * wi.smokeMaxAge);
               MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", x, y, z);
-              prm.setMotion(rot.xCoord * wi.acceleration + (this.rand.nextDouble() - 0.5D) * 0.2D, rot.yCoord * wi.acceleration + (this.rand.nextDouble() - 0.5D) * 0.2D, rot.zCoord * wi.acceleration + (this.rand.nextDouble() - 0.5D) * 0.2D);
+              prm.setMotion(rot.x * wi.acceleration + (this.rand.nextDouble() - 0.5D) * 0.2D, rot.y * wi.acceleration + (this.rand.nextDouble() - 0.5D) * 0.2D, rot.z * wi.acceleration + (this.rand.nextDouble() - 0.5D) * 0.2D);
               prm.size = (this.rand.nextInt(5) + 5.0F) * wi.smokeSize;
               prm.setColor(wi.color.a + this.rand.nextFloat() * 0.05F, wi.color.r + c, wi.color.g + c, wi.color.b + c);
               prm.age = maxAge;
@@ -2922,8 +2922,8 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       this.pilotSeat.prevPosZ = this.pilotSeat.posZ;
       this.pilotSeat.setPosition(px, py, pz);
       if (info != null && info.length > 0 && info[0] != null) {
-        Vec3d v = getTransformedPosition((info[0]).pos.xCoord, (info[0]).pos.yCoord, (info[0]).pos.zCoord, px, py, pz, (info[0]).rotSeat);
-        this.pilotSeat.setPosition(v.xCoord, v.yCoord, v.zCoord);
+        Vec3d v = getTransformedPosition((info[0]).pos.x, (info[0]).pos.y, (info[0]).pos.z, px, py, pz, (info[0]).rotSeat);
+        this.pilotSeat.setPosition(v.x, v.y, v.z);
       } 
       this.pilotSeat.rotationPitch = getRotPitch();
       this.pilotSeat.rotationYaw = getRotYaw();
@@ -2945,8 +2945,8 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
         seat.prevPosY = seat.posY;
         seat.prevPosZ = seat.posZ;
         MCH_SeatInfo si = (i < info.length) ? info[i] : info[0];
-        Vec3d v = getTransformedPosition(si.pos.xCoord, si.pos.yCoord + offsetY, si.pos.zCoord, px, py, pz, si.rotSeat);
-        seat.setPosition(v.xCoord, v.yCoord, v.zCoord);
+        Vec3d v = getTransformedPosition(si.pos.x, si.pos.y + offsetY, si.pos.z, px, py, pz, si.rotSeat);
+        seat.setPosition(v.x, v.y, v.z);
         seat.rotationPitch = getRotPitch();
         seat.rotationYaw = getRotYaw();
         if (setPrevPos) {
@@ -2986,11 +2986,11 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       if (passenger instanceof EntityPlayer)
         if (!W_Lib.isClientPlayer(passenger)); 
       if (info != null && info.length > 0) {
-        v = getTransformedPosition((info[0]).pos.xCoord, (info[0]).pos.yCoord + riddenEntityYOffset - 0.5D, (info[0]).pos.zCoord, px, py + 0.3499999940395355D, pz, (info[0]).rotSeat);
+        v = getTransformedPosition((info[0]).pos.x, (info[0]).pos.y + riddenEntityYOffset - 0.5D, (info[0]).pos.z, px, py + 0.3499999940395355D, pz, (info[0]).rotSeat);
       } else {
         v = getTransformedPosition(0.0D, (riddenEntityYOffset - 1.0F), 0.0D);
       } 
-      passenger.setPosition(v.xCoord, v.yCoord, v.zCoord);
+      passenger.setPosition(v.x, v.y, v.z);
     } 
   }
   
@@ -3002,8 +3002,8 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     float ry = getLastRiderYaw();
     if (getRiddenByEntity() != null)
       ry = (getRiddenByEntity()).rotationYaw; 
-    Vec3d tpos = (getAcInfo()).turretPosition.addVector(0.0D, pos.yCoord, 0.0D);
-    Vec3d v = pos.addVector(-tpos.xCoord, -tpos.yCoord, -tpos.zCoord);
+    Vec3d tpos = (getAcInfo()).turretPosition.addVector(0.0D, pos.y, 0.0D);
+    Vec3d v = pos.addVector(-tpos.x, -tpos.y, -tpos.z);
     v = MCH_Lib.RotVec3(v, -ry, 0.0F, 0.0F);
     Vec3d vv = MCH_Lib.RotVec3(tpos, -getRotYaw(), -getRotPitch(), -getRotRoll());
     return v.add(vv);
@@ -3048,7 +3048,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
         } else {
           v = MCH_Lib.RotVec3(v, -getRotYaw(), -getRotPitch(), -getRotRoll());
         } 
-        MCH_ViewEntityDummy.setCameraPosition(x + v.xCoord, y + v.yCoord, z + v.zCoord);
+        MCH_ViewEntityDummy.setCameraPosition(x + v.x, y + v.y, z + v.z);
         if (!cpi.fixRot);
       } 
     } 
@@ -3059,8 +3059,8 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       float ry = getLastRiderYaw();
       if (getRiddenByEntity() != null)
         ry = (getRiddenByEntity()).rotationYaw; 
-      Vec3d tpos = (getAcInfo()).turretPosition.addVector(0.0D, pos.yCoord, 0.0D);
-      Vec3d v = pos.addVector(-tpos.xCoord, -tpos.yCoord, -tpos.zCoord);
+      Vec3d tpos = (getAcInfo()).turretPosition.addVector(0.0D, pos.y, 0.0D);
+      Vec3d v = pos.addVector(-tpos.x, -tpos.y, -tpos.z);
       v = MCH_Lib.RotVec3(v, -ry, 0.0F, 0.0F);
       Vec3d vv = MCH_Lib.RotVec3(tpos, -getRotYaw(), -getRotPitch(), -getRotRoll());
       return v.add(vv);
@@ -3069,7 +3069,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   }
   
   public Vec3d getTransformedPosition(Vec3d v) {
-    return getTransformedPosition(v.xCoord, v.yCoord, v.zCoord);
+    return getTransformedPosition(v.x, v.y, v.z);
   }
   
   public Vec3d getTransformedPosition(double x, double y, double z) {
@@ -3077,11 +3077,11 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   }
   
   public Vec3d getTransformedPosition(Vec3d v, Vec3d pos) {
-    return getTransformedPosition(v.xCoord, v.yCoord, v.zCoord, pos.xCoord, pos.yCoord, pos.zCoord);
+    return getTransformedPosition(v.x, v.y, v.z, pos.x, pos.y, pos.z);
   }
   
   public Vec3d getTransformedPosition(Vec3d v, double px, double py, double pz) {
-    return getTransformedPosition(v.xCoord, v.yCoord, v.zCoord, this.posX, this.posY, this.posZ);
+    return getTransformedPosition(v.x, v.y, v.z, this.posX, this.posY, this.posZ);
   }
   
   public Vec3d getTransformedPosition(double x, double y, double z, double px, double py, double pz) {
@@ -3092,10 +3092,10 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   public Vec3d getTransformedPosition(double x, double y, double z, double px, double py, double pz, boolean rotSeat) {
     if (rotSeat && getAcInfo() != null) {
       MCH_AircraftInfo info = getAcInfo();
-      Vec3d tv = MCH_Lib.RotVec3(x - info.turretPosition.xCoord, y - info.turretPosition.yCoord, z - info.turretPosition.zCoord, -getLastRiderYaw() + getRotYaw(), 0.0F, 0.0F);
-      x = tv.xCoord + info.turretPosition.xCoord;
-      y = tv.yCoord + info.turretPosition.yCoord;
-      z = tv.zCoord + info.turretPosition.zCoord;
+      Vec3d tv = MCH_Lib.RotVec3(x - info.turretPosition.x, y - info.turretPosition.y, z - info.turretPosition.z, -getLastRiderYaw() + getRotYaw(), 0.0F, 0.0F);
+      x = tv.x + info.turretPosition.x;
+      y = tv.y + info.turretPosition.y;
+      z = tv.z + info.turretPosition.z;
     } 
     Vec3d v = MCH_Lib.RotVec3(x, y, z, -getRotYaw(), -getRotPitch(), -getRotRoll());
     return v.addVector(px, py, pz);
@@ -3255,7 +3255,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     this.camera.initCamera(sid, entity);
     MCH_SeatInfo seatInfo = getSeatInfo(seat.seatID + 1);
     if (seatInfo != null)
-      setUnmountPosition(entity, new Vec3d(seatInfo.pos.xCoord, 0.0D, seatInfo.pos.zCoord)); 
+      setUnmountPosition(entity, new Vec3d(seatInfo.pos.x, 0.0D, seatInfo.pos.z)); 
     if (!isRidePlayer()) {
       switchGunnerMode(false);
       switchHoveringMode(false);
@@ -3461,13 +3461,13 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
             if (getSeatIdByEntity(entity) > 1) {
               ret = true;
               Vec3d dropPos = getTransformedPosition((getAcInfo()).mobDropOption.pos, (Vec3d)this.prevPosition.oldest());
-              (this.seats[i]).posX = dropPos.xCoord;
-              (this.seats[i]).posY = dropPos.yCoord;
-              (this.seats[i]).posZ = dropPos.zCoord;
+              (this.seats[i]).posX = dropPos.x;
+              (this.seats[i]).posY = dropPos.y;
+              (this.seats[i]).posZ = dropPos.z;
               entity.dismountRidingEntity();
-              entity.posX = dropPos.xCoord;
-              entity.posY = dropPos.yCoord;
-              entity.posZ = dropPos.zCoord;
+              entity.posX = dropPos.x;
+              entity.posY = dropPos.y;
+              entity.posZ = dropPos.z;
               dropEntityParachute(entity);
               break;
             } 
@@ -3489,12 +3489,12 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       if (info != null && info.unmountPosition != null) {
         v = getTransformedPosition(info.unmountPosition);
       } else {
-        double x = pos.xCoord;
+        double x = pos.x;
         x = (x >= 0.0D) ? (x + 3.0D) : (x - 3.0D);
-        v = getTransformedPosition(x, 2.0D, pos.zCoord);
+        v = getTransformedPosition(x, 2.0D, pos.z);
       } 
-      rByEntity.setPosition(v.xCoord, v.yCoord, v.zCoord);
-      this.listUnmountReserve.add(new UnmountReserve(this, rByEntity, v.xCoord, v.yCoord, v.zCoord));
+      rByEntity.setPosition(v.x, v.y, v.z);
+      this.listUnmountReserve.add(new UnmountReserve(this, rByEntity, v.x, v.y, v.z));
     } 
   }
   
@@ -3533,13 +3533,13 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   public void ejectSeatSub(Entity entity, int sid) {
     Vec3d pos = (getSeatInfo(sid) != null) ? (getSeatInfo(sid)).pos : null;
     if (pos != null) {
-      Vec3d vec3d = getTransformedPosition(pos.xCoord, pos.yCoord + 2.0D, pos.zCoord);
-      entity.setPosition(vec3d.xCoord, vec3d.yCoord, vec3d.zCoord);
+      Vec3d vec3d = getTransformedPosition(pos.x, pos.y + 2.0D, pos.z);
+      entity.setPosition(vec3d.x, vec3d.y, vec3d.z);
     } 
     Vec3d v = MCH_Lib.RotVec3(0.0D, 2.0D, 0.0D, -getRotYaw(), -getRotPitch(), -getRotRoll());
-    entity.motionX = this.motionX + v.xCoord + (this.rand.nextFloat() - 0.5D) * 0.1D;
-    entity.motionY = this.motionY + v.yCoord;
-    entity.motionZ = this.motionZ + v.zCoord + (this.rand.nextFloat() - 0.5D) * 0.1D;
+    entity.motionX = this.motionX + v.x + (this.rand.nextFloat() - 0.5D) * 0.1D;
+    entity.motionY = this.motionY + v.y;
+    entity.motionZ = this.motionZ + v.z + (this.rand.nextFloat() - 0.5D) * 0.1D;
     MCH_EntityParachute parachute = new MCH_EntityParachute(this.world, entity.posX, entity.posY, entity.posZ);
     parachute.rotationYaw = entity.rotationYaw;
     parachute.motionX = entity.motionX;
@@ -3608,9 +3608,9 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       MCH_EntitySeat seat = getSeat(sid);
       if (getSeatInfo(1 + sid) instanceof MCH_SeatRackInfo && seat != null && seat.getRiddenByEntity() == null) {
         MCH_SeatRackInfo info = (MCH_SeatRackInfo)getSeatInfo(1 + sid);
-        Vec3d v = MCH_Lib.RotVec3((info.getEntryPos()).xCoord, (info.getEntryPos()).yCoord, (info.getEntryPos()).zCoord, -getRotYaw(), -getRotPitch(), -getRotRoll());
+        Vec3d v = MCH_Lib.RotVec3((info.getEntryPos()).x, (info.getEntryPos()).y, (info.getEntryPos()).z, -getRotYaw(), -getRotPitch(), -getRotRoll());
         v = v.addVector(this.posX, this.posY, this.posZ);
-        AxisAlignedBB bb = new AxisAlignedBB(v.xCoord, v.yCoord, v.zCoord, v.xCoord, v.yCoord, v.zCoord);
+        AxisAlignedBB bb = new AxisAlignedBB(v.x, v.y, v.z, v.x, v.y, v.z);
         float range = info.range;
         List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, bb.expand(range, range, range));
         for (int i = 0; i < list.size(); i++) {
@@ -3647,15 +3647,15 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
         Entity entity = seat.getRiddenByEntity();
         Vec3d pos = info.getEntryPos();
         if (entity instanceof MCH_EntityAircraft)
-          if (pos.zCoord >= (getAcInfo()).bbZ) {
+          if (pos.z >= (getAcInfo()).bbZ) {
             pos = pos.addVector(0.0D, 0.0D, 12.0D);
           } else {
             pos = pos.addVector(0.0D, 0.0D, -12.0D);
           }  
-        Vec3d v = MCH_Lib.RotVec3(pos.xCoord, pos.yCoord, pos.zCoord, -getRotYaw(), -getRotPitch(), -getRotRoll());
-        seat.posX = entity.posX = this.posX + v.xCoord;
-        seat.posY = entity.posY = this.posY + v.yCoord;
-        seat.posZ = entity.posZ = this.posZ + v.zCoord;
+        Vec3d v = MCH_Lib.RotVec3(pos.x, pos.y, pos.z, -getRotYaw(), -getRotPitch(), -getRotRoll());
+        seat.posX = entity.posX = this.posX + v.x;
+        seat.posY = entity.posY = this.posY + v.y;
+        seat.posZ = entity.posZ = this.posZ + v.z;
         UnmountReserve ur = new UnmountReserve(this, entity, entity.posX, entity.posY, entity.posZ);
         ur.cnt = 8;
         this.listUnmountReserve.add(ur);
@@ -3705,7 +3705,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
                 if (seat != null && seat.getRiddenByEntity() == null) {
                   Vec3d v = ac.getTransformedPosition(info.getEntryPos());
                   float r = info.range;
-                  if (this.posX >= v.xCoord - r && this.posX <= v.xCoord + r && this.posY >= v.yCoord - r && this.posY <= v.yCoord + r && this.posZ >= v.zCoord - r && this.posZ <= v.zCoord + r)
+                  if (this.posX >= v.x - r && this.posX <= v.x + r && this.posY >= v.y - r && this.posY <= v.y + r && this.posZ >= v.z - r && this.posZ <= v.z + r)
                     if (canRideAircraft(ac, sid, info)) {
                       W_WorldFunc.DEF_playSoundEffect(this.world, this.posX, this.posY, this.posZ, "random.click", 1.0F, 1.0F);
                       startRiding((Entity)seat);
@@ -3759,7 +3759,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
               if (seat != null && seat.getRiddenByEntity() == null) {
                 Vec3d v = ac.getTransformedPosition(info.getEntryPos());
                 float r = info.range;
-                if (this.posX >= v.xCoord - r && this.posX <= v.xCoord + r && this.posY >= v.yCoord - r && this.posY <= v.yCoord + r && this.posZ >= v.zCoord - r && this.posZ <= v.zCoord + r)
+                if (this.posX >= v.x - r && this.posX <= v.x + r && this.posY >= v.y - r && this.posY <= v.y + r && this.posZ >= v.z - r && this.posZ <= v.z + r)
                   if (canRideAircraft(ac, sid, info)) {
                     this.canRideRackStatus = true;
                     return;
@@ -3899,12 +3899,12 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     if (!checkTeam(player))
       return false; 
     ItemStack itemStack = player.getHeldItem(hand);
-    if (!itemStack.func_190926_b() && itemStack.getItem() instanceof mcheli.tool.MCH_ItemWrench) {
+    if (!itemStack.isEmpty() && itemStack.getItem() instanceof mcheli.tool.MCH_ItemWrench) {
       if (!this.world.isRemote && player.isSneaking())
         switchNextTextureName(); 
       return false;
     } 
-    if (!itemStack.func_190926_b() && itemStack.getItem() instanceof mcheli.mob.MCH_ItemSpawnGunner)
+    if (!itemStack.isEmpty() && itemStack.getItem() instanceof mcheli.mob.MCH_ItemSpawnGunner)
       return false; 
     if (player.isSneaking()) {
       displayInventory(player);
@@ -4085,7 +4085,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       MCH_AircraftInfo.CameraPosition cpi = getCameraPosInfo();
       Vec3d cp = (cpi != null) ? cpi.pos : Vec3d.ZERO;
       Vec3d v = MCH_Lib.RotVec3(cp, -getRotYaw(), -getRotPitch(), -getRotRoll());
-      this.camera.setPosition(x + v.xCoord, y + v.yCoord, z + v.zCoord);
+      this.camera.setPosition(x + v.x, y + v.y, z + v.z);
     } 
   }
   
@@ -4452,7 +4452,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
         if (this.world.isRemote && isUsed) {
           Vec3d wrv = MCH_Lib.RotVec3(0.0D, 0.0D, -1.0D, -w.rotationYaw - yaw, -w.rotationPitch);
           Vec3d spv = w.getCurrentWeapon().getShotPos((Entity)this);
-          spawnParticleMuzzleFlash(this.world, w.getInfo(), this.posX + spv.xCoord, this.posY + spv.yCoord, this.posZ + spv.zCoord, wrv);
+          spawnParticleMuzzleFlash(this.world, w.getInfo(), this.posX + spv.x, this.posY + spv.y, this.posZ + spv.z, wrv);
         } 
         w.updateWeapon((Entity)this, isUsed, index);
         id++;
@@ -4558,9 +4558,9 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   private void spawnParticleMuzzleFlash(World w, MCH_WeaponInfo wi, double px, double py, double pz, Vec3d wrv) {
     if (wi.listMuzzleFlashSmoke != null)
       for (MCH_WeaponInfo.MuzzleFlash mf : wi.listMuzzleFlashSmoke) {
-        double x = px + -wrv.xCoord * mf.dist;
-        double y = py + -wrv.yCoord * mf.dist;
-        double z = pz + -wrv.zCoord * mf.dist;
+        double x = px + -wrv.x * mf.dist;
+        double y = py + -wrv.y * mf.dist;
+        double z = pz + -wrv.z * mf.dist;
         MCH_ParticleParam p = new MCH_ParticleParam(w, "smoke", px, py, pz);
         p.size = mf.size;
         for (int i = 0; i < mf.num; i++) {
@@ -4582,7 +4582,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
     if (wi.listMuzzleFlash != null)
       for (MCH_WeaponInfo.MuzzleFlash mf : wi.listMuzzleFlash) {
         float color = this.rand.nextFloat() * 0.1F + 0.9F;
-        MCH_ParticlesUtil.spawnParticleExplode(this.world, px + -wrv.xCoord * mf.dist, py + -wrv.yCoord * mf.dist, pz + -wrv.zCoord * mf.dist, mf.size, color * mf.r, color * mf.g, color * mf.b, mf.a, mf.age + w.rand
+        MCH_ParticlesUtil.spawnParticleExplode(this.world, px + -wrv.x * mf.dist, py + -wrv.y * mf.dist, pz + -wrv.z * mf.dist, mf.size, color * mf.r, color * mf.g, color * mf.b, mf.a, mf.age + w.rand
             
             .nextInt(3));
       }  

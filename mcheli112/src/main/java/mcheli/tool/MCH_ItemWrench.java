@@ -164,7 +164,7 @@ public class MCH_ItemWrench extends W_Item {
   private static RayTraceResult rayTrace(EntityLivingBase entity, double dist, float tick) {
     Vec3d vec3 = new Vec3d(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
     Vec3d vec31 = entity.getLook(tick);
-    Vec3d vec32 = vec3.addVector(vec31.xCoord * dist, vec31.yCoord * dist, vec31.zCoord * dist);
+    Vec3d vec32 = vec3.addVector(vec31.x * dist, vec31.y * dist, vec31.z * dist);
     return entity.world.rayTraceBlocks(vec3, vec32, false, false, true);
   }
   
@@ -177,12 +177,12 @@ public class MCH_ItemWrench extends W_Item {
     if (objectMouseOver != null)
       d1 = objectMouseOver.hitVec.distanceTo(vec3); 
     Vec3d vec31 = user.getLook(tick);
-    Vec3d vec32 = vec3.addVector(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0);
+    Vec3d vec32 = vec3.addVector(vec31.x * d0, vec31.y * d0, vec31.z * d0);
     pointedEntity = null;
     Vec3d vec33 = null;
     float f1 = 1.0F;
     List<Entity> list = user.world.getEntitiesWithinAABBExcludingEntity((Entity)user, user
-        .getEntityBoundingBox().addCoord(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0).expand(f1, f1, f1));
+        .getEntityBoundingBox().addCoord(vec31.x * d0, vec31.y * d0, vec31.z * d0).expand(f1, f1, f1));
     double d2 = d1;
     for (int i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
@@ -251,7 +251,7 @@ public class MCH_ItemWrench extends W_Item {
   
   public boolean getIsRepairable(ItemStack item1, ItemStack item2) {
     ItemStack mat = this.toolMaterial.getRepairItemStack();
-    if (!mat.func_190926_b() && OreDictionary.itemMatches(mat, item2, false))
+    if (!mat.isEmpty() && OreDictionary.itemMatches(mat, item2, false))
       return true; 
     return super.getIsRepairable(item1, item2);
   }

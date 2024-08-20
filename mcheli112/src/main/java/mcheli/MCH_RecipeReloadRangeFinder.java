@@ -13,14 +13,14 @@ public class MCH_RecipeReloadRangeFinder extends IForgeRegistryEntry.Impl<IRecip
     int ccnt = 0;
     for (int i = 0; i < inv.getSizeInventory(); i++) {
       ItemStack is = inv.getStackInSlot(i);
-      if (!is.func_190926_b())
+      if (!is.isEmpty())
         if (is.getItem() instanceof mcheli.tool.rangefinder.MCH_ItemRangeFinder) {
           if (is.getMetadata() == 0)
             return false; 
           jcnt++;
           if (jcnt > 1)
             return false; 
-        } else if (is.getItem() instanceof net.minecraft.item.ItemRedstone && is.func_190916_E() > 0) {
+        } else if (is.getItem() instanceof net.minecraft.item.ItemRedstone && is.getCount() > 0) {
           ccnt++;
           if (ccnt > 1)
             return false; 
@@ -41,6 +41,6 @@ public class MCH_RecipeReloadRangeFinder extends IForgeRegistryEntry.Impl<IRecip
   }
   
   public ItemStack getRecipeOutput() {
-    return ItemStack.field_190927_a;
+    return ItemStack.EMPTY;
   }
 }

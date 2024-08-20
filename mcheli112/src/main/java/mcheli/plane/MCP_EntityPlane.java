@@ -410,9 +410,9 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
       } 
       Vec3d rotor_pos = ((MCP_PlaneInfo.Rotor)(getPlaneInfo()).rotorList.get(ri)).pos;
       Vec3d pos = MCH_Lib.RotVec3(rotor_pos, -yaw, -pitch, -roll);
-      double x = this.posX + pos.xCoord;
-      double y = this.posY + pos.yCoord;
-      double z = this.posZ + pos.zCoord;
+      double x = this.posX + pos.x;
+      double y = this.posY + pos.y;
+      double z = this.posZ + pos.z;
       onUpdate_Particle2SpawnSmoke(ri, x, y, z, 1.0F, spawnSmoke);
     } 
     spawnSmoke = true;
@@ -425,10 +425,10 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
     double py = this.posY;
     double pz = this.posZ;
     if (getSeatInfo(0) != null && (getSeatInfo(0)).pos != null) {
-      Vec3d pos = MCH_Lib.RotVec3(0.0D, (getSeatInfo(0)).pos.yCoord, -2.0D, -yaw, -pitch, -roll);
-      px += pos.xCoord;
-      py += pos.yCoord;
-      pz += pos.zCoord;
+      Vec3d pos = MCH_Lib.RotVec3(0.0D, (getSeatInfo(0)).pos.y, -2.0D, -yaw, -pitch, -roll);
+      px += pos.x;
+      py += pos.y;
+      pz += pos.z;
     } 
     onUpdate_Particle2SpawnSmoke(rotorNum, px, py, pz, (rotorNum == 0) ? 2.0F : 1.0F, spawnSmoke);
     this.isFirstDamageSmoke = false;
@@ -438,13 +438,13 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
     if (this.isFirstDamageSmoke || this.prevDamageSmokePos[ri] == null)
       this.prevDamageSmokePos[ri] = new Vec3d(x, y, z); 
     Vec3d prev = this.prevDamageSmokePos[ri];
-    double dx = x - prev.xCoord;
-    double dy = y - prev.yCoord;
-    double dz = z - prev.zCoord;
+    double dx = x - prev.x;
+    double dy = y - prev.y;
+    double dz = z - prev.z;
     int num = (int)(MathHelper.sqrt(dx * dx + dy * dy + dz * dz) / 0.3D) + 1;
     for (int i = 0; i < num; i++) {
       float c = 0.2F + this.rand.nextFloat() * 0.3F;
-      MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", prev.xCoord + (x - prev.xCoord) * i / 3.0D, prev.yCoord + (y - prev.yCoord) * i / 3.0D, prev.zCoord + (z - prev.zCoord) * i / 3.0D);
+      MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", prev.x + (x - prev.x) * i / 3.0D, prev.y + (y - prev.y) * i / 3.0D, prev.z + (z - prev.z) * i / 3.0D);
       prm.motionX = size * (this.rand.nextDouble() - 0.5D) * 0.3D;
       prm.motionY = size * this.rand.nextDouble() * 0.1D;
       prm.motionZ = size * (this.rand.nextDouble() - 0.5D) * 0.3D;
@@ -490,12 +490,12 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
     Vec3d v = getTransformedPosition(pos);
     v = v.addVector(this.rand.nextDouble() - 0.5D, (this.rand.nextDouble() - 0.5D) * 0.5D, this.rand
         .nextDouble() - 0.5D);
-    int x = (int)(v.xCoord + 0.5D);
-    int y = (int)(v.yCoord + 0.0D);
-    int z = (int)(v.zCoord + 0.5D);
+    int x = (int)(v.x + 0.5D);
+    int y = (int)(v.y + 0.0D);
+    int z = (int)(v.z + 0.5D);
     if (W_WorldFunc.isBlockWater(this.world, x, y, z)) {
       float c = this.rand.nextFloat() * 0.3F + 0.7F;
-      MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", v.xCoord, v.yCoord, v.zCoord);
+      MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", v.x, v.y, v.z);
       prm.motionX = mx + (this.rand.nextFloat() - 0.5D) * 0.7D;
       prm.motionY = my;
       prm.motionZ = mz + (this.rand.nextFloat() - 0.5D) * 0.7D;
@@ -519,13 +519,13 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
     for (MCH_AircraftInfo.DrawnPart nozzle : this.planeInfo.nozzles) {
       if (this.rand.nextFloat() <= getCurrentThrottle() * 1.5D) {
         Vec3d nozzlePos = MCH_Lib.RotVec3(nozzle.pos, -yaw, -pitch, -roll);
-        double x = this.posX + nozzlePos.xCoord + nozzleRot.xCoord;
-        double y = this.posY + nozzlePos.yCoord + nozzleRot.yCoord;
-        double z = this.posZ + nozzlePos.zCoord + nozzleRot.zCoord;
+        double x = this.posX + nozzlePos.x + nozzleRot.x;
+        double y = this.posY + nozzlePos.y + nozzleRot.y;
+        double z = this.posZ + nozzlePos.z + nozzleRot.z;
         float a = 0.7F;
-        if (W_WorldFunc.getBlockId(this.world, (int)(x + nozzleRot.xCoord * 3.0D), (int)(y + nozzleRot.yCoord * 3.0D), (int)(z + nozzleRot.zCoord * 3.0D)) != 0)
+        if (W_WorldFunc.getBlockId(this.world, (int)(x + nozzleRot.x * 3.0D), (int)(y + nozzleRot.y * 3.0D), (int)(z + nozzleRot.z * 3.0D)) != 0)
           a = 2.0F; 
-        MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", x, y, z, nozzleRot.xCoord + ((this.rand.nextFloat() - 0.5F) * a), nozzleRot.yCoord, nozzleRot.zCoord + ((this.rand.nextFloat() - 0.5F) * a), 5.0F * (getAcInfo()).particlesScale);
+        MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", x, y, z, nozzleRot.x + ((this.rand.nextFloat() - 0.5F) * a), nozzleRot.y, nozzleRot.z + ((this.rand.nextFloat() - 0.5F) * a), 5.0F * (getAcInfo()).particlesScale);
         MCH_ParticlesUtil.spawnParticle(prm);
       } 
     } 
@@ -629,15 +629,15 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
       setRotPitch(getRotPitch() * 0.95F);
       v = MCH_Lib.Rot2Vec3(getRotYaw(), getRotPitch() - getNozzleRotation());
       if (getNozzleRotation() >= 90.0F)
-        v = new Vec3d(v.xCoord * 0.800000011920929D, v.yCoord, v.zCoord * 0.800000011920929D); 
+        v = new Vec3d(v.x * 0.800000011920929D, v.y, v.z * 0.800000011920929D); 
     } else {
       v = MCH_Lib.Rot2Vec3(getRotYaw(), getRotPitch() - 10.0F);
     } 
     if (!levelOff)
       if (getNozzleRotation() <= 0.01F) {
-        this.motionY += v.yCoord * throttle / 2.0D;
+        this.motionY += v.y * throttle / 2.0D;
       } else {
-        this.motionY += v.yCoord * throttle / 8.0D;
+        this.motionY += v.y * throttle / 8.0D;
       }  
     boolean canMove = true;
     if (!(getAcInfo()).canMoveOnGround) {
@@ -647,11 +647,11 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
     } 
     if (canMove)
       if ((getAcInfo()).enableBack && this.throttleBack > 0.0F) {
-        this.motionX -= v.xCoord * this.throttleBack;
-        this.motionZ -= v.zCoord * this.throttleBack;
+        this.motionX -= v.x * this.throttleBack;
+        this.motionZ -= v.z * this.throttleBack;
       } else {
-        this.motionX += v.xCoord * throttle;
-        this.motionZ += v.zCoord * throttle;
+        this.motionX += v.x * throttle;
+        this.motionZ += v.z * throttle;
       }  
     double motion = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
     float speedLimit = getMaxSpeed();

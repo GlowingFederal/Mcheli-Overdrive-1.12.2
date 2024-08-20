@@ -66,7 +66,7 @@ public class W_Face {
     Vec3d v1 = new Vec3d(((this.vertices[1]).x - (this.vertices[0]).x), ((this.vertices[1]).y - (this.vertices[0]).y), ((this.vertices[1]).z - (this.vertices[0]).z));
     Vec3d v2 = new Vec3d(((this.vertices[2]).x - (this.vertices[0]).x), ((this.vertices[2]).y - (this.vertices[0]).y), ((this.vertices[2]).z - (this.vertices[0]).z));
     Vec3d normalVector = v1.crossProduct(v2).normalize();
-    return new W_Vertex((float)normalVector.xCoord, (float)normalVector.yCoord, (float)normalVector.zCoord);
+    return new W_Vertex((float)normalVector.x, (float)normalVector.y, (float)normalVector.z);
   }
   
   public String toString() {

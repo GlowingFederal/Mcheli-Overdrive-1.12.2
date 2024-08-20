@@ -470,7 +470,7 @@ public class MCH_DraftingTableGui extends W_GuiContainer {
   public void drawItemRecipe(IRecipe recipe, int x, int y) {
     if (recipe == null)
       return; 
-    if (recipe.getRecipeOutput().func_190926_b())
+    if (recipe.getRecipeOutput().isEmpty())
       return; 
     if (recipe.getRecipeOutput().getItem() == null)
       return; 

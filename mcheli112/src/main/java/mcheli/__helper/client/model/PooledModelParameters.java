@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 public class PooledModelParameters {
   private static EntityLivingBase heldItemUser;
   
-  private static ItemStack rendererTargetItem = ItemStack.field_190927_a;
+  private static ItemStack rendererTargetItem = ItemStack.EMPTY;
   
   private static ItemCameraTransforms.TransformType transformType = ItemCameraTransforms.TransformType.NONE;
   

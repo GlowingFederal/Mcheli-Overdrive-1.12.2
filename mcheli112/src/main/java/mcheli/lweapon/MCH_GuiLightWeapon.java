@@ -140,8 +140,8 @@ public class MCH_GuiLightWeapon extends MCH_Gui {
         pos = new Vec3d((this.width / 2 * scale), (this.height / 2 * scale), 0.0D); 
       double IX = 280.0D * fac;
       double IY = 370.0D * fac;
-      double cx = pos.xCoord / scale;
-      double cy = this.height - pos.yCoord / scale;
+      double cx = pos.x / scale;
+      double cy = this.height - pos.y / scale;
       double sx = MCH_Lib.RNG(cx, left + IX, right - IX);
       double sy = MCH_Lib.RNG(cy, top + IY, bottom - IY);
       if (gs.getLockCount() >= gs.getLockCountMax() / 2)
@@ -150,8 +150,8 @@ public class MCH_GuiLightWeapon extends MCH_Gui {
         pos = MCH_ClientLightWeaponTickHandler.getMartEntityBBPos();
         if (pos == null)
           pos = new Vec3d(((this.width / 2 - 65) * scale), ((this.height / 2 + 50) * scale), 0.0D); 
-        double bx = pos.xCoord / scale;
-        double by = this.height - pos.yCoord / scale;
+        double bx = pos.x / scale;
+        double by = this.height - pos.y / scale;
         double dx = Math.abs(cx - bx);
         double dy = Math.abs(cy - by);
         double p = 1.0D - gs.getLockCount() / gs.getLockCountMax();

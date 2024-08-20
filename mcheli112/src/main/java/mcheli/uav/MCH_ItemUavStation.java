@@ -62,14 +62,14 @@ public class MCH_ItemUavStation extends W_Item {
     boolean flag = false;
     float f9 = 1.0F;
     List<Entity> list = worldIn.getEntitiesWithinAABBExcludingEntity((Entity)playerIn, playerIn
-        .getEntityBoundingBox().addCoord(vec32.xCoord * d3, vec32.yCoord * d3, vec32.zCoord * d3).expand(f9, f9, f9));
+        .getEntityBoundingBox().expand(vec32.x * d3, vec32.y * d3, vec32.z * d3).expand(f9, f9, f9));
     int i;
     for (i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
       if (entity.canBeCollidedWith()) {
         float f10 = entity.getCollisionBorderSize();
         AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expand(f10, f10, f10);
-        if (axisalignedbb.isVecInside(vec3))
+        if (axisalignedbb.contains(vec3))
           flag = true; 
       } 
     } 
@@ -86,9 +86,9 @@ public class MCH_ItemUavStation extends W_Item {
       if (!worldIn.getCollisionBoxes((Entity)entityUavSt, entityUavSt.getEntityBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty())
         return ActionResult.newResult(EnumActionResult.FAIL, itemstack); 
       if (!worldIn.isRemote)
-        worldIn.spawnEntityInWorld((Entity)entityUavSt); 
+        worldIn.spawnEntity((Entity)entityUavSt);
       if (!playerIn.capabilities.isCreativeMode)
-        itemstack.func_190918_g(1); 
+        itemstack.shrink(1); 
     } 
     return ActionResult.newResult(EnumActionResult.SUCCESS, itemstack);
   }

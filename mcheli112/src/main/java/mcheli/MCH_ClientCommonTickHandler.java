@@ -468,7 +468,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
   public void onPlayerTickPre(EntityPlayer player) {
     if (player.world.isRemote) {
       ItemStack currentItemstack = player.getHeldItem(EnumHand.MAIN_HAND);
-      if (!currentItemstack.func_190926_b() && currentItemstack.getItem() instanceof mcheli.tool.MCH_ItemWrench)
+      if (!currentItemstack.isEmpty() && currentItemstack.getItem() instanceof mcheli.tool.MCH_ItemWrench)
         if (player.getItemInUseCount() > 0 && player.getActiveItemStack() != currentItemstack) {
           int maxdm = currentItemstack.getMaxDamage();
           int dm = currentItemstack.getMetadata();

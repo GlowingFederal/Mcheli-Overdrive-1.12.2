@@ -493,7 +493,7 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
       } else if (item.equalsIgnoreCase("DamageFactor")) {
         String[] s = splitParam(data);
         if (s.length >= 2) {
-          Class<MCH_EntityVehicle> clazz;
+          Class<MCH_EntityVehicle> clazz = null;
           Class<? extends Entity> c = null;
           String className = s[0].toLowerCase();
           if (className.equals("player")) {
@@ -596,7 +596,7 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
     
     public final int damage;
     
-    public ItemStack itemStack = ItemStack.field_190927_a;
+    public ItemStack itemStack = ItemStack.EMPTY;
     
     public RoundItem(int n, String name, int damage) {
       this.num = n;

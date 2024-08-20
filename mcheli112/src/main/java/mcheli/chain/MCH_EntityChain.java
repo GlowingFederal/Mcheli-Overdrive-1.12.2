@@ -215,7 +215,7 @@ public class MCH_EntityChain extends W_Entity {
       this.motionY *= 0.8D;
       this.motionZ *= 0.8D;
     } 
-    moveEntity(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+    move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
     if (isTowingEntity()) {
       setPosition(this.towEntity.posX, this.towEntity.posY + 2.0D, this.towEntity.posZ);
       updateTowingEntityPosRot();

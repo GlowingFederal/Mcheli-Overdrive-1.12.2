@@ -86,7 +86,7 @@ public abstract class MCH_ItemAircraft extends W_Item {
     boolean flag = false;
     float f9 = 1.0F;
     List<Entity> list = world.getEntitiesWithinAABBExcludingEntity((Entity)player, player
-        .getEntityBoundingBox().addCoord(vec32.xCoord * d3, vec32.yCoord * d3, vec32.zCoord * d3).expand(f9, f9, f9));
+        .getEntityBoundingBox().addCoord(vec32.x * d3, vec32.y * d3, vec32.z * d3).expand(f9, f9, f9));
     for (int i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
       if (entity.canBeCollidedWith()) {
@@ -142,7 +142,7 @@ public abstract class MCH_ItemAircraft extends W_Item {
           MCH_CriteriaTriggers.PUT_AIRCRAFT.trigger((EntityPlayerMP)player);
         } 
         if (!player.capabilities.isCreativeMode)
-          itemStack.func_190918_g(1); 
+          itemStack.shrink(1); 
       } 
     } 
     return ac;

@@ -80,7 +80,7 @@ public class MCH_EntityBullet extends MCH_EntityBaseBullet {
       return;
     } 
     if (m != null)
-      vec31 = W_WorldFunc.getWorldVec3(this.world, m.hitVec.xCoord, m.hitVec.yCoord, m.hitVec.zCoord); 
+      vec31 = W_WorldFunc.getWorldVec3(this.world, m.hitVec.x, m.hitVec.y, m.hitVec.z); 
     Entity entity = null;
     List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, 
         getEntityBoundingBox().addCoord(mx, my, mz).expand(21.0D, 21.0D, 21.0D));

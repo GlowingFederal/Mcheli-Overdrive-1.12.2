@@ -48,7 +48,7 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
   
   protected EntityPlayer prevThePlayer = null;
   
-  protected ItemStack prevItemStack = ItemStack.field_190927_a;
+  protected ItemStack prevItemStack = ItemStack.EMPTY;
   
   public MCH_Key KeyAttack;
   
@@ -144,15 +144,15 @@ public class MCH_ClientLightWeaponTickHandler extends MCH_ClientTickHandlerBase 
       initWeaponParam((EntityPlayer)entityPlayerSP);
       this.prevThePlayer = (EntityPlayer)entityPlayerSP;
     } 
-    ItemStack is = (entityPlayerSP != null) ? entityPlayerSP.getHeldItemMainhand() : ItemStack.field_190927_a;
+    ItemStack is = (entityPlayerSP != null) ? entityPlayerSP.getHeldItemMainhand() : ItemStack.EMPTY;
     if (entityPlayerSP == null || entityPlayerSP.getRidingEntity() instanceof mcheli.gltd.MCH_EntityGLTD || entityPlayerSP
       .getRidingEntity() instanceof MCH_EntityAircraft)
-      is = ItemStack.field_190927_a; 
+      is = ItemStack.EMPTY; 
     if (gs.getLockingEntity() == null)
       markEntity = null; 
-    if (!is.func_190926_b() && is.getItem() instanceof MCH_ItemLightWeaponBase) {
+    if (!is.isEmpty() && is.getItem() instanceof MCH_ItemLightWeaponBase) {
       MCH_ItemLightWeaponBase lweapon = (MCH_ItemLightWeaponBase)is.getItem();
-      if (this.prevItemStack.func_190926_b() || (!this.prevItemStack.isItemEqual(is) && 
+      if (this.prevItemStack.isEmpty() || (!this.prevItemStack.isItemEqual(is) && 
         !this.prevItemStack.getUnlocalizedName().equals(is.getUnlocalizedName()))) {
         initWeaponParam((EntityPlayer)entityPlayerSP);
         weapon = MCH_WeaponCreator.createWeapon(((EntityPlayer)entityPlayerSP).world, MCH_ItemLightWeaponBase.getName(is), Vec3d.ZERO, 0.0F, 0.0F, null, false);

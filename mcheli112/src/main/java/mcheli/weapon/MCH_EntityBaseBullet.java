@@ -617,10 +617,10 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
       return;
     } 
     if (m != null)
-      vec31 = W_WorldFunc.getWorldVec3(this.world, m.hitVec.xCoord, m.hitVec.yCoord, m.hitVec.zCoord); 
+      vec31 = W_WorldFunc.getWorldVec3(this.world, m.hitVec.x, m.hitVec.y, m.hitVec.z); 
     Entity entity = null;
     List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity((Entity)this, 
-        getEntityBoundingBox().addCoord(mx, my, mz).expand(21.0D, 21.0D, 21.0D));
+        getEntityBoundingBox().expand(mx, my, mz).expand(21.0D, 21.0D, 21.0D));
     double d0 = 0.0D;
     for (int j = 0; j < list.size(); j++) {
       Entity entity1 = list.get(j);
@@ -697,29 +697,29 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
       if (this.piercing > 0) {
         this.piercing--;
         if (expPower > 0.0F)
-          newExplosion(m.hitVec.xCoord + dx, m.hitVec.yCoord + dy, m.hitVec.zCoord + dz, 1.0F, 1.0F, false); 
+          newExplosion(m.hitVec.x + dx, m.hitVec.y + dy, m.hitVec.z + dz, 1.0F, 1.0F, false); 
       } else {
         if (expPowerInWater == 0.0F) {
           if ((getInfo()).isFAE) {
             newFAExplosion(this.posX, this.posY, this.posZ, expPower, (getInfo()).explosionBlock);
           } else if (expPower > 0.0F) {
-            newExplosion(m.hitVec.xCoord + dx, m.hitVec.yCoord + dy, m.hitVec.zCoord + dz, expPower, 
+            newExplosion(m.hitVec.x + dx, m.hitVec.y + dy, m.hitVec.z + dz, expPower, 
                 (getInfo()).explosionBlock, false);
           } else if (expPower < 0.0F) {
             playExplosionSound();
           } 
         } else if (m.entityHit != null) {
           if (isInWater()) {
-            newExplosion(m.hitVec.xCoord + dx, m.hitVec.yCoord + dy, m.hitVec.zCoord + dz, expPowerInWater, expPowerInWater, true);
+            newExplosion(m.hitVec.x + dx, m.hitVec.y + dy, m.hitVec.z + dz, expPowerInWater, expPowerInWater, true);
           } else {
-            newExplosion(m.hitVec.xCoord + dx, m.hitVec.yCoord + dy, m.hitVec.zCoord + dz, expPower, 
+            newExplosion(m.hitVec.x + dx, m.hitVec.y + dy, m.hitVec.z + dz, expPower, 
                 (getInfo()).explosionBlock, false);
           } 
         } else if (isInWater() || MCH_Lib.isBlockInWater(this.world, m.getBlockPos().getX(), m
             .getBlockPos().getY(), m.getBlockPos().getZ())) {
           newExplosion(m.getBlockPos().getX(), m.getBlockPos().getY(), m.getBlockPos().getZ(), expPowerInWater, expPowerInWater, true);
         } else if (expPower > 0.0F) {
-          newExplosion(m.hitVec.xCoord + dx, m.hitVec.yCoord + dy, m.hitVec.zCoord + dz, expPower, (getInfo()).explosionBlock, false);
+          newExplosion(m.hitVec.x + dx, m.hitVec.y + dy, m.hitVec.z + dz, expPower, (getInfo()).explosionBlock, false);
         } else if (expPower < 0.0F) {
           playExplosionSound();
         } 
@@ -730,7 +730,7 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         float p = (getInfo()).power;
         for (int i = 0; i < p / 3.0F; i++)
           MCH_ParticlesUtil.spawnParticleTileCrack(this.world, m.getBlockPos().getX(), m.getBlockPos().getY(), m
-              .getBlockPos().getZ(), m.hitVec.xCoord + (this.rand.nextFloat() - 0.5D) * p / 10.0D, m.hitVec.yCoord + 0.1D, m.hitVec.zCoord + (this.rand
+              .getBlockPos().getZ(), m.hitVec.x + (this.rand.nextFloat() - 0.5D) * p / 10.0D, m.hitVec.y + 0.1D, m.hitVec.z + (this.rand
               .nextFloat() - 0.5D) * p / 10.0D, -this.motionX * p / 2.0D, (p / 2.0F), -this.motionZ * p / 2.0D); 
       } 
     } 
@@ -801,7 +801,7 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
       return false; 
     if (!this.world.isRemote)
       if (par2 > 0.0F && ds.getDamageType().equalsIgnoreCase("thrown")) {
-        setBeenAttacked();
+        markVelocityChanged();
         Vec3d pos = new Vec3d(this.posX, this.posY, this.posZ);
         RayTraceResult m = new RayTraceResult(pos, EnumFacing.DOWN, new BlockPos(pos));
         onImpact(m, 1.0F);

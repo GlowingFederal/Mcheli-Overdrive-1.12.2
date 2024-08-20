@@ -262,9 +262,9 @@ public class MCH_EntityGunner extends EntityLivingBase {
       double dx = (this.targetEntity.posX - this.targetPrevPosX) * tick;
       double dy = (this.targetEntity.posY - this.targetPrevPosY) * tick + this.targetEntity.height * this.rand.nextDouble();
       double dz = (this.targetEntity.posZ - this.targetPrevPosZ) * tick;
-      double d0 = this.targetEntity.posX + dx - pos.xCoord;
-      double d1 = this.targetEntity.posY + dy - pos.yCoord;
-      double d2 = this.targetEntity.posZ + dz - pos.zCoord;
+      double d0 = this.targetEntity.posX + dx - pos.x;
+      double d1 = this.targetEntity.posY + dy - pos.y;
+      double d2 = this.targetEntity.posZ + dz - pos.z;
       double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
       float yaw = MathHelper.wrapDegrees((float)(Math.atan2(d2, d0) * 180.0D / Math.PI) - 90.0F);
       float pitch = (float)-(Math.atan2(d1, d3) * 180.0D / Math.PI);
@@ -303,9 +303,9 @@ public class MCH_EntityGunner extends EntityLivingBase {
   
   private boolean checkPitch(EntityLivingBase entity, MCH_EntityAircraft ac, Vec3d pos) {
     try {
-      double d0 = entity.posX - pos.xCoord;
-      double d1 = entity.posY - pos.yCoord;
-      double d2 = entity.posZ - pos.zCoord;
+      double d0 = entity.posX - pos.x;
+      double d1 = entity.posY - pos.y;
+      double d2 = entity.posZ - pos.z;
       double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
       float pitch = (float)-(Math.atan2(d1, d3) * 180.0D / Math.PI);
       MCH_AircraftInfo ai = ac.getAcInfo();
@@ -347,7 +347,7 @@ public class MCH_EntityGunner extends EntityLivingBase {
       Vec3d v1 = new Vec3d(0.0D, 0.0D, 1.0D);
       float yaw = -ac.getRotYaw() + (wi.maxYaw + wi.minYaw) / 2.0F - wi.defaultYaw;
       v1 = v1.rotateYaw(yaw * 3.1415927F / 180.0F);
-      Vec3d v2 = (new Vec3d(entity.posX - pos.xCoord, 0.0D, entity.posZ - pos.zCoord)).normalize();
+      Vec3d v2 = (new Vec3d(entity.posX - pos.x, 0.0D, entity.posZ - pos.z)).normalize();
       double dot = v1.dotProduct(v2);
       double rad = Math.acos(dot);
       double deg = rad * 180.0D / Math.PI;
@@ -405,7 +405,7 @@ public class MCH_EntityGunner extends EntityLivingBase {
   }
   
   public ItemStack getItemStackFromSlot(EntityEquipmentSlot slotIn) {
-    return ItemStack.field_190927_a;
+    return ItemStack.EMPTY;
   }
   
   public void setItemStackToSlot(EntityEquipmentSlot slotIn, ItemStack stack) {}

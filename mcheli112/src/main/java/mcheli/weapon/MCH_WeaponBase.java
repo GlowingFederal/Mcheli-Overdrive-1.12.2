@@ -170,9 +170,9 @@ public abstract class MCH_WeaponBase {
   
   public boolean use(MCH_WeaponParam prm) {
     Vec3d v = getShotPos(prm.entity);
-    prm.posX += v.xCoord;
-    prm.posY += v.yCoord;
-    prm.posZ += v.zCoord;
+    prm.posX += v.x;
+    prm.posY += v.y;
+    prm.posZ += v.z;
     if (shot(prm)) {
       this.tick = 0;
       return true;
@@ -183,7 +183,7 @@ public abstract class MCH_WeaponBase {
   public Vec3d getShotPos(Entity entity) {
     if (entity instanceof MCH_EntityAircraft && this.onTurret)
       return ((MCH_EntityAircraft)entity).calcOnTurretPos(this.position); 
-    Vec3d v = new Vec3d(this.position.xCoord, this.position.yCoord, this.position.zCoord);
+    Vec3d v = new Vec3d(this.position.x, this.position.y, this.position.z);
     float roll = (entity instanceof MCH_EntityAircraft) ? ((MCH_EntityAircraft)entity).getRotRoll() : 0.0F;
     return MCH_Lib.RotVec3(v, -entity.rotationYaw, -entity.rotationPitch, -roll);
   }
@@ -211,14 +211,14 @@ public abstract class MCH_WeaponBase {
     if (this.weaponInfo.gravity >= 0.0F)
       return -1.0D; 
     Vec3d v = MCH_Lib.RotVec3(0.0D, 0.0D, 1.0D, -prm.rotYaw, -prm.rotPitch, -prm.rotRoll);
-    double s = Math.sqrt(v.xCoord * v.xCoord + v.yCoord * v.yCoord + v.zCoord * v.zCoord);
+    double s = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
     double acc = (this.acceleration < 4.0F) ? this.acceleration : 4.0D;
     double accFac = this.acceleration / acc;
-    double my = v.yCoord * this.acceleration / s;
+    double my = v.y * this.acceleration / s;
     if (my <= 0.0D)
       return -1.0D; 
-    double mx = v.xCoord * this.acceleration / s;
-    double mz = v.zCoord * this.acceleration / s;
+    double mx = v.x * this.acceleration / s;
+    double mz = v.z * this.acceleration / s;
     double ls = my / this.weaponInfo.gravity;
     double gravity = this.weaponInfo.gravity * accFac;
     if (ls < -12.0D) {

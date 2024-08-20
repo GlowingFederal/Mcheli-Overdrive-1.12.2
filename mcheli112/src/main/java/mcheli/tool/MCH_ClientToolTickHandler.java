@@ -44,10 +44,10 @@ public class MCH_ClientToolTickHandler extends MCH_ClientTickHandlerBase {
   private void onTick_ItemRangeFinder(boolean inGUI, EntityPlayer player) {
     if (MCH_ItemRangeFinder.rangeFinderUseCooldown > 0)
       MCH_ItemRangeFinder.rangeFinderUseCooldown--; 
-    ItemStack itemStack = ItemStack.field_190927_a;
+    ItemStack itemStack = ItemStack.EMPTY;
     if (player != null) {
       itemStack = player.getHeldItemMainhand();
-      if (!itemStack.func_190926_b() && itemStack.getItem() instanceof MCH_ItemRangeFinder) {
+      if (!itemStack.isEmpty() && itemStack.getItem() instanceof MCH_ItemRangeFinder) {
         boolean usingItem = (player.getItemInUseMaxCount() > 8 && MCH_ItemRangeFinder.canUse(player));
         if (!MCH_ItemRangeFinder.continueUsingItem && usingItem)
           MCH_ItemRangeFinder.onStartUseItem(); 
@@ -78,7 +78,7 @@ public class MCH_ClientToolTickHandler extends MCH_ClientTickHandlerBase {
       } 
     } 
     if (MCH_ItemRangeFinder.continueUsingItem)
-      if (itemStack.func_190926_b() || !(itemStack.getItem() instanceof MCH_ItemRangeFinder))
+      if (itemStack.isEmpty() || !(itemStack.getItem() instanceof MCH_ItemRangeFinder))
         MCH_ItemRangeFinder.onStopUseItem();  
   }
   
@@ -86,12 +86,12 @@ public class MCH_ClientToolTickHandler extends MCH_ClientTickHandlerBase {
     if (player == null)
       return; 
     ItemStack itemStack = player.getHeldItemMainhand();
-    if (!itemStack.func_190926_b() && itemStack.getItem() instanceof MCH_ItemWrench) {
+    if (!itemStack.isEmpty() && itemStack.getItem() instanceof MCH_ItemWrench) {
       int maxdm = itemStack.getMaxDamage();
       int dm = itemStack.getMetadata();
       if (dm <= maxdm) {
         ItemStack renderItemstack = W_Reflection.getItemRendererMainHand();
-        if (renderItemstack.func_190926_b() || itemStack.getItem() == renderItemstack.getItem())
+        if (renderItemstack.isEmpty() || itemStack.getItem() == renderItemstack.getItem())
           W_Reflection.setItemRendererMainHand(player.inventory.getCurrentItem()); 
       } 
     } 

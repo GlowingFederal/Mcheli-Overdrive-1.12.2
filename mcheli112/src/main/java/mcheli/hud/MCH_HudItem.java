@@ -147,11 +147,11 @@ public abstract class MCH_HudItem extends Gui {
   }
   
   public void drawCenteredString(String s, int x, int y, int color) {
-    drawCenteredString(mc.fontRendererObj, s, x, y, color);
+    drawCenteredString(mc.fontRenderer, s, x, y, color);
   }
   
   public void drawString(String s, int x, int y, int color) {
-    drawString(mc.fontRendererObj, s, x, y, color);
+    drawString(mc.fontRenderer, s, x, y, color);
   }
   
   public void drawTexture(String name, double left, double top, double width, double height, double uLeft, double vTop, double uWidth, double vHeight, float rot, int textureWidth, int textureHeight) {

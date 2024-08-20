@@ -47,7 +47,7 @@ public class MCH_ItemGLTD extends W_Item {
     boolean flag = false;
     float f9 = 1.0F;
     List<Entity> list = par2World.getEntitiesWithinAABBExcludingEntity((Entity)par3EntityPlayer, par3EntityPlayer
-        .getEntityBoundingBox().addCoord(vec32.xCoord * d3, vec32.yCoord * d3, vec32.zCoord * d3).expand(f9, f9, f9));
+        .getEntityBoundingBox().addCoord(vec32.x * d3, vec32.y * d3, vec32.z * d3).expand(f9, f9, f9));
     for (int i = 0; i < list.size(); i++) {
       Entity entity = list.get(i);
       if (entity.canBeCollidedWith()) {
@@ -71,7 +71,7 @@ public class MCH_ItemGLTD extends W_Item {
       if (!par2World.isRemote)
         par2World.spawnEntityInWorld((Entity)entityboat); 
       if (!par3EntityPlayer.capabilities.isCreativeMode)
-        itemstack.func_190918_g(1); 
+        itemstack.shrink(1); 
     } 
     return ActionResult.newResult(EnumActionResult.SUCCESS, itemstack);
   }

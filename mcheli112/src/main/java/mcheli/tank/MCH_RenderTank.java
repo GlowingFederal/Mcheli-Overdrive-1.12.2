@@ -79,8 +79,8 @@ public class MCH_RenderTank extends MCH_RenderAircraft<MCH_EntityTank> {
           .color(cint.r, cint.g, cint.b, cint.a).endVertex();
         builder.pos(w1.posX - tank.posX + posX, w1.posY - tank.posY + posY, w1.posZ - tank.posZ + posZ)
           .color(cint.r, cint.g, cint.b, cint.a).endVertex();
-        builder.pos(posX + wp.xCoord, posY + wp.yCoord, posZ + wp.zCoord).color(cint.r, cint.g, cint.b, cint.a).endVertex();
-        builder.pos(posX + wp.xCoord, posY + wp.yCoord, posZ + wp.zCoord).color(cint.r, cint.g, cint.b, cint.a).endVertex();
+        builder.pos(posX + wp.x, posY + wp.y, posZ + wp.z).color(cint.r, cint.g, cint.b, cint.a).endVertex();
+        builder.pos(posX + wp.x, posY + wp.y, posZ + wp.z).color(cint.r, cint.g, cint.b, cint.a).endVertex();
         builder.pos(w2.posX - tank.posX + posX, w2.posY - tank.posY + posY, w2.posZ - tank.posZ + posZ)
           .color(cint.r, cint.g, cint.b, cint.a).endVertex();
       } else {
@@ -90,8 +90,8 @@ public class MCH_RenderTank extends MCH_RenderAircraft<MCH_EntityTank> {
           .color(cint.r, cint.g, cint.b, cint.a).endVertex();
         builder.pos(w2.posX - tank.posX + posX, w2.posY - tank.posY + posY, w2.posZ - tank.posZ + posZ)
           .color(cint.r, cint.g, cint.b, cint.a).endVertex();
-        builder.pos(posX + wp.xCoord, posY + wp.yCoord, posZ + wp.zCoord).color(cint.r, cint.g, cint.b, cint.a).endVertex();
-        builder.pos(posX + wp.xCoord, posY + wp.yCoord, posZ + wp.zCoord).color(cint.r, cint.g, cint.b, cint.a).endVertex();
+        builder.pos(posX + wp.x, posY + wp.y, posZ + wp.z).color(cint.r, cint.g, cint.b, cint.a).endVertex();
+        builder.pos(posX + wp.x, posY + wp.y, posZ + wp.z).color(cint.r, cint.g, cint.b, cint.a).endVertex();
         builder.pos(w1.posX - tank.posX + posX, w1.posY - tank.posY + posY, w1.posZ - tank.posZ + posZ)
           .color(cint.r, cint.g, cint.b, cint.a).endVertex();
       } 

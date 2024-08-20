@@ -30,7 +30,7 @@ public abstract class W_EntityPlayer extends EntityPlayer {
   
   public static boolean consumeInventoryItem(EntityPlayer player, Item item) {
     int index = player.inventory.func_194014_c(new ItemStack(item));
-    return (item != null && player.inventory.decrStackSize(index, 1).func_190926_b());
+    return (item != null && player.inventory.decrStackSize(index, 1).isEmpty());
   }
   
   public static void addChatMessage(EntityPlayer player, String s) {

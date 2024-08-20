@@ -36,13 +36,13 @@ public class MCH_ItemThrowable extends W_Item {
     if (!(entityLiving instanceof EntityPlayer))
       return; 
     EntityPlayer player = (EntityPlayer)entityLiving;
-    if (!itemStack.func_190926_b() && itemStack.func_190916_E() > 0) {
+    if (!itemStack.isEmpty() && itemStack.getCount() > 0) {
       MCH_ThrowableInfo info = MCH_ThrowableInfoManager.get(itemStack.getItem());
       if (info != null) {
         if (!player.capabilities.isCreativeMode) {
-          itemStack.func_190918_g(1);
-          if (itemStack.func_190916_E() <= 0)
-            player.inventory.setInventorySlotContents(player.inventory.currentItem, ItemStack.field_190927_a); 
+          itemStack.shrink(1);
+          if (itemStack.getCount() <= 0)
+            player.inventory.setInventorySlotContents(player.inventory.currentItem, ItemStack.EMPTY); 
         } 
         world.playSound((EntityPlayer)null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 0.5F, 0.4F / (itemRand
             

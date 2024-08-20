@@ -199,9 +199,9 @@ public class MCH_EntitySeat extends W_Entity implements IEntitySinglePassenger {
     if (!getParent().checkTeam(player))
       return false; 
     ItemStack itemStack = player.getHeldItem(hand);
-    if (!itemStack.func_190926_b() && itemStack.getItem() instanceof mcheli.tool.MCH_ItemWrench)
-      return getParent().processInitialInteract(player, hand); 
-    if (!itemStack.func_190926_b() && itemStack.getItem() instanceof mcheli.mob.MCH_ItemSpawnGunner)
+    if (!itemStack.isEmpty() && itemStack.getItem() instanceof mcheli.tool.MCH_ItemWrench)
+      return getParent().processInitialInteract(player, hand);
+    if (!itemStack.isEmpty() && itemStack.getItem() instanceof mcheli.mob.MCH_ItemSpawnGunner)
       return getParent().processInitialInteract(player, hand); 
     Entity riddenByEntity = getRiddenByEntity();
     if (riddenByEntity != null)

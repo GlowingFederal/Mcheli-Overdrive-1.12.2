@@ -130,37 +130,37 @@ public class MqoParser {
   }
   
   private static _Face[] parseFace(String line, int lineCount, boolean mirror, List<_Vertex> vertices) {
-    _TextureCoord[] texCoords1, texCoords2;
+    _TextureCoord[] texs1, texs2;
     String[] s = line.split("[ VU)(M]+");
     int vnum = Integer.valueOf(s[0]).intValue();
     if (vnum != 3 && vnum != 4)
       return new _Face[0]; 
     if (vnum == 3) {
-      _TextureCoord[] texCoords;
+      _TextureCoord[] texs;
       int[] verticesID = { Integer.valueOf(s[3]).intValue(), Integer.valueOf(s[2]).intValue(), Integer.valueOf(s[1]).intValue() };
       _Vertex[] verts = { vertices.get(verticesID[0]), vertices.get(verticesID[1]), vertices.get(verticesID[2]) };
       if (s.length >= 11) {
-        texCoords = new _TextureCoord[] { new _TextureCoord(Float.valueOf(s[9]).floatValue(), Float.valueOf(s[10]).floatValue()), new _TextureCoord(Float.valueOf(s[7]).floatValue(), Float.valueOf(s[8]).floatValue()), new _TextureCoord(Float.valueOf(s[5]).floatValue(), Float.valueOf(s[6]).floatValue()) };
+        texs = new _TextureCoord[] { new _TextureCoord(Float.valueOf(s[9]).floatValue(), Float.valueOf(s[10]).floatValue()), new _TextureCoord(Float.valueOf(s[7]).floatValue(), Float.valueOf(s[8]).floatValue()), new _TextureCoord(Float.valueOf(s[5]).floatValue(), Float.valueOf(s[6]).floatValue()) };
       } else {
-        texCoords = new _TextureCoord[] { new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F) };
+        texs = new _TextureCoord[] { new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F) };
       } 
-      return new _Face[] { new _Face(verticesID, verts, texCoords) };
+      return new _Face[] { new _Face(verticesID, verts, texs) };
     } 
     int[] verticesID1 = { Integer.valueOf(s[3]).intValue(), Integer.valueOf(s[2]).intValue(), Integer.valueOf(s[1]).intValue() };
     _Vertex[] verts1 = { vertices.get(verticesID1[0]), vertices.get(verticesID1[1]), vertices.get(verticesID1[2]) };
     if (s.length >= 12) {
-      texCoords1 = new _TextureCoord[] { new _TextureCoord(Float.valueOf(s[10]).floatValue(), Float.valueOf(s[11]).floatValue()), new _TextureCoord(Float.valueOf(s[8]).floatValue(), Float.valueOf(s[9]).floatValue()), new _TextureCoord(Float.valueOf(s[6]).floatValue(), Float.valueOf(s[7]).floatValue()) };
+      texs1 = new _TextureCoord[] { new _TextureCoord(Float.valueOf(s[10]).floatValue(), Float.valueOf(s[11]).floatValue()), new _TextureCoord(Float.valueOf(s[8]).floatValue(), Float.valueOf(s[9]).floatValue()), new _TextureCoord(Float.valueOf(s[6]).floatValue(), Float.valueOf(s[7]).floatValue()) };
     } else {
-      texCoords1 = new _TextureCoord[] { new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F) };
+      texs1 = new _TextureCoord[] { new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F) };
     } 
     int[] verticesID2 = { Integer.valueOf(s[4]).intValue(), Integer.valueOf(s[3]).intValue(), Integer.valueOf(s[1]).intValue() };
     _Vertex[] verts2 = { vertices.get(verticesID2[0]), vertices.get(verticesID2[1]), vertices.get(verticesID2[2]) };
     if (s.length >= 14) {
-      texCoords2 = new _TextureCoord[] { new _TextureCoord(Float.valueOf(s[12]).floatValue(), Float.valueOf(s[13]).floatValue()), new _TextureCoord(Float.valueOf(s[10]).floatValue(), Float.valueOf(s[11]).floatValue()), new _TextureCoord(Float.valueOf(s[6]).floatValue(), Float.valueOf(s[7]).floatValue()) };
+      texs2 = new _TextureCoord[] { new _TextureCoord(Float.valueOf(s[12]).floatValue(), Float.valueOf(s[13]).floatValue()), new _TextureCoord(Float.valueOf(s[10]).floatValue(), Float.valueOf(s[11]).floatValue()), new _TextureCoord(Float.valueOf(s[6]).floatValue(), Float.valueOf(s[7]).floatValue()) };
     } else {
-      texCoords2 = new _TextureCoord[] { new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F) };
+      texs2 = new _TextureCoord[] { new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F), new _TextureCoord(0.0F, 0.0F) };
     } 
-    return new _Face[] { new _Face(verticesID1, verts1, texCoords1), new _Face(verticesID2, verts2, texCoords2) };
+    return new _Face[] { new _Face(verticesID1, verts1, texs1), new _Face(verticesID2, verts2, texs2) };
   }
   
   private static boolean isValidGroupObjectLine(String line) {

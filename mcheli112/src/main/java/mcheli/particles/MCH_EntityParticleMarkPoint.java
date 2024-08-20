@@ -62,20 +62,20 @@ public class MCH_EntityParticleMarkPoint extends MCH_EntityParticleBase implemen
       float pitch = (mc.gameSettings.thirdPersonView != 2) ? -viewer.rotationPitch : -viewer.rotationPitch;
       Vec3d v = MCH_Lib.RotVec3(0.0D, 0.0D, -dist, yaw, pitch);
       if (mc.gameSettings.thirdPersonView == 2)
-        v = new Vec3d(-v.xCoord, -v.yCoord, -v.zCoord); 
+        v = new Vec3d(-v.x, -v.y, -v.z); 
       Vec3d vs = new Vec3d(viewer.posX, viewer.posY + viewer.getEyeHeight(), viewer.posZ);
       RayTraceResult mop = entityIn.world.rayTraceBlocks(vs.addVector(0.0D, 0.0D, 0.0D), vs
-          .addVector(v.xCoord, v.yCoord, v.zCoord));
+          .addVector(v.x, v.y, v.z));
       double block_dist = dist;
       if (mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
         block_dist = vs.distanceTo(mop.hitVec) - 0.4D;
         if (block_dist < 0.0D)
           block_dist = 0.0D; 
       } 
-      GL11.glTranslated(v.xCoord * block_dist / dist, v.yCoord * block_dist / dist, v.zCoord * block_dist / dist);
-      ix += v.xCoord * block_dist / dist;
-      iy += v.yCoord * block_dist / dist;
-      iz += v.zCoord * block_dist / dist;
+      GL11.glTranslated(v.x * block_dist / dist, v.y * block_dist / dist, v.z * block_dist / dist);
+      ix += v.x * block_dist / dist;
+      iy += v.y * block_dist / dist;
+      iz += v.z * block_dist / dist;
     } 
     double px = (float)(this.prevPosX + (this.posX - this.prevPosX) * partialTicks - ix);
     double py = (float)(this.prevPosY + (this.posY - this.prevPosY) * partialTicks - iy);

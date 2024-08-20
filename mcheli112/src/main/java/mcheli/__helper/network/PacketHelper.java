@@ -42,11 +42,11 @@ public class PacketHelper {
   }
   
   public static void writeItemStack(DataOutputStream dos, ItemStack itemstack) throws IOException {
-    if (itemstack.func_190926_b()) {
+    if (itemstack.isEmpty()) {
       dos.writeShort(-1);
     } else {
       dos.writeShort(Item.getIdFromItem(itemstack.getItem()));
-      dos.writeByte(itemstack.func_190916_E());
+      dos.writeByte(itemstack.getCount());
       dos.writeShort(itemstack.getMetadata());
       NBTTagCompound nbttagcompound = null;
       if (itemstack.getItem().isDamageable() || itemstack.getItem().getShareTag())
@@ -58,7 +58,7 @@ public class PacketHelper {
   public static ItemStack readItemStack(ByteArrayDataInput data) throws IOException {
     int i = data.readShort();
     if (i < 0)
-      return ItemStack.field_190927_a; 
+      return ItemStack.EMPTY; 
     int j = data.readByte();
     int k = data.readShort();
     ItemStack itemstack = new ItemStack(Item.getItemById(i), j, k);

@@ -22,7 +22,7 @@ public class MCH_ToolPacketHandler {
     pc.readData(data);
     scheduler.addScheduledTask(() -> {
           ItemStack itemStack = player.getHeldItemMainhand();
-          if (!itemStack.func_190926_b() && itemStack.getItem() instanceof mcheli.tool.rangefinder.MCH_ItemRangeFinder)
+          if (!itemStack.isEmpty() && itemStack.getItem() instanceof mcheli.tool.rangefinder.MCH_ItemRangeFinder)
             if (pc.targetFilter == 0) {
               if (MCH_Multiplay.markPoint(player, player.posX, player.posY + player.getEyeHeight(), player.posZ)) {
                 W_WorldFunc.MOD_playSoundAtEntity((Entity)player, "pi", 1.0F, 1.0F);

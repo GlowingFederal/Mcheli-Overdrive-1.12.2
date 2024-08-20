@@ -16,7 +16,7 @@ public abstract class W_GuiContainer extends GuiContainer {
   }
   
   public void drawItemStack(ItemStack item, int x, int y) {
-    if (item.func_190926_b())
+    if (item.isEmpty())
       return; 
     if (item.getItem() == null)
       return; 

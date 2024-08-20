@@ -24,7 +24,7 @@ public class MCH_ItemLightWeaponBase extends W_Item {
   }
   
   public static String getName(ItemStack itemStack) {
-    if (!itemStack.func_190926_b() && itemStack.getItem() instanceof MCH_ItemLightWeaponBase) {
+    if (!itemStack.isEmpty() && itemStack.getItem() instanceof MCH_ItemLightWeaponBase) {
       String name = itemStack.getUnlocalizedName();
       int li = name.lastIndexOf(":");
       if (li >= 0)
@@ -35,8 +35,8 @@ public class MCH_ItemLightWeaponBase extends W_Item {
   }
   
   public static boolean isHeld(@Nullable EntityPlayer player) {
-    ItemStack is = (player != null) ? player.getHeldItemMainhand() : ItemStack.field_190927_a;
-    if (!is.func_190926_b() && is.getItem() instanceof MCH_ItemLightWeaponBase)
+    ItemStack is = (player != null) ? player.getHeldItemMainhand() : ItemStack.EMPTY;
+    if (!is.isEmpty() && is.getItem() instanceof MCH_ItemLightWeaponBase)
       return (player.getItemInUseMaxCount() > 10); 
     return false;
   }
@@ -61,7 +61,7 @@ public class MCH_ItemLightWeaponBase extends W_Item {
   
   public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
     ItemStack itemstack = playerIn.getHeldItem(handIn);
-    if (!itemstack.func_190926_b())
+    if (!itemstack.isEmpty())
       playerIn.setActiveHand(handIn); 
     return ActionResult.newResult(EnumActionResult.SUCCESS, itemstack);
   }

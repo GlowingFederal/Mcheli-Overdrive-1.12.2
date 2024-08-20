@@ -142,7 +142,7 @@ public class MCH_EventHook extends W_EventHook {
   
   public void entityInteractEvent(PlayerInteractEvent.EntityInteract event) {
     ItemStack item = event.getEntityPlayer().getHeldItem(event.getHand());
-    if (item.func_190926_b())
+    if (item.isEmpty())
       return; 
     if (item.getItem() instanceof MCH_ItemChain) {
       MCH_ItemChain.interactEntity(item, event.getTarget(), event.getEntityPlayer(), 

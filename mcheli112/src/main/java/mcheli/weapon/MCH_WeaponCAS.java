@@ -134,9 +134,9 @@ public class MCH_WeaponCAS extends MCH_WeaponBase {
     Vec3d dst = W_WorldFunc.getWorldVec3(this.worldObj, prm.entity.posX + tX, prm.entity.posY + tY + 2.0D, prm.entity.posZ + tZ);
     RayTraceResult m = W_WorldFunc.clip(this.worldObj, src, dst);
     if (m != null && W_MovingObjectPosition.isHitTypeTile(m)) {
-      this.targetPosX = m.hitVec.xCoord;
-      this.targetPosY = m.hitVec.yCoord;
-      this.targetPosZ = m.hitVec.zCoord;
+      this.targetPosX = m.hitVec.x;
+      this.targetPosY = m.hitVec.y;
+      this.targetPosZ = m.hitVec.z;
       this.direction = (int)MCH_Lib.getRotate360((yaw + 45.0F)) / 90;
       this.direction += rand.nextBoolean() ? -1 : 1;
       this.direction %= 4;
@@ -174,14 +174,14 @@ public class MCH_WeaponCAS extends MCH_WeaponBase {
     RayTraceResult m = W_WorldFunc.clip(this.worldObj, src, dst);
     if (W_MovingObjectPosition.isHitTypeTile(m)) {
       if (this.worldObj.isRemote) {
-        double dx = m.hitVec.xCoord - px;
-        double dz = m.hitVec.zCoord - pz;
+        double dx = m.hitVec.x - px;
+        double dz = m.hitVec.z - pz;
         if (Math.sqrt(dx * dx + dz * dz) < 20.0D)
           return false; 
       } 
-      this.targetPosX = m.hitVec.xCoord;
-      this.targetPosY = m.hitVec.yCoord;
-      this.targetPosZ = m.hitVec.zCoord;
+      this.targetPosX = m.hitVec.x;
+      this.targetPosY = m.hitVec.y;
+      this.targetPosZ = m.hitVec.z;
       this.direction = (int)MCH_Lib.getRotate360((yaw + 45.0F)) / 90;
       this.direction += rand.nextBoolean() ? -1 : 1;
       this.direction %= 4;

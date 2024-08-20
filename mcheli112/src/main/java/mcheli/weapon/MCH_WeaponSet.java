@@ -277,7 +277,7 @@ public class MCH_WeaponSet {
         float yaw = shooter.rotationYaw;
         float pitch = shooter.rotationPitch;
         if (!(shooter instanceof mcheli.vehicle.MCH_EntityVehicle) || shooter.isBeingRidden());
-        MCH_EntityCartridge.spawnCartridge(shooter.world, crtWpn.cartridge, shooter.posX + v.xCoord, shooter.posY + v.yCoord, shooter.posZ + v.zCoord, shooter.motionX, shooter.motionY, shooter.motionZ, yaw + this.rotationYaw, pitch + this.rotationPitch);
+        MCH_EntityCartridge.spawnCartridge(shooter.world, crtWpn.cartridge, shooter.posX + v.x, shooter.posY + v.y, shooter.posZ + v.z, shooter.motionX, shooter.motionY, shooter.motionZ, yaw + this.rotationYaw, pitch + this.rotationPitch);
       }  
     if (index < this.recoilBuf.length) {
       Recoil r = this.recoilBuf[index];

@@ -20,9 +20,9 @@ public class MCH_EntityBlockDustFX extends ParticleBlockDust {
   
   public static class Factory implements IParticleFactory {
     @Nullable
-    public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_) {
+    public Particle createParticle(int particleID, World worldIn, double xIn, double yIn, double zIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_) {
       IBlockState iblockstate = Block.getStateById(p_178902_15_[0]);
-      return (iblockstate.getRenderType() == EnumBlockRenderType.INVISIBLE) ? null : (Particle)(new MCH_EntityBlockDustFX(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, iblockstate))
+      return (iblockstate.getRenderType() == EnumBlockRenderType.INVISIBLE) ? null : (Particle)(new MCH_EntityBlockDustFX(worldIn, xIn, yIn, zIn, xSpeedIn, ySpeedIn, zSpeedIn, iblockstate))
         
         .init();
     }

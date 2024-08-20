@@ -35,6 +35,6 @@ public class MCH_ContainerUavStation extends Container {
   }
   
   public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
-    return ItemStack.field_190927_a;
+    return ItemStack.EMPTY;
   }
 }

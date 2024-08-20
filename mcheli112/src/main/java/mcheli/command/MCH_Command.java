@@ -430,7 +430,7 @@ public class MCH_Command extends CommandBase {
                 IInventory ii = (IInventory)block2;
                 for (int i = 0; i < ii.getSizeInventory(); i++) {
                   ItemStack is = ii.removeStackFromSlot(i);
-                  if (!is.func_190926_b())
+                  if (!is.isEmpty())
                     is.func_190920_e(0); 
                 } 
               } 

@@ -17,15 +17,15 @@ class _Face implements DebugInfoObject {
   
   private _Vertex faceNormal;
   
-  _Face(int[] ids, _Vertex[] verts, _TextureCoord[] texCoords) {
-    this(ids, verts, verts, texCoords);
+  _Face(int[] ids, _Vertex[] verts, _TextureCoord[] texs) {
+    this(ids, verts, verts, texs);
   }
   
-  _Face(int[] ids, _Vertex[] verts, _Vertex[] normals, _TextureCoord[] texCoords) {
+  _Face(int[] ids, _Vertex[] verts, _Vertex[] normals, _TextureCoord[] texs) {
     this.verticesID = ids;
     this.vertices = verts;
     this.vertexNormals = normals;
-    this.textureCoordinates = texCoords;
+    this.textureCoordinates = texs;
     this.faceNormal = calculateFaceNormal(verts);
   }
   
@@ -33,7 +33,7 @@ class _Face implements DebugInfoObject {
     Vec3d v1 = new Vec3d(((verts[1]).x - (verts[0]).x), ((verts[1]).y - (verts[0]).y), ((verts[1]).z - (verts[0]).z));
     Vec3d v2 = new Vec3d(((verts[2]).x - (verts[0]).x), ((verts[2]).y - (verts[0]).y), ((verts[2]).z - (verts[0]).z));
     Vec3d normalVector = v1.crossProduct(v2).normalize();
-    return new _Vertex((float)normalVector.xCoord, (float)normalVector.yCoord, (float)normalVector.zCoord);
+    return new _Vertex((float)normalVector.x, (float)normalVector.y, (float)normalVector.z);
   }
   
   _Face calcVerticesNormal(List<_Face> faces, boolean shading, double facet) {

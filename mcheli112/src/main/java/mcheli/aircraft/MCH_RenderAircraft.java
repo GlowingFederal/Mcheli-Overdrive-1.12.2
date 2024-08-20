@@ -179,7 +179,7 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
     float rot = ac.prevRotYawWheel + (ac.rotYawWheel - ac.prevRotYawWheel) * tickTime;
     for (MCH_AircraftInfo.SearchLight sl : info.searchLights) {
       GL11.glPushMatrix();
-      GL11.glTranslated(sl.pos.xCoord, sl.pos.yCoord, sl.pos.zCoord);
+      GL11.glTranslated(sl.pos.x, sl.pos.y, sl.pos.z);
       if (!sl.fixDir) {
         GL11.glRotatef(yaw - ac.getRotYaw() + sl.yaw, 0.0F, -1.0F, 0.0F);
         GL11.glRotatef(pitch + 90.0F - ac.getRotPitch() + sl.pitch, 1.0F, 0.0F, 0.0F);
@@ -341,7 +341,7 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
       GL11.glTranslated(x, y, z);
       for (MCH_BoundingBox bb : e.extraBoundingBox) {
         GL11.glPushMatrix();
-        GL11.glTranslated(bb.rotatedOffset.xCoord, bb.rotatedOffset.yCoord, bb.rotatedOffset.zCoord);
+        GL11.glTranslated(bb.rotatedOffset.x, bb.rotatedOffset.y, bb.rotatedOffset.z);
         GL11.glPushMatrix();
         GL11.glScalef(bb.width, bb.height, bb.width);
         bindTexture("textures/bounding_box.png");
@@ -396,7 +396,7 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
       GL11.glRotatef(yaw, 0.0F, -1.0F, 0.0F);
       GL11.glRotatef(pitch, 1.0F, 0.0F, 0.0F);
       GL11.glRotatef(roll, 0.0F, 0.0F, 1.0F);
-      GL11.glTranslated(seat.pos.xCoord, seat.pos.yCoord, seat.pos.zCoord);
+      GL11.glTranslated(seat.pos.x, seat.pos.y, seat.pos.z);
       GL11.glScalef(1.0F, 1.0F, 1.0F);
       bindTexture("textures/seat_pilot.png");
       debugModel.renderAll();
@@ -449,9 +449,9 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
     float rot = ac.prevRotLightHatch + (ac.rotLightHatch - ac.prevRotLightHatch) * tickTime;
     for (MCH_AircraftInfo.Hatch t : info.lightHatchList) {
       GL11.glPushMatrix();
-      GL11.glTranslated(t.pos.xCoord, t.pos.yCoord, t.pos.zCoord);
-      GL11.glRotated((rot * t.maxRot), t.rot.xCoord, t.rot.yCoord, t.rot.zCoord);
-      GL11.glTranslated(-t.pos.xCoord, -t.pos.yCoord, -t.pos.zCoord);
+      GL11.glTranslated(t.pos.x, t.pos.y, t.pos.z);
+      GL11.glRotated((rot * t.maxRot), t.rot.x, t.rot.y, t.rot.z);
+      GL11.glTranslated(-t.pos.x, -t.pos.y, -t.pos.z);
       renderPart(t.model, info.model, t.modelName);
       GL11.glPopMatrix();
     } 
@@ -463,9 +463,9 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
     float rot = ac.prevRotYawWheel + (ac.rotYawWheel - ac.prevRotYawWheel) * tickTime;
     for (MCH_AircraftInfo.PartWheel t : info.partSteeringWheel) {
       GL11.glPushMatrix();
-      GL11.glTranslated(t.pos.xCoord, t.pos.yCoord, t.pos.zCoord);
-      GL11.glRotated((rot * t.rotDir), t.rot.xCoord, t.rot.yCoord, t.rot.zCoord);
-      GL11.glTranslated(-t.pos.xCoord, -t.pos.yCoord, -t.pos.zCoord);
+      GL11.glTranslated(t.pos.x, t.pos.y, t.pos.z);
+      GL11.glRotated((rot * t.rotDir), t.rot.x, t.rot.y, t.rot.z);
+      GL11.glTranslated(-t.pos.x, -t.pos.y, -t.pos.z);
       renderPart(t.model, info.model, t.modelName);
       GL11.glPopMatrix();
     } 
@@ -477,12 +477,12 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
     float yaw = ac.prevRotYawWheel + (ac.rotYawWheel - ac.prevRotYawWheel) * tickTime;
     for (MCH_AircraftInfo.PartWheel t : info.partWheel) {
       GL11.glPushMatrix();
-      GL11.glTranslated(t.pos2.xCoord, t.pos2.yCoord, t.pos2.zCoord);
-      GL11.glRotated((yaw * t.rotDir), t.rot.xCoord, t.rot.yCoord, t.rot.zCoord);
-      GL11.glTranslated(-t.pos2.xCoord, -t.pos2.yCoord, -t.pos2.zCoord);
-      GL11.glTranslated(t.pos.xCoord, t.pos.yCoord, t.pos.zCoord);
+      GL11.glTranslated(t.pos2.x, t.pos2.y, t.pos2.z);
+      GL11.glRotated((yaw * t.rotDir), t.rot.x, t.rot.y, t.rot.z);
+      GL11.glTranslated(-t.pos2.x, -t.pos2.y, -t.pos2.z);
+      GL11.glTranslated(t.pos.x, t.pos.y, t.pos.z);
       GL11.glRotatef(ac.prevRotWheel + (ac.rotWheel - ac.prevRotWheel) * tickTime, 1.0F, 0.0F, 0.0F);
-      GL11.glTranslated(-t.pos.xCoord, -t.pos.yCoord, -t.pos.zCoord);
+      GL11.glTranslated(-t.pos.x, -t.pos.y, -t.pos.z);
       renderPart(t.model, info.model, t.modelName);
       GL11.glPopMatrix();
     } 
@@ -499,9 +499,9 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
       rot = MCH_Lib.smooth(rot, prevRot, tickTime);
       MCH_AircraftInfo.RotPart h = info.partRotPart.get(i);
       GL11.glPushMatrix();
-      GL11.glTranslated(h.pos.xCoord, h.pos.yCoord, h.pos.zCoord);
-      GL11.glRotatef(rot, (float)h.rot.xCoord, (float)h.rot.yCoord, (float)h.rot.zCoord);
-      GL11.glTranslated(-h.pos.xCoord, -h.pos.yCoord, -h.pos.zCoord);
+      GL11.glTranslated(h.pos.x, h.pos.y, h.pos.z);
+      GL11.glRotatef(rot, (float)h.rot.x, (float)h.rot.y, (float)h.rot.z);
+      GL11.glTranslated(-h.pos.x, -h.pos.y, -h.pos.z);
       renderPart(h.model, info.model, h.modelName);
       GL11.glPopMatrix();
     } 
@@ -537,12 +537,12 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
         }  
       GL11.glPushMatrix();
       if (w.turret) {
-        GL11.glTranslated(info.turretPosition.xCoord, info.turretPosition.yCoord, info.turretPosition.zCoord);
+        GL11.glTranslated(info.turretPosition.x, info.turretPosition.y, info.turretPosition.z);
         float ty = MCH_Lib.smooth(ac.getLastRiderYaw() - ac.getRotYaw(), ac.prevLastRiderYaw - ac.prevRotationYaw, tickTime);
         GL11.glRotatef(ty, 0.0F, -1.0F, 0.0F);
-        GL11.glTranslated(-info.turretPosition.xCoord, -info.turretPosition.yCoord, -info.turretPosition.zCoord);
+        GL11.glTranslated(-info.turretPosition.x, -info.turretPosition.y, -info.turretPosition.z);
       } 
-      GL11.glTranslated(w.pos.xCoord, w.pos.yCoord, w.pos.zCoord);
+      GL11.glTranslated(w.pos.x, w.pos.y, w.pos.z);
       if (w.yaw) {
         if (ws != null) {
           rotYaw = ws.rotationYaw - ws.defaultRotationYaw;
@@ -604,10 +604,10 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
         GL11.glRotatef(ws.defaultRotationYaw, 0.0F, -1.0F, 0.0F);
         if (w.rotBarrel) {
           float rotBrl = ws.prevRotBarrel + (ws.rotBarrel - ws.prevRotBarrel) * tickTime;
-          GL11.glRotatef(rotBrl, (float)w.rot.xCoord, (float)w.rot.yCoord, (float)w.rot.zCoord);
+          GL11.glRotatef(rotBrl, (float)w.rot.x, (float)w.rot.y, (float)w.rot.z);
         } 
       } 
-      GL11.glTranslated(-w.pos.xCoord, -w.pos.yCoord, -w.pos.zCoord);
+      GL11.glTranslated(-w.pos.x, -w.pos.y, -w.pos.z);
       if (!w.isMissile || !ac.isWeaponNotCooldown(ws, weaponIndex)) {
         renderPart(w.model, info.model, w.modelName);
         for (MCH_AircraftInfo.PartWeaponChild wc : w.child) {
@@ -626,7 +626,7 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
     float prevYaw = 0.0F;
     float rotPitch = 0.0F;
     float prevPitch = 0.0F;
-    GL11.glTranslated(w.pos.xCoord, w.pos.yCoord, w.pos.zCoord);
+    GL11.glTranslated(w.pos.x, w.pos.y, w.pos.z);
     if (w.yaw) {
       if (ws != null) {
         rotYaw = ws.rotationYaw - ws.defaultRotationYaw;
@@ -681,7 +681,7 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
     } 
     if (ws != null)
       GL11.glRotatef(ws.defaultRotationYaw, 0.0F, -1.0F, 0.0F); 
-    GL11.glTranslated(-w.pos.xCoord, -w.pos.yCoord, -w.pos.zCoord);
+    GL11.glTranslated(-w.pos.x, -w.pos.y, -w.pos.z);
     renderPart(w.model, info.model, w.modelName);
   }
   
@@ -692,9 +692,9 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
     float[] prevRot = ac.prevRotTrackRoller;
     for (MCH_AircraftInfo.TrackRoller t : info.partTrackRoller) {
       GL11.glPushMatrix();
-      GL11.glTranslated(t.pos.xCoord, t.pos.yCoord, t.pos.zCoord);
+      GL11.glTranslated(t.pos.x, t.pos.y, t.pos.z);
       GL11.glRotatef(prevRot[t.side] + (rot[t.side] - prevRot[t.side]) * tickTime, 1.0F, 0.0F, 0.0F);
-      GL11.glTranslated(-t.pos.xCoord, -t.pos.yCoord, -t.pos.zCoord);
+      GL11.glTranslated(-t.pos.x, -t.pos.y, -t.pos.z);
       renderPart(t.model, info.model, t.modelName);
       GL11.glPopMatrix();
     } 
@@ -767,11 +767,11 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
         float r = ac.partHatch.rotation / ac.partHatch.rotationMax;
         float pr = ac.partHatch.prevRotation / ac.partHatch.rotationMax;
         float f = pr + (r - pr) * tickTime;
-        GL11.glTranslated(h.pos.xCoord * f, h.pos.yCoord * f, h.pos.zCoord * f);
+        GL11.glTranslated(h.pos.x * f, h.pos.y * f, h.pos.z * f);
       } else {
-        GL11.glTranslated(h.pos.xCoord, h.pos.yCoord, h.pos.zCoord);
-        GL11.glRotatef((prevRot + (rot - prevRot) * tickTime) * h.maxRotFactor, (float)h.rot.xCoord, (float)h.rot.yCoord, (float)h.rot.zCoord);
-        GL11.glTranslated(-h.pos.xCoord, -h.pos.yCoord, -h.pos.zCoord);
+        GL11.glTranslated(h.pos.x, h.pos.y, h.pos.z);
+        GL11.glRotatef((prevRot + (rot - prevRot) * tickTime) * h.maxRotFactor, (float)h.rot.x, (float)h.rot.y, (float)h.rot.z);
+        GL11.glTranslated(-h.pos.x, -h.pos.y, -h.pos.z);
       } 
       renderPart(h.model, info.model, h.modelName);
       GL11.glPopMatrix();
@@ -784,10 +784,10 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
     float throttle = MCH_Lib.smooth((float)ac.getCurrentThrottle(), (float)ac.getPrevCurrentThrottle(), tickTime);
     for (MCH_AircraftInfo.Throttle h : info.partThrottle) {
       GL11.glPushMatrix();
-      GL11.glTranslated(h.pos.xCoord, h.pos.yCoord, h.pos.zCoord);
-      GL11.glRotatef(throttle * h.rot2, (float)h.rot.xCoord, (float)h.rot.yCoord, (float)h.rot.zCoord);
-      GL11.glTranslated(-h.pos.xCoord, -h.pos.yCoord, -h.pos.zCoord);
-      GL11.glTranslated(h.slide.xCoord * throttle, h.slide.yCoord * throttle, h.slide.zCoord * throttle);
+      GL11.glTranslated(h.pos.x, h.pos.y, h.pos.z);
+      GL11.glRotatef(throttle * h.rot2, (float)h.rot.x, (float)h.rot.y, (float)h.rot.z);
+      GL11.glTranslated(-h.pos.x, -h.pos.y, -h.pos.z);
+      GL11.glTranslated(h.slide.x * throttle, h.slide.y * throttle, h.slide.z * throttle);
       renderPart(h.model, info.model, h.modelName);
       GL11.glPopMatrix();
     } 
@@ -802,11 +802,11 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
         float r = ws.rot / 90.0F;
         float pr = ws.prevRot / 90.0F;
         float f = pr + (r - pr) * tickTime;
-        GL11.glTranslated(w.pos.xCoord * f, w.pos.yCoord * f, w.pos.zCoord * f);
+        GL11.glTranslated(w.pos.x * f, w.pos.y * f, w.pos.z * f);
       } else {
-        GL11.glTranslated(w.pos.xCoord, w.pos.yCoord, w.pos.zCoord);
-        GL11.glRotatef((ws.prevRot + (ws.rot - ws.prevRot) * tickTime) * w.maxRotFactor, (float)w.rot.xCoord, (float)w.rot.yCoord, (float)w.rot.zCoord);
-        GL11.glTranslated(-w.pos.xCoord, -w.pos.yCoord, -w.pos.zCoord);
+        GL11.glTranslated(w.pos.x, w.pos.y, w.pos.z);
+        GL11.glRotatef((ws.prevRot + (ws.rot - ws.prevRot) * tickTime) * w.maxRotFactor, (float)w.rot.x, (float)w.rot.y, (float)w.rot.z);
+        GL11.glTranslated(-w.pos.x, -w.pos.y, -w.pos.z);
       } 
       renderPart(w.model, info.model, w.modelName);
       GL11.glPopMatrix();
@@ -824,12 +824,12 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
     float pitch = prevRotPitch + (rotPitch - prevRotPitch) * tickTime - ac.getRotPitch();
     for (MCH_AircraftInfo.Camera c : info.cameraList) {
       GL11.glPushMatrix();
-      GL11.glTranslated(c.pos.xCoord, c.pos.yCoord, c.pos.zCoord);
+      GL11.glTranslated(c.pos.x, c.pos.y, c.pos.z);
       if (c.yawSync)
         GL11.glRotatef(yaw, 0.0F, -1.0F, 0.0F); 
       if (c.pitchSync)
         GL11.glRotatef(pitch, 1.0F, 0.0F, 0.0F); 
-      GL11.glTranslated(-c.pos.xCoord, -c.pos.yCoord, -c.pos.zCoord);
+      GL11.glTranslated(-c.pos.x, -c.pos.y, -c.pos.z);
       renderPart(c.model, info.model, c.modelName);
       GL11.glPopMatrix();
     } 
@@ -845,11 +845,11 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
           float r = ac.partCanopy.rotation / ac.partCanopy.rotationMax;
           float pr = ac.partCanopy.prevRotation / ac.partCanopy.rotationMax;
           float f = pr + (r - pr) * tickTime;
-          GL11.glTranslated(c.pos.xCoord * f, c.pos.yCoord * f, c.pos.zCoord * f);
+          GL11.glTranslated(c.pos.x * f, c.pos.y * f, c.pos.z * f);
         } else {
-          GL11.glTranslated(c.pos.xCoord, c.pos.yCoord, c.pos.zCoord);
-          GL11.glRotatef((prevRot + (rot - prevRot) * tickTime) * c.maxRotFactor, (float)c.rot.xCoord, (float)c.rot.yCoord, (float)c.rot.zCoord);
-          GL11.glTranslated(-c.pos.xCoord, -c.pos.yCoord, -c.pos.zCoord);
+          GL11.glTranslated(c.pos.x, c.pos.y, c.pos.z);
+          GL11.glRotatef((prevRot + (rot - prevRot) * tickTime) * c.maxRotFactor, (float)c.rot.x, (float)c.rot.y, (float)c.rot.z);
+          GL11.glTranslated(-c.pos.x, -c.pos.y, -c.pos.z);
         } 
         renderPart(c.model, info.model, c.modelName);
         GL11.glPopMatrix();
@@ -870,28 +870,28 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
         rotHatch = 90.0F; 
       for (MCH_AircraftInfo.LandingGear n : info.landingGear) {
         GL11.glPushMatrix();
-        GL11.glTranslated(n.pos.xCoord, n.pos.yCoord, n.pos.zCoord);
+        GL11.glTranslated(n.pos.x, n.pos.y, n.pos.z);
         if (!n.reverse) {
           if (!n.hatch) {
-            GL11.glRotatef(rot1 * n.maxRotFactor, (float)n.rot.xCoord, (float)n.rot.yCoord, (float)n.rot.zCoord);
+            GL11.glRotatef(rot1 * n.maxRotFactor, (float)n.rot.x, (float)n.rot.y, (float)n.rot.z);
           } else {
-            GL11.glRotatef(rotHatch * n.maxRotFactor, (float)n.rot.xCoord, (float)n.rot.yCoord, (float)n.rot.zCoord);
+            GL11.glRotatef(rotHatch * n.maxRotFactor, (float)n.rot.x, (float)n.rot.y, (float)n.rot.z);
           } 
         } else {
-          GL11.glRotatef(rot1Rev * n.maxRotFactor, (float)n.rot.xCoord, (float)n.rot.yCoord, (float)n.rot.zCoord);
+          GL11.glRotatef(rot1Rev * n.maxRotFactor, (float)n.rot.x, (float)n.rot.y, (float)n.rot.z);
         } 
         if (n.enableRot2)
           if (!n.reverse) {
-            GL11.glRotatef(rot1 * n.maxRotFactor2, (float)n.rot2.xCoord, (float)n.rot2.yCoord, (float)n.rot2.zCoord);
+            GL11.glRotatef(rot1 * n.maxRotFactor2, (float)n.rot2.x, (float)n.rot2.y, (float)n.rot2.z);
           } else {
-            GL11.glRotatef(rot1Rev * n.maxRotFactor2, (float)n.rot2.xCoord, (float)n.rot2.yCoord, (float)n.rot2.zCoord);
+            GL11.glRotatef(rot1Rev * n.maxRotFactor2, (float)n.rot2.x, (float)n.rot2.y, (float)n.rot2.z);
           }  
-        GL11.glTranslated(-n.pos.xCoord, -n.pos.yCoord, -n.pos.zCoord);
+        GL11.glTranslated(-n.pos.x, -n.pos.y, -n.pos.z);
         if (n.slide != null) {
           float f = rot / 90.0F;
           if (n.reverse)
             f = 1.0F - f; 
-          GL11.glTranslated(f * n.slide.xCoord, f * n.slide.yCoord, f * n.slide.zCoord);
+          GL11.glTranslated(f * n.slide.x, f * n.slide.y, f * n.slide.z);
         } 
         renderPart(n.model, info.model, n.modelName);
         GL11.glPopMatrix();
@@ -991,10 +991,10 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
       GL11.glDisable(2896);
       for (int i = 0; i < info.repellingHooks.size(); i++) {
         builder.begin(3, DefaultVertexFormats.POSITION_COLOR);
-        builder.pos(((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.xCoord, ((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.yCoord, 
-            ((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.zCoord).color(0, 0, 0, 255).endVertex();
-        builder.pos(((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.xCoord, ((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.yCoord + ac.ropesLength, 
-            ((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.zCoord).color(0, 0, 0, 255).endVertex();
+        builder.pos(((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.x, ((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.y, 
+            ((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.z).color(0, 0, 0, 255).endVertex();
+        builder.pos(((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.x, ((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.y + ac.ropesLength, 
+            ((MCH_AircraftInfo.RepellingHook)info.repellingHooks.get(i)).pos.z).color(0, 0, 0, 255).endVertex();
         tessellator.draw();
       } 
       GL11.glEnable(2896);

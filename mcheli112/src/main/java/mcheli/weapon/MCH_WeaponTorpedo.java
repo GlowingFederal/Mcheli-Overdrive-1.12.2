@@ -57,9 +57,9 @@ public class MCH_WeaponTorpedo extends MCH_WeaponBase {
     float yaw = prm.user.rotationYaw;
     float pitch = prm.user.rotationPitch;
     Vec3d v = MCH_Lib.RotVec3(0.0D, 0.0D, 1.0D, -yaw, -pitch, -prm.rotRoll);
-    double tX = v.xCoord;
-    double tZ = v.zCoord;
-    double tY = v.yCoord;
+    double tX = v.x;
+    double tZ = v.z;
+    double tY = v.y;
     double dist = MathHelper.sqrt(tX * tX + tY * tY + tZ * tZ);
     if (this.worldObj.isRemote) {
       tX = tX * 100.0D / dist;
@@ -86,9 +86,9 @@ public class MCH_WeaponTorpedo extends MCH_WeaponBase {
         MCH_EntityTorpedo e = new MCH_EntityTorpedo(this.worldObj, prm.posX, prm.posY, prm.posZ, prm.entity.motionX, prm.entity.motionY, prm.entity.motionZ, yaw, 0.0F, this.acceleration);
         e.setName(this.name);
         e.setParameterFromWeapon(this, prm.entity, prm.user);
-        e.targetPosX = m.hitVec.xCoord;
-        e.targetPosY = m.hitVec.yCoord;
-        e.targetPosZ = m.hitVec.zCoord;
+        e.targetPosX = m.hitVec.x;
+        e.targetPosY = m.hitVec.y;
+        e.targetPosZ = m.hitVec.z;
         e.motionX = mx;
         e.motionY = my;
         e.motionZ = mz;

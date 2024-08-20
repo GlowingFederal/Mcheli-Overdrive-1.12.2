@@ -43,8 +43,8 @@ public class MCH_RenderChain extends W_Render<MCH_EntityChain> {
       GL11.glTranslated(x, y, z);
       GL11.glPushMatrix();
       Vec3d v = MCH_Lib.getYawPitchFromVec(x, y, z);
-      GL11.glRotatef((float)v.yCoord, 0.0F, -1.0F, 0.0F);
-      GL11.glRotatef((float)v.zCoord, 0.0F, 0.0F, 1.0F);
+      GL11.glRotatef((float)v.y, 0.0F, -1.0F, 0.0F);
+      GL11.glRotatef((float)v.z, 0.0F, 0.0F, 1.0F);
       MCH_ModelManager.render("chain");
       GL11.glPopMatrix();
       diff -= 0.949999988079071D;

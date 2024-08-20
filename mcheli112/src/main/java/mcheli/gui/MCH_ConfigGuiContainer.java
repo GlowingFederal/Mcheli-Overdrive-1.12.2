@@ -20,6 +20,6 @@ public class MCH_ConfigGuiContainer extends Container {
   }
   
   public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2) {
-    return ItemStack.field_190927_a;
+    return ItemStack.EMPTY;
   }
 }

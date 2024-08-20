@@ -4,8 +4,11 @@ import java.io.IOException;
 import mcheli.aircraft.MCH_AircraftInfo;
 import mcheli.helicopter.MCH_HeliInfo;
 import mcheli.helicopter.MCH_HeliInfoManager;
+import mcheli.helicopter.MCH_ItemHeli;
+import mcheli.plane.MCP_ItemPlane;
 import mcheli.plane.MCP_PlaneInfo;
 import mcheli.plane.MCP_PlaneInfoManager;
+import mcheli.tank.MCH_ItemTank;
 import mcheli.tank.MCH_TankInfo;
 import mcheli.tank.MCH_TankInfoManager;
 import mcheli.wrapper.W_GuiContainer;
@@ -31,34 +34,40 @@ public class MCH_GuiUavStation extends W_GuiContainer {
     super(new MCH_ContainerUavStation(inventoryPlayer, uavStation));
     this.uavStation = uavStation;
   }
-  
+
   protected void drawGuiContainerForegroundLayer(int param1, int param2) {
-    MCH_TankInfo mCH_TankInfo;
-    if (this.uavStation == null)
-      return; 
-    ItemStack item = this.uavStation.getStackInSlot(0);
-    MCH_AircraftInfo info = null;
-    if (!item.func_190926_b() && item.getItem() instanceof mcheli.plane.MCP_ItemPlane)
-      MCP_PlaneInfo mCP_PlaneInfo = MCP_PlaneInfoManager.getFromItem(item.getItem()); 
-    if (!item.func_190926_b() && item.getItem() instanceof mcheli.helicopter.MCH_ItemHeli)
-      MCH_HeliInfo mCH_HeliInfo = MCH_HeliInfoManager.getFromItem(item.getItem()); 
-    if (!item.func_190926_b() && item.getItem() instanceof mcheli.tank.MCH_ItemTank)
-      mCH_TankInfo = MCH_TankInfoManager.getFromItem(item.getItem()); 
-    if (item.func_190926_b() || (mCH_TankInfo != null && ((MCH_AircraftInfo)mCH_TankInfo).isUAV)) {
-      if (this.uavStation.getKind() <= 1) {
-        drawString("UAV Station", 8, 6, 16777215);
-      } else if (item.func_190926_b() || ((MCH_AircraftInfo)mCH_TankInfo).isSmallUAV) {
-        drawString("UAV Controller", 8, 6, 16777215);
+    if(this.uavStation != null) {
+      ItemStack item = this.uavStation.getStackInSlot(0);
+      Object info = null;
+      if(item != null && item.getItem() instanceof MCP_ItemPlane) {
+        info = MCP_PlaneInfoManager.getFromItem(item.getItem());
+      }
+
+      if(item != null && item.getItem() instanceof MCH_ItemHeli) {
+        info = MCH_HeliInfoManager.getFromItem(item.getItem());
+      }
+
+      if(item != null && item.getItem() instanceof MCH_ItemTank) {
+        info = MCH_TankInfoManager.getFromItem(item.getItem());
+      }
+
+      if(item != null && (item == null || info == null || !((MCH_AircraftInfo)info).isUAV)) {
+        if(item != null) {
+          this.drawString("Not UAV", 8, 6, 16711680);
+        }
+      } else if(this.uavStation.getKind() <= 1) {
+        this.drawString("UAV Station", 8, 6, 16777215);
+      } else if(item != null && !((MCH_AircraftInfo)info).isSmallUAV) {
+        this.drawString("Small UAV only", 8, 6, 16711680);
       } else {
-        drawString("Small UAV only", 8, 6, 16711680);
-      } 
-    } else if (!item.func_190926_b()) {
-      drawString("Not UAV", 8, 6, 16711680);
-    } 
-    drawString(I18n.format("container.inventory", new Object[0]), 8, this.ySize - 96 + 2, 16777215);
-    drawString(String.format("X.%+2d", new Object[] { Integer.valueOf(this.uavStation.posUavX) }), 58, 15, 16777215);
-    drawString(String.format("Y.%+2d", new Object[] { Integer.valueOf(this.uavStation.posUavY) }), 58, 37, 16777215);
-    drawString(String.format("Z.%+2d", new Object[] { Integer.valueOf(this.uavStation.posUavZ) }), 58, 59, 16777215);
+        this.drawString("UAV Controller", 8, 6, 16777215);
+      }
+
+      this.drawString(I18n.format("container.inventory"), 8, super.ySize - 96 + 2, 16777215);
+      this.drawString(String.format("X.%+2d", new Object[]{Integer.valueOf(this.uavStation.posUavX)}), 58, 15, 16777215);
+      this.drawString(String.format("Y.%+2d", new Object[]{Integer.valueOf(this.uavStation.posUavY)}), 58, 37, 16777215);
+      this.drawString(String.format("Z.%+2d", new Object[]{Integer.valueOf(this.uavStation.posUavZ)}), 58, 59, 16777215);
+    }
   }
   
   protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3) {

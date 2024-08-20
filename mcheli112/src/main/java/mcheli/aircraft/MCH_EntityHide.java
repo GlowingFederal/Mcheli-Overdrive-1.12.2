@@ -194,8 +194,8 @@ public class MCH_EntityHide extends W_Entity implements IEntitySinglePassenger {
       int id = getRopeIndex();
       if (id >= 0) {
         Vec3d v = this.ac.getRopePos(id);
-        this.posX = v.xCoord;
-        this.posZ = v.zCoord;
+        this.posX = v.x;
+        this.posZ = v.z;
       } 
     } 
     setPosition(this.posX, this.posY, this.posZ);
@@ -241,7 +241,7 @@ public class MCH_EntityHide extends W_Entity implements IEntitySinglePassenger {
     int id = getRopeIndex();
     if (this.ac != null && id >= 0) {
       Vec3d v = this.ac.getRopePos(id);
-      if (Math.abs(this.posY - v.yCoord) > (Math.abs(this.ac.ropesLength) + 5.0F))
+      if (Math.abs(this.posY - v.y) > (Math.abs(this.ac.ropesLength) + 5.0F))
         onGroundAndDead(); 
     } 
     Entity riddenByEntity = getRiddenByEntity();

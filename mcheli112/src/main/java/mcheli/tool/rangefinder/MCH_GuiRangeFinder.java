@@ -75,10 +75,10 @@ public class MCH_GuiRangeFinder extends MCH_Gui {
     if (damage > 0) {
       Vec3d vs = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
       Vec3d ve = MCH_Lib.Rot2Vec3(player.rotationYaw, player.rotationPitch);
-      ve = vs.addVector(ve.xCoord * 300.0D, ve.yCoord * 300.0D, ve.zCoord * 300.0D);
+      ve = vs.addVector(ve.x * 300.0D, ve.y * 300.0D, ve.z * 300.0D);
       RayTraceResult mop = player.world.rayTraceBlocks(vs, ve, true);
       if (mop != null && mop.typeOfHit != RayTraceResult.Type.MISS) {
-        int range = (int)player.getDistance(mop.hitVec.xCoord, mop.hitVec.yCoord, mop.hitVec.zCoord);
+        int range = (int)player.getDistance(mop.hitVec.x, mop.hitVec.y, mop.hitVec.z);
         drawDigit(String.format("%4d", new Object[] { Integer.valueOf(range) }), (int)px, (int)py, 13, -15663328);
       } else {
         drawDigit(String.format("----", new Object[0]), (int)px, (int)py, 13, -61424);

@@ -39,7 +39,7 @@ public class MCH_EntityWheel extends W_Entity {
   
   public void setWheelPos(Vec3d pos, Vec3d weightedCenter) {
     this.pos = pos;
-    this.isPlus = (pos.zCoord >= weightedCenter.zCoord);
+    this.isPlus = (pos.z >= weightedCenter.z);
   }
   
   public void travelToDimension(int dimensionId) {}

@@ -190,7 +190,7 @@ public class MCH_EntityThrowable extends EntityThrowable implements IThrowableEn
       case UP:
         this.motionX *= 0.8999999761581421D;
         this.motionZ *= 0.8999999761581421D;
-        this.boundPosY = m.hitVec.yCoord;
+        this.boundPosY = m.hitVec.y;
         if ((m.sideHit == EnumFacing.DOWN && this.motionY > 0.0D) || (m.sideHit == EnumFacing.UP && this.motionY < 0.0D)) {
           this.motionY = -this.motionY * bound;
           break;

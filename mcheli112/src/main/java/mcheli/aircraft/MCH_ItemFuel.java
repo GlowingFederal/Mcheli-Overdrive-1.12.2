@@ -32,16 +32,16 @@ public class MCH_ItemFuel extends W_Item {
     NonNullList<ItemStack> nonNullList = player.inventory.mainInventory;
     for (int i = 0; i < nonNullList.size(); i++) {
       ItemStack is = nonNullList.get(i);
-      if (!is.func_190926_b() && is.getItem() instanceof net.minecraft.item.ItemCoal && is.getMetadata() == coalType) {
-        for (int j = 0; is.func_190916_E() > 0 && stack.isItemDamaged() && j < 64; j++) {
+      if (!is.isEmpty() && is.getItem() instanceof net.minecraft.item.ItemCoal && is.getMetadata() == coalType) {
+        for (int j = 0; is.getCount() > 0 && stack.isItemDamaged() && j < 64; j++) {
           int damage = stack.getMetadata() - ((coalType == 1) ? 75 : 100);
           if (damage < 0)
             damage = 0; 
           stack.setItemDamage(damage);
-          is.func_190918_g(1);
+          is.shrink(1);
         } 
-        if (is.func_190916_E() <= 0)
-          nonNullList.set(i, ItemStack.field_190927_a); 
+        if (is.getCount() <= 0)
+          nonNullList.set(i, ItemStack.EMPTY); 
       } 
     } 
   }

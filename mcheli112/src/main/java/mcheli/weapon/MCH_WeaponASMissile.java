@@ -53,9 +53,9 @@ public class MCH_WeaponASMissile extends MCH_WeaponBase {
         MCH_EntityASMissile e = new MCH_EntityASMissile(this.worldObj, prm.posX, prm.posY, prm.posZ, tX, tY, tZ, yaw, pitch, this.acceleration);
         e.setName(this.name);
         e.setParameterFromWeapon(this, prm.entity, prm.user);
-        e.targetPosX = m.hitVec.xCoord;
-        e.targetPosY = m.hitVec.yCoord;
-        e.targetPosZ = m.hitVec.zCoord;
+        e.targetPosX = m.hitVec.x;
+        e.targetPosY = m.hitVec.y;
+        e.targetPosZ = m.hitVec.z;
         this.worldObj.spawnEntityInWorld((Entity)e);
         playSound(prm.entity);
       } 

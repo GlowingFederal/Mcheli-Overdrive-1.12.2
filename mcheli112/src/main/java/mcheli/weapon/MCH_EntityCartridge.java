@@ -120,7 +120,7 @@ public class MCH_EntityCartridge extends W_Entity {
     double d = Math.max(Math.abs(this.motionX), Math.abs(this.motionY));
     d = Math.max(d, Math.abs(this.motionZ));
     if (W_MovingObjectPosition.isHitTypeTile(m)) {
-      setPosition(m.hitVec.xCoord, m.hitVec.yCoord, m.hitVec.zCoord);
+      setPosition(m.hitVec.x, m.hitVec.y, m.hitVec.z);
       this.motionX += d * (this.rand.nextFloat() - 0.5F) * 0.10000000149011612D;
       this.motionY += d * (this.rand.nextFloat() - 0.5F) * 0.10000000149011612D;
       this.motionZ += d * (this.rand.nextFloat() - 0.5F) * 0.10000000149011612D;

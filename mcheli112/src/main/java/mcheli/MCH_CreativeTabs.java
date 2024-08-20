@@ -30,7 +30,7 @@ public class MCH_CreativeTabs extends CreativeTabs {
     this.iconItems = new ArrayList<>();
     this.currentIconIndex = 0;
     this.switchItemWait = 0;
-    this.lastItem = ItemStack.field_190927_a;
+    this.lastItem = ItemStack.EMPTY;
   }
   
   public void setFixedIconItem(String itemName) {
@@ -44,7 +44,7 @@ public class MCH_CreativeTabs extends CreativeTabs {
   
   public ItemStack getTabIconItem() {
     if (this.iconItems.size() <= 0)
-      return ItemStack.field_190927_a; 
+      return ItemStack.EMPTY; 
     this.currentIconIndex = (this.currentIconIndex + 1) % this.iconItems.size();
     return this.iconItems.get(this.currentIconIndex);
   }
@@ -58,7 +58,7 @@ public class MCH_CreativeTabs extends CreativeTabs {
       this.lastItem = getTabIconItem();
       this.switchItemWait = 60;
     } 
-    if (this.lastItem.func_190926_b())
+    if (this.lastItem.isEmpty())
       this.lastItem = new ItemStack(W_Item.getItemByName("iron_block")); 
     return this.lastItem;
   }

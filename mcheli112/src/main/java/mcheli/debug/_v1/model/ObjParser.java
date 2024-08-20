@@ -159,25 +159,25 @@ public class ObjParser {
       String[] subTokens = null;
       int[] verticesID = new int[tokens.length];
       _Vertex[] verts = new _Vertex[tokens.length];
-      _TextureCoord[] texCoords = new _TextureCoord[tokens.length];
+      _TextureCoord[] texs = new _TextureCoord[tokens.length];
       _Vertex[] normals = new _Vertex[tokens.length];
       if (isValidFace_V_VT_VN_Line(line)) {
         for (int i = 0; i < tokens.length; i++) {
           subTokens = tokens[i].split("/");
           verticesID[i] = Integer.parseInt(subTokens[0]) - 1;
           verts[i] = vertices.get(Integer.parseInt(subTokens[0]) - 1);
-          texCoords[i] = textureCoordinates.get(Integer.parseInt(subTokens[1]) - 1);
+          texs[i] = textureCoordinates.get(Integer.parseInt(subTokens[1]) - 1);
           normals[i] = vertexNormals.get(Integer.parseInt(subTokens[2]) - 1);
         } 
-        face = new _Face(verticesID, verts, normals, texCoords);
+        face = new _Face(verticesID, verts, normals, texs);
       } else if (isValidFace_V_VT_Line(line)) {
         for (int i = 0; i < tokens.length; i++) {
           subTokens = tokens[i].split("/");
           verticesID[i] = Integer.parseInt(subTokens[0]) - 1;
           verts[i] = vertices.get(Integer.parseInt(subTokens[0]) - 1);
-          texCoords[i] = textureCoordinates.get(Integer.parseInt(subTokens[1]) - 1);
+          texs[i] = textureCoordinates.get(Integer.parseInt(subTokens[1]) - 1);
         } 
-        face = new _Face(verticesID, verts, new _Vertex[0], texCoords);
+        face = new _Face(verticesID, verts, new _Vertex[0], texs);
       } else if (isValidFace_V_VN_Line(line)) {
         for (int i = 0; i < tokens.length; i++) {
           subTokens = tokens[i].split("//");

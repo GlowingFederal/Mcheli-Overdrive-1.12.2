@@ -107,12 +107,12 @@ public class MCH_GuiGLTD extends MCH_Gui {
     Vec3d dst = W_WorldFunc.getWorldVec3(w, c.posX + tX, c.posY + tY, c.posZ + tZ);
     RayTraceResult m = W_WorldFunc.clip(w, src, dst);
     if (m != null) {
-      drawString(String.format("X: %+.2fm", new Object[] { Double.valueOf(m.hitVec.xCoord) }), this.centerX + 50, this.centerY - 5 - 15, color);
-      drawString(String.format("Y: %+.2fm", new Object[] { Double.valueOf(m.hitVec.yCoord) }), this.centerX + 50, this.centerY - 5, color);
-      drawString(String.format("Z: %+.2fm", new Object[] { Double.valueOf(m.hitVec.zCoord) }), this.centerX + 50, this.centerY - 5 + 15, color);
-      double x = m.hitVec.xCoord - c.posX;
-      double y = m.hitVec.yCoord - c.posY;
-      double z = m.hitVec.zCoord - c.posZ;
+      drawString(String.format("X: %+.2fm", new Object[] { Double.valueOf(m.hitVec.x) }), this.centerX + 50, this.centerY - 5 - 15, color);
+      drawString(String.format("Y: %+.2fm", new Object[] { Double.valueOf(m.hitVec.y) }), this.centerX + 50, this.centerY - 5, color);
+      drawString(String.format("Z: %+.2fm", new Object[] { Double.valueOf(m.hitVec.z) }), this.centerX + 50, this.centerY - 5 + 15, color);
+      double x = m.hitVec.x - c.posX;
+      double y = m.hitVec.y - c.posY;
+      double z = m.hitVec.z - c.posZ;
       double len = Math.sqrt(x * x + y * y + z * z);
       drawCenteredString(String.format("[%.2fm]", new Object[] { Double.valueOf(len) }), this.centerX, this.centerY + 30, (len > 20.0D) ? color : colorDanger);
     } else {

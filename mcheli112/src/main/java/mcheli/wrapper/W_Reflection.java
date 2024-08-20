@@ -78,7 +78,7 @@ public class W_Reflection {
       return (ItemStack)ObfuscationReflectionHelper.getPrivateValue(ItemRenderer.class, getItemRenderer(), "itemStackMainHand");
     } catch (Exception e) {
       e.printStackTrace();
-      return ItemStack.field_190927_a;
+      return ItemStack.EMPTY;
     } 
   }
   

@@ -37,12 +37,12 @@ public class MCH_AircraftBoundingBox extends AxisAlignedBB {
     boolean ret = false;
     double dist = 1.0E7D;
     this.ac.lastBBDamageFactor = 1.0F;
-    if (super.intersectsWith(aabb)) {
+    if (super.intersects(aabb)) {
       dist = getDistSq(aabb, this);
       ret = true;
     } 
     for (MCH_BoundingBox bb : this.ac.extraBoundingBox) {
-      if (bb.getBoundingBox().intersectsWith(aabb)) {
+      if (bb.getBoundingBox().intersects(aabb)) {
         double dist2 = getDistSq(aabb, this);
         if (dist2 < dist) {
           dist = dist2;

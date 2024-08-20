@@ -30,8 +30,8 @@ public class MCH_RenderAAMissile extends MCH_RenderBulletBase<MCH_EntityAAMissil
     GL11.glPushMatrix();
     GL11.glTranslated(posX, posY, posZ);
     Vec3d v = MCH_Lib.getYawPitchFromVec(mx, my, mz);
-    GL11.glRotatef((float)v.yCoord - 90.0F, 0.0F, -1.0F, 0.0F);
-    GL11.glRotatef((float)v.zCoord, -1.0F, 0.0F, 0.0F);
+    GL11.glRotatef((float)v.y - 90.0F, 0.0F, -1.0F, 0.0F);
+    GL11.glRotatef((float)v.z, -1.0F, 0.0F, 0.0F);
     renderModel(aam);
     GL11.glPopMatrix();
   }

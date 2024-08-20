@@ -132,7 +132,7 @@ public class MCH_ItemSpawnGunner extends W_Item {
       } 
     } 
     if (!player.capabilities.isCreativeMode)
-      itemstack.func_190918_g(1); 
+      itemstack.shrink(1); 
     return ActionResult.newResult(EnumActionResult.SUCCESS, itemstack);
   }
   

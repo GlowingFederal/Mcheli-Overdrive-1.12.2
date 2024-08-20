@@ -234,7 +234,7 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
     if (!MCH_Multiplay.canAttackEntity(damageSource, (Entity)this))
       return false; 
     boolean isCreative = false;
-    Entity entity = damageSource.getEntity();
+    Entity entity = damageSource.getImmediateSource();
     boolean isDamegeSourcePlayer = false;
     if (entity instanceof EntityPlayer) {
       isCreative = ((EntityPlayer)entity).capabilities.isCreativeMode;
@@ -243,8 +243,8 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
       W_WorldFunc.MOD_playSoundAtEntity((Entity)this, "hit", 1.0F, 1.0F);
     } else {
       W_WorldFunc.MOD_playSoundAtEntity((Entity)this, "helidmg", 1.0F, 0.9F + this.rand.nextFloat() * 0.1F);
-    } 
-    setBeenAttacked();
+    }
+    markVelocityChanged();
     if (damage > 0.0F) {
       Entity riddenByEntity = getRiddenByEntity();
       if (riddenByEntity != null)
@@ -425,7 +425,7 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
   
   private void onUpdate_Server() {
     this.motionY -= 0.03D;
-    moveEntity(MoverType.SELF, 0.0D, this.motionY, 0.0D);
+    move(MoverType.SELF, 0.0D, this.motionY, 0.0D);
     this.motionY *= 0.96D;
     this.motionX = 0.0D;
     this.motionZ = 0.0D;
@@ -436,10 +436,10 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
         unmountEntity(true);
       } else {
         ItemStack item = getStackInSlot(0);
-        if (!item.func_190926_b()) {
+        if (!item.isEmpty()) {
           handleItem(riddenByEntity, item);
-          if (item.func_190916_E() == 0)
-            setInventorySlotContents(0, ItemStack.field_190927_a); 
+          if (item.getCount() == 0)
+            setInventorySlotContents(0, ItemStack.EMPTY); 
         } 
       }  
     if (getLastControlAircraft() == null)
@@ -477,7 +477,7 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
   
   public void handleItem(@Nullable Entity user, ItemStack itemStack) {
     MCH_EntityTank mCH_EntityTank;
-    if (user == null || user.isDead || itemStack.func_190926_b() || itemStack.func_190916_E() != 1)
+    if (user == null || user.isDead || itemStack.isEmpty() || itemStack.getCount() != 1)
       return; 
     if (this.world.isRemote)
       return; 
@@ -505,41 +505,42 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
         } else {
           MCH_EntityHeli mCH_EntityHeli = ((MCH_ItemHeli)item).createAircraft(this.world, x, y, z, itemStack);
         }  
-    } 
-    if (item instanceof MCH_ItemTank) {
-      MCH_TankInfo hi = MCH_TankInfoManager.getFromItem(item);
-      if (hi != null && hi.isUAV)
-        if (!hi.isSmallUAV && getKind() == 2) {
+    }
+    if(item instanceof MCH_ItemTank) {
+      MCH_TankInfo hi2 = MCH_TankInfoManager.getFromItem(item);
+      if(hi2 != null && hi2.isUAV) {
+        if(!hi2.isSmallUAV && this.getKind() == 2) {
           ac = null;
         } else {
-          mCH_EntityTank = ((MCH_ItemTank)item).createAircraft(this.world, x, y, z, itemStack);
-        }  
-    } 
-    if (mCH_EntityTank == null)
-      return; 
-    ((MCH_EntityAircraft)mCH_EntityTank).rotationYaw = this.rotationYaw - 180.0F;
-    ((MCH_EntityAircraft)mCH_EntityTank).prevRotationYaw = ((MCH_EntityAircraft)mCH_EntityTank).rotationYaw;
+          ac = ((MCH_ItemTank)item).createAircraft(super.world, x, y, z, itemStack);
+        }
+      }
+    }
+
+    //((MCH_EntityAircraft)mCH_EntityTank).rotationYaw = this.rotationYaw - 180.0F;
+    //((MCH_EntityAircraft)mCH_EntityTank).prevRotationYaw = ((MCH_EntityAircraft)mCH_EntityTank).rotationYaw;
     user.rotationYaw = this.rotationYaw - 180.0F;
-    if (this.world.getCollisionBoxes((Entity)mCH_EntityTank, mCH_EntityTank.getEntityBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty()) {
-      itemStack.func_190918_g(1);
+    //if (this.world.getCollisionBoxes((Entity)mCH_EntityTank, mCH_EntityTank.getEntityBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty()) {
+      itemStack.shrink(1);
       MCH_Lib.DbgLog(this.world, "Create UAV: %s : %s", new Object[] { item
             
             .getUnlocalizedName(), item });
       user.rotationYaw = this.rotationYaw - 180.0F;
-      if (!mCH_EntityTank.isTargetDrone()) {
-        mCH_EntityTank.setUavStation(this);
-        setControlAircract((MCH_EntityAircraft)mCH_EntityTank);
-      } 
-      this.world.spawnEntityInWorld((Entity)mCH_EntityTank);
-      if (!mCH_EntityTank.isTargetDrone()) {
-        mCH_EntityTank.setFuel((int)(mCH_EntityTank.getMaxFuel() * 0.05F));
-        W_EntityPlayer.closeScreen(user);
-      } else {
-        mCH_EntityTank.setFuel(mCH_EntityTank.getMaxFuel());
-      } 
-    } else {
-      mCH_EntityTank.setDead();
-    } 
+      //if (!mCH_EntityTank.isTargetDrone()) {
+      //  mCH_EntityTank.setUavStation(this);
+      //  setControlAircract((MCH_EntityAircraft)mCH_EntityTank);
+      //}
+      //this.world.spawnEntity((Entity)mCH_EntityTank);
+      //if (!mCH_EntityTank.isTargetDrone()) {
+      //  mCH_EntityTank.setFuel((int)(mCH_EntityTank.getMaxFuel() * 0.05F));
+      //  W_EntityPlayer.closeScreen(user);
+      //} else {
+      //  mCH_EntityTank.setFuel(mCH_EntityTank.getMaxFuel());
+      //}
+    //}
+  // else {
+  //   mCH_EntityTank.setDead();
+  // }
   }
   
   public void _setInventorySlotContents(int par1, ItemStack itemStack) {
@@ -574,7 +575,12 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
   public int getSizeInventory() {
     return 1;
   }
-  
+
+  @Override
+  public boolean isEmpty() {
+    return false;
+  }
+
   public int getInventoryStackLimit() {
     return 1;
   }
@@ -606,6 +612,6 @@ public class MCH_EntityUavStation extends W_EntityContainer implements IEntitySi
   
   public ItemStack getPickedResult(RayTraceResult target) {
     int kind = getKind();
-    return (kind > 0) ? new ItemStack((Item)MCH_MOD.itemUavStation[kind - 1]) : ItemStack.field_190927_a;
+    return (kind > 0) ? new ItemStack((Item)MCH_MOD.itemUavStation[kind - 1]) : ItemStack.EMPTY;
   }
 }

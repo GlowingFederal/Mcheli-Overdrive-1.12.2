@@ -734,7 +734,7 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo implements IItemCont
           this.wheels.add(new Wheel(this, new Vec3d(x, y, toFloat(s[i])))); 
         Collections.sort(this.wheels, new Comparator<Wheel>() {
               public int compare(MCH_AircraftInfo.Wheel arg0, MCH_AircraftInfo.Wheel arg1) {
-                return (arg0.pos.zCoord > arg1.pos.zCoord) ? -1 : 1;
+                return (arg0.pos.z > arg1.pos.z) ? -1 : 1;
               }
             });
       } 

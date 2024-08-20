@@ -34,7 +34,7 @@ public class MCH_ItemParachute extends W_Item {
         world.spawnEntityInWorld((Entity)entity);
       }  
     if (!player.capabilities.isCreativeMode)
-      itemstack.func_190918_g(1); 
+      itemstack.shrink(1); 
     return ActionResult.newResult(EnumActionResult.SUCCESS, itemstack);
   }
 }

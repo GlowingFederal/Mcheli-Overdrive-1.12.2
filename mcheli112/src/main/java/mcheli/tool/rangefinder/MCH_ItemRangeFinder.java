@@ -38,7 +38,7 @@ public class MCH_ItemRangeFinder extends W_Item {
       return false; 
     if (player.world == null)
       return false; 
-    if (player.getHeldItemMainhand().func_190926_b())
+    if (player.getHeldItemMainhand().isEmpty())
       return false; 
     if (!(player.getHeldItemMainhand().getItem() instanceof MCH_ItemRangeFinder))
       return false; 

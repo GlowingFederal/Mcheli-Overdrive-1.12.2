@@ -88,60 +88,62 @@ public class MCH_GuiTitle extends MCH_Gui {
     int l = 0;
     TextComponentString chatcomponenttext = new TextComponentString("");
     ArrayList<ITextComponent> arraylist = Lists.newArrayList();
-    ArrayList<ITextComponent> arraylist1 = Lists.newArrayList((Iterable)chatComponent);
+    ArrayList<ITextComponent> arraylist1 = Lists.newArrayList((Iterable) chatComponent);
     for (int i1 = 0; i1 < arraylist1.size(); i1++) {
       ITextComponent ichatcomponent1 = arraylist1.get(i1);
       String[] splitLine = (ichatcomponent1.getUnformattedComponentText() + "").split("\n");
       int lineCnt = 0;
       for (String sLine : splitLine) {
         String s = formatColors(ichatcomponent1.getStyle().getFormattingCode() + sLine);
-        int j1 = this.mc.fontRendererObj.getStringWidth(s);
+        int j1 = this.mc.fontRenderer.getStringWidth(s);
+        //fontRendererObj.getStringWidth(s);
         TextComponentString chatcomponenttext1 = new TextComponentString(s);
         chatcomponenttext1.setStyle(ichatcomponent1.getStyle().createShallowCopy());
         boolean flag1 = false;
         if (l + j1 > k) {
-          String s1 = this.mc.fontRendererObj.trimStringToWidth(s, k - l, false);
+          String s1 = this.mc.fontRenderer.trimStringToWidth(s, k - l, false);
           String s2 = (s1.length() < s.length()) ? s.substring(s1.length()) : null;
           if (s2 != null && s2.length() > 0) {
             int k1 = s1.lastIndexOf(" ");
-            if (k1 >= 0 && this.mc.fontRendererObj.getStringWidth(s.substring(0, k1)) > 0) {
+            if (k1 >= 0 && this.mc.fontRenderer.getStringWidth(s.substring(0, k1)) > 0) {
               s1 = s.substring(0, k1);
               s2 = s.substring(k1);
-            } 
+            }
             TextComponentString chatcomponenttext2 = new TextComponentString(s2);
             chatcomponenttext2.setStyle(ichatcomponent1.getStyle().createShallowCopy());
             arraylist1.add(i1 + 1, chatcomponenttext2);
-          } 
-          j1 = this.mc.fontRendererObj.getStringWidth(s1);
+          }
+          j1 = this.mc.fontRenderer.getStringWidth(s1);
           chatcomponenttext1 = new TextComponentString(s1);
           chatcomponenttext1.setStyle(ichatcomponent1.getStyle().createShallowCopy());
           flag1 = true;
-        } 
+        }
         if (l + j1 <= k) {
           l += j1;
-          chatcomponenttext.appendSibling((ITextComponent)chatcomponenttext1);
+          chatcomponenttext.appendSibling((ITextComponent) chatcomponenttext1);
         } else {
           flag1 = true;
-        } 
+        }
         if (flag1) {
           arraylist.add(chatcomponenttext);
           l = 0;
           chatcomponenttext = new TextComponentString("");
-        } 
+        }
         lineCnt++;
         if (lineCnt < splitLine.length) {
           arraylist.add(chatcomponenttext);
           l = 0;
           chatcomponenttext = new TextComponentString("");
-        } 
-      } 
-    } 
+        }
+      }
+    }
     arraylist.add(chatcomponenttext);
     Iterator<ITextComponent> iterator = arraylist.iterator();
+    ITextComponent ichatcomponent2;
     for (; iterator.hasNext(); this.chatLines.add(new ChatLine(displayTime, ichatcomponent2, line)))
-      ITextComponent ichatcomponent2 = iterator.next(); 
+      ichatcomponent2 = iterator.next();
     while (this.chatLines.size() > 100)
-      this.chatLines.remove(this.chatLines.size() - 1); 
+      this.chatLines.remove(this.chatLines.size() - 1);
   }
   
   private int calculateChatboxHeight() {
@@ -182,9 +184,9 @@ public class MCH_GuiTitle extends MCH_Gui {
         drawRect(0, y + 9, this.mc.displayWidth, y, alpha / 2 << 24);
         GL11.glEnable(3042);
         String s = chatline.getChatComponent().getFormattedText();
-        int sw = this.mc.displayWidth / 2 / scaleFactor - this.mc.fontRendererObj.getStringWidth(s);
+        int sw = this.mc.displayWidth / 2 / scaleFactor - this.mc.fontRenderer.getStringWidth(s);
         sw = (int)(sw / scale);
-        this.mc.fontRendererObj.drawStringWithShadow(s, sw, (y + 1), 16777215 + (alpha << 24));
+        this.mc.fontRenderer.drawStringWithShadow(s, sw, (y + 1), 16777215 + (alpha << 24));
         GL11.glDisable(3008);
       } 
     } 

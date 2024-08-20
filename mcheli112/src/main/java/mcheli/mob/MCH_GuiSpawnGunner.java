@@ -29,7 +29,7 @@ public class MCH_GuiSpawnGunner extends MCH_Gui {
   }
   
   public boolean isDrawGui(EntityPlayer player) {
-    return (player != null && player.world != null && !player.getHeldItemMainhand().func_190926_b() && player
+    return (player != null && player.world != null && !player.getHeldItemMainhand().isEmpty() && player
       .getHeldItemMainhand().getItem() instanceof MCH_ItemSpawnGunner);
   }
   

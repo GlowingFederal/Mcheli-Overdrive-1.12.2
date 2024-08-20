@@ -76,7 +76,7 @@ public abstract class W_Entity extends Entity {
   }
   
   public static boolean shouldExplodeBlock(Entity entity, Explosion par1Explosion, World par2World, int par3, int par4, int par5, int par6, float par7) {
-    return entity.verifyExplosion(par1Explosion, par2World, new BlockPos(par3, par4, par5), 
+    return entity.canExplosionDestroyBlock(par1Explosion, par2World, new BlockPos(par3, par4, par5),
         W_Block.getBlockById(par6).getDefaultState(), par7);
   }
   

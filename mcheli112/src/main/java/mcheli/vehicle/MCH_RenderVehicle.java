@@ -70,7 +70,7 @@ public class MCH_RenderVehicle extends MCH_RenderAircraft<MCH_EntityVehicle> {
     } 
     int bkIndex = index;
     if (vp.rotPitch || vp.rotYaw || vp.type == 1) {
-      GL11.glTranslated(vp.pos.xCoord, vp.pos.yCoord, vp.pos.zCoord);
+      GL11.glTranslated(vp.pos.x, vp.pos.y, vp.pos.z);
       if (vp.rotYaw)
         GL11.glRotatef(-vehicle.lastRiderYaw + yaw, 0.0F, 1.0F, 0.0F); 
       if (vp.rotPitch) {
@@ -79,7 +79,7 @@ public class MCH_RenderVehicle extends MCH_RenderAircraft<MCH_EntityVehicle> {
       } 
       if (vp.type == 1)
         GL11.glRotatef(rotBrl, 0.0F, 0.0F, -1.0F); 
-      GL11.glTranslated(-vp.pos.xCoord, -vp.pos.yCoord, -vp.pos.zCoord);
+      GL11.glTranslated(-vp.pos.x, -vp.pos.y, -vp.pos.z);
     } 
     if (vp.type == 2)
       GL11.glTranslated(0.0D, 0.0D, (-vp.recoilBuf * recoilBuf)); 

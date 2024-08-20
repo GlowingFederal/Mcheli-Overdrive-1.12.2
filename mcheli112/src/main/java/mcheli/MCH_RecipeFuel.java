@@ -13,14 +13,14 @@ public class MCH_RecipeFuel extends IForgeRegistryEntry.Impl<IRecipe> implements
     int ccnt = 0;
     for (int i = 0; i < inv.getSizeInventory(); i++) {
       ItemStack is = inv.getStackInSlot(i);
-      if (!is.func_190926_b())
+      if (!is.isEmpty())
         if (is.getItem() instanceof mcheli.aircraft.MCH_ItemFuel) {
           if (is.getMetadata() == 0)
             return false; 
           jcnt++;
           if (jcnt > 1)
             return false; 
-        } else if (is.getItem() instanceof net.minecraft.item.ItemCoal && is.func_190916_E() > 0) {
+        } else if (is.getItem() instanceof net.minecraft.item.ItemCoal && is.getMaxStackSize() > 0) {
           ccnt++;
         } else {
           return false;
@@ -34,14 +34,14 @@ public class MCH_RecipeFuel extends IForgeRegistryEntry.Impl<IRecipe> implements
     int i;
     for (i = 0; i < inv.getSizeInventory(); i++) {
       ItemStack is = inv.getStackInSlot(i);
-      if (!is.func_190926_b() && is.getItem() instanceof mcheli.aircraft.MCH_ItemFuel) {
+      if (!is.isEmpty() && is.getItem() instanceof mcheli.aircraft.MCH_ItemFuel) {
         output.setItemDamage(is.getMetadata());
         break;
       } 
     } 
     for (i = 0; i < inv.getSizeInventory(); i++) {
       ItemStack is = inv.getStackInSlot(i);
-      if (!is.func_190926_b() && is.getItem() instanceof net.minecraft.item.ItemCoal) {
+      if (!is.isEmpty() && is.getItem() instanceof net.minecraft.item.ItemCoal) {
         int sp = 100;
         if (is.getMetadata() == 1)
           sp = 75; 
@@ -54,12 +54,17 @@ public class MCH_RecipeFuel extends IForgeRegistryEntry.Impl<IRecipe> implements
     } 
     return output;
   }
-  
+
+  @Override
+  public boolean canFit(int width, int height) {
+    return false;
+  }
+
   public boolean func_194133_a(int width, int height) {
     return (width >= 3 && height >= 3);
   }
-  
+
   public ItemStack getRecipeOutput() {
-    return ItemStack.field_190927_a;
+    return null;
   }
 }

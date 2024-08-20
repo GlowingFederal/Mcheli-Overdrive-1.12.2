@@ -147,7 +147,7 @@ public class MCH_EntityFlare extends W_Entity implements IEntityAdditionalSpawnD
     vec3 = W_WorldFunc.getWorldVec3(this.world, this.posX, this.posY, this.posZ);
     vec31 = W_WorldFunc.getWorldVec3(this.world, this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
     if (mop != null) {
-      vec31 = W_WorldFunc.getWorldVec3(this.world, mop.hitVec.xCoord, mop.hitVec.yCoord, mop.hitVec.zCoord);
+      vec31 = W_WorldFunc.getWorldVec3(this.world, mop.hitVec.x, mop.hitVec.y, mop.hitVec.z);
       onImpact(mop);
     } 
   }

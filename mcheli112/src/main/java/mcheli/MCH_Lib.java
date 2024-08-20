@@ -71,8 +71,8 @@ public class MCH_Lib {
   }
   
   public static Vec3d calculateFaceNormal(Vec3d[] vertices) {
-    Vec3d v1 = new Vec3d((vertices[1]).xCoord - (vertices[0]).xCoord, (vertices[1]).yCoord - (vertices[0]).yCoord, (vertices[1]).zCoord - (vertices[0]).zCoord);
-    Vec3d v2 = new Vec3d((vertices[2]).xCoord - (vertices[0]).xCoord, (vertices[2]).yCoord - (vertices[0]).yCoord, (vertices[2]).zCoord - (vertices[0]).zCoord);
+    Vec3d v1 = new Vec3d((vertices[1]).x - (vertices[0]).x, (vertices[1]).y - (vertices[0]).y, (vertices[1]).z - (vertices[0]).z);
+    Vec3d v2 = new Vec3d((vertices[2]).x - (vertices[0]).x, (vertices[2]).y - (vertices[0]).y, (vertices[2]).z - (vertices[0]).z);
     return v1.crossProduct(v2).normalize();
   }
   
@@ -154,14 +154,14 @@ public class MCH_Lib {
   }
   
   public static Vec3d RotVec3(Vec3d vin, float yaw, float pitch) {
-    Vec3d v = new Vec3d(vin.xCoord, vin.yCoord, vin.zCoord);
+    Vec3d v = new Vec3d(vin.x, vin.y, vin.z);
     v = v.rotatePitch(pitch / 180.0F * 3.1415927F);
     v = v.rotateYaw(yaw / 180.0F * 3.1415927F);
     return v;
   }
   
   public static Vec3d RotVec3(Vec3d vin, float yaw, float pitch, float roll) {
-    Vec3d v = new Vec3d(vin.xCoord, vin.yCoord, vin.zCoord);
+    Vec3d v = new Vec3d(vin.x, vin.y, vin.z);
     v = W_Vec3.rotateRoll(roll / 180.0F * 3.1415927F, v);
     v = v.rotatePitch(pitch / 180.0F * 3.1415927F);
     v = v.rotateYaw(yaw / 180.0F * 3.1415927F);
@@ -290,7 +290,7 @@ public class MCH_Lib {
   }
   
   public static Block getBlockY(World world, Vec3d pos, int size, int lenY, boolean canColliableOnly) {
-    return getBlockY(world, pos.xCoord, pos.yCoord, pos.zCoord, size, lenY, canColliableOnly);
+    return getBlockY(world, pos.x, pos.y, pos.z, size, lenY, canColliableOnly);
   }
   
   public static Block getBlockY(World world, double posX, double posY, double posZ, int size, int lenY, boolean canColliableOnly) {
@@ -321,7 +321,7 @@ public class MCH_Lib {
   }
   
   public static Vec3d getYawPitchFromVec(Vec3d v) {
-    return getYawPitchFromVec(v.xCoord, v.yCoord, v.zCoord);
+    return getYawPitchFromVec(v.x, v.y, v.z);
   }
   
   public static Vec3d getYawPitchFromVec(double x, double y, double z) {
@@ -359,7 +359,7 @@ public class MCH_Lib {
   }
   
   public static void disableFirstPersonItemRender(ItemStack itemStack) {
-    if (itemStack.func_190926_b() && itemStack.getItem() instanceof net.minecraft.item.ItemMapBase)
+    if (itemStack.isEmpty() && itemStack.getItem() instanceof net.minecraft.item.ItemMapBase)
       if (!(W_McClient.getRenderEntity() instanceof MCH_ViewEntityDummy))
         return;  
     disableFirstPersonItemRender();

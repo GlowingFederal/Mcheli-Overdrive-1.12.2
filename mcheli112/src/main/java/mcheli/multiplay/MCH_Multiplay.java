@@ -201,8 +201,8 @@ public class MCH_Multiplay {
       if (ac != null)
         acRoll = ac.getRotRoll(); 
       Vec3d vv = MCH_Lib.RotVec3(0.0D, 0.0D, 1.0D, -player.rotationYaw, -player.rotationPitch, -acRoll);
-      double tx = vv.xCoord;
-      double tz = vv.zCoord;
+      double tx = vv.x;
+      double tz = vv.z;
       List<Entity> list = player.world.getEntitiesWithinAABBExcludingEntity((Entity)player, player
           .getEntityBoundingBox().expand(spotLength, spotLength, spotLength));
       List<Integer> entityList = new ArrayList<>();
@@ -212,11 +212,11 @@ public class MCH_Multiplay {
         if (canSpotEntityWithFilter(targetFilter, entity)) {
           MCH_TargetType stopType = canSpotEntity((Entity)player, posX, posY, posZ, entity, true);
           if (stopType != MCH_TargetType.NONE && stopType != MCH_TargetType.SAME_TEAM_PLAYER) {
-            double dist = entity.getDistanceSq(pos.xCoord, pos.yCoord, pos.zCoord);
+            double dist = entity.getDistanceSq(pos.x, pos.y, pos.z);
             if (dist > 1.0D && dist < (spotLength * spotLength)) {
-              double cx = entity.posX - pos.xCoord;
-              double cy = entity.posY - pos.yCoord;
-              double cz = entity.posZ - pos.zCoord;
+              double cx = entity.posX - pos.x;
+              double cy = entity.posY - pos.y;
+              double cz = entity.posZ - pos.z;
               double h = MCH_Lib.getPosAngle(tx, tz, cx, cz);
               double v = Math.atan2(cy, Math.sqrt(cx * cx + cz * cz)) * 180.0D / Math.PI;
               v = Math.abs(v + player.rotationPitch);
@@ -250,7 +250,7 @@ public class MCH_Multiplay {
   public static boolean markPoint(EntityPlayer player, double posX, double posY, double posZ) {
     Vec3d vs = new Vec3d(posX, posY, posZ);
     Vec3d ve = MCH_Lib.Rot2Vec3(player.rotationYaw, player.rotationPitch);
-    ve = vs.addVector(ve.xCoord * 300.0D, ve.yCoord * 300.0D, ve.zCoord * 300.0D);
+    ve = vs.addVector(ve.x * 300.0D, ve.y * 300.0D, ve.z * 300.0D);
     RayTraceResult mop = player.world.rayTraceBlocks(vs, ve, true);
     if (mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
       sendMarkPointToSameTeam(player, mop.getBlockPos().getX(), mop.getBlockPos().getY(), mop

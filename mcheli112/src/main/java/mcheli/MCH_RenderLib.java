@@ -22,7 +22,7 @@ public class MCH_RenderLib {
     BufferBuilder builder = tessellator.getBuffer();
     builder.begin(mode, DefaultVertexFormats.POSITION);
     for (Vec3d v : points)
-      builder.pos(v.xCoord, v.yCoord, v.zCoord).endVertex(); 
+      builder.pos(v.x, v.y, v.z).endVertex(); 
     tessellator.draw();
     GL11.glEnable(3553);
     GL11.glDisable(3042);

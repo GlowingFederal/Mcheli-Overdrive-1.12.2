@@ -25,7 +25,7 @@ public abstract class W_EntityContainer extends W_Entity implements IInventory {
   public W_EntityContainer(World par1World) {
     super(par1World);
     this.containerItems = new ItemStack[54];
-    Arrays.fill((Object[])this.containerItems, ItemStack.field_190927_a);
+    Arrays.fill((Object[])this.containerItems, ItemStack.EMPTY);
   }
   
   protected void entityInit() {}
@@ -46,7 +46,7 @@ public abstract class W_EntityContainer extends W_Entity implements IInventory {
       int n = getSizeInventory();
       numUsingSlot = 0;
       for (int i = 0; i < n && i < this.containerItems.length; i++) {
-        if (!getStackInSlot(i).func_190926_b())
+        if (!getStackInSlot(i).isEmpty())
           numUsingSlot++; 
       } 
     } 
@@ -55,31 +55,31 @@ public abstract class W_EntityContainer extends W_Entity implements IInventory {
   
   public boolean func_191420_l() {
     for (ItemStack itemstack : this.containerItems) {
-      if (!itemstack.func_190926_b())
+      if (!itemstack.isEmpty())
         return false; 
     } 
     return true;
   }
   
   public ItemStack decrStackSize(int par1, int par2) {
-    if (!this.containerItems[par1].func_190926_b()) {
-      if (this.containerItems[par1].func_190916_E() <= par2) {
+    if (!this.containerItems[par1].isEmpty()) {
+      if (this.containerItems[par1].getCount() <= par2) {
         ItemStack itemStack = this.containerItems[par1];
-        this.containerItems[par1] = ItemStack.field_190927_a;
+        this.containerItems[par1] = ItemStack.EMPTY;
         return itemStack;
       } 
       ItemStack itemstack = this.containerItems[par1].splitStack(par2);
-      if (this.containerItems[par1].func_190916_E() == 0)
-        this.containerItems[par1] = ItemStack.field_190927_a; 
+      if (this.containerItems[par1].getCount() == 0)
+        this.containerItems[par1] = ItemStack.EMPTY; 
       return itemstack;
     } 
-    return ItemStack.field_190927_a;
+    return ItemStack.EMPTY;
   }
   
   public ItemStack removeStackFromSlot(int par1) {
-    if (!this.containerItems[par1].func_190926_b()) {
+    if (!this.containerItems[par1].isEmpty()) {
       ItemStack itemstack = this.containerItems[par1];
-      this.containerItems[par1] = ItemStack.field_190927_a;
+      this.containerItems[par1] = ItemStack.EMPTY;
       return itemstack;
     } 
     return null;
@@ -87,8 +87,8 @@ public abstract class W_EntityContainer extends W_Entity implements IInventory {
   
   public void setInventorySlotContents(int par1, ItemStack par2ItemStack) {
     this.containerItems[par1] = par2ItemStack;
-    if (!par2ItemStack.func_190926_b() && par2ItemStack.func_190916_E() > getInventoryStackLimit())
-      par2ItemStack.func_190920_e(getInventoryStackLimit()); 
+    if (!par2ItemStack.isEmpty() && par2ItemStack.getCount() > getInventoryStackLimit())
+      par2ItemStack.setCount(getInventoryStackLimit());
     markDirty();
   }
   
@@ -134,23 +134,23 @@ public abstract class W_EntityContainer extends W_Entity implements IInventory {
     if (this.dropContentsWhenDead && !this.world.isRemote)
       for (int i = 0; i < getSizeInventory(); i++) {
         ItemStack itemstack = getStackInSlot(i);
-        if (!itemstack.func_190926_b()) {
+        if (!itemstack.isEmpty()) {
           float x = this.rand.nextFloat() * 0.8F + 0.1F;
           float y = this.rand.nextFloat() * 0.8F + 0.1F;
           float z = this.rand.nextFloat() * 0.8F + 0.1F;
-          while (itemstack.func_190916_E() > 0) {
+          while (itemstack.getCount() > 0) {
             int j = this.rand.nextInt(21) + 10;
-            if (j > itemstack.func_190916_E())
-              j = itemstack.func_190916_E(); 
-            itemstack.func_190918_g(j);
+            if (j > itemstack.getCount())
+              j = itemstack.getCount(); 
+            itemstack.shrink(j);
             EntityItem entityitem = new EntityItem(this.world, this.posX + x, this.posY + y, this.posZ + z, new ItemStack(itemstack.getItem(), j, itemstack.getMetadata()));
             if (itemstack.hasTagCompound())
-              entityitem.getEntityItem().setTagCompound(itemstack.getTagCompound().copy()); 
+              entityitem.getItem().setTagCompound(itemstack.getTagCompound().copy());
             float f3 = 0.05F;
             entityitem.motionX = ((float)this.rand.nextGaussian() * f3);
             entityitem.motionY = ((float)this.rand.nextGaussian() * f3 + 0.2F);
             entityitem.motionZ = ((float)this.rand.nextGaussian() * f3);
-            this.world.spawnEntityInWorld((Entity)entityitem);
+            this.world.spawnEntity((Entity)entityitem);
           } 
         } 
       }  
@@ -160,7 +160,7 @@ public abstract class W_EntityContainer extends W_Entity implements IInventory {
   protected void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {
     NBTTagList nbttaglist = new NBTTagList();
     for (int i = 0; i < this.containerItems.length; i++) {
-      if (!this.containerItems[i].func_190926_b()) {
+      if (!this.containerItems[i].isEmpty()) {
         NBTTagCompound nbttagcompound1 = new NBTTagCompound();
         nbttagcompound1.setByte("Slot", (byte)i);
         this.containerItems[i].writeToNBT(nbttagcompound1);
@@ -173,7 +173,7 @@ public abstract class W_EntityContainer extends W_Entity implements IInventory {
   protected void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
     NBTTagList nbttaglist = W_NBTTag.getTagList(par1NBTTagCompound, "Items", 10);
     this.containerItems = new ItemStack[getSizeInventory()];
-    Arrays.fill((Object[])this.containerItems, ItemStack.field_190927_a);
+    Arrays.fill((Object[])this.containerItems, ItemStack.EMPTY);
     MCH_Lib.DbgLog(this.world, "W_EntityContainer.readEntityFromNBT.InventorySize = %d", new Object[] { Integer.valueOf(getSizeInventory()) });
     for (int i = 0; i < nbttaglist.tagCount(); i++) {
       NBTTagCompound nbttagcompound1 = W_NBTTag.tagAt(nbttaglist, i);

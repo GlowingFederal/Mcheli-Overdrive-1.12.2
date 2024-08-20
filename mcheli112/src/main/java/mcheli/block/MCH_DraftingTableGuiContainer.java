@@ -64,25 +64,25 @@ public class MCH_DraftingTableGuiContainer extends Container {
   }
   
   public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
-    ItemStack itemstack = ItemStack.field_190927_a;
+    ItemStack itemstack = ItemStack.EMPTY;
     Slot slot = this.inventorySlots.get(slotIndex);
     if (slot != null && slot.getHasStack()) {
       ItemStack itemstack1 = slot.getStack();
       itemstack = itemstack1.copy();
       if (slotIndex == this.outputSlotIndex) {
         if (!mergeItemStack(itemstack1, 0, 36, true))
-          return ItemStack.field_190927_a; 
+          return ItemStack.EMPTY; 
         slot.onSlotChange(itemstack1, itemstack);
       } else {
-        return ItemStack.field_190927_a;
+        return ItemStack.EMPTY;
       } 
-      if (itemstack1.func_190916_E() == 0) {
-        slot.putStack(ItemStack.field_190927_a);
+      if (itemstack1.getCount() == 0) {
+        slot.putStack(ItemStack.EMPTY);
       } else {
         slot.onSlotChanged();
       } 
-      if (itemstack1.func_190916_E() == itemstack.func_190916_E())
-        return ItemStack.field_190927_a; 
+      if (itemstack1.getCount() == itemstack.getCount())
+        return ItemStack.EMPTY; 
       slot.func_190901_a(player, itemstack1);
     } 
     return itemstack;
@@ -92,7 +92,7 @@ public class MCH_DraftingTableGuiContainer extends Container {
     super.onContainerClosed(player);
     if (!player.world.isRemote) {
       ItemStack itemstack = getSlot(this.outputSlotIndex).getStack();
-      if (!itemstack.func_190926_b())
+      if (!itemstack.isEmpty())
         W_EntityPlayer.dropPlayerItemWithRandomChoice(player, itemstack, false, false); 
     } 
     MCH_Lib.DbgLog(player.world, "MCH_DraftingTableGuiContainer.onContainerClosed", new Object[0]);

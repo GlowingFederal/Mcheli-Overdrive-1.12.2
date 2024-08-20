@@ -52,7 +52,7 @@ public class WeaponPointRenderer {
             Color4f c = C[id % C.length];
             float f = i * 0.1F;
             double d = j * 0.04D;
-            builder.pos(vec3d.xCoord, vec3d.yCoord + d, vec3d.zCoord)
+            builder.pos(vec3d.x, vec3d.y + d, vec3d.z)
               .color(in(c.x + f), in(c.y + f), in(c.z + f), c.w).endVertex();
           } 
         } 

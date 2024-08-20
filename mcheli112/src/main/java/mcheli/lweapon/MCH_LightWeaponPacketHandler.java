@@ -28,7 +28,7 @@ public class MCH_LightWeaponPacketHandler {
           if (pc.camMode == 1)
             player.removePotionEffect(MobEffects.NIGHT_VISION); 
           ItemStack is = player.getHeldItemMainhand();
-          if (is.func_190926_b())
+          if (is.isEmpty())
             return; 
           if (!(is.getItem() instanceof MCH_ItemLightWeaponBase))
             return; 
@@ -49,7 +49,7 @@ public class MCH_LightWeaponPacketHandler {
             w.shot(prm);
             if (!player.capabilities.isCreativeMode)
               if (is.getMaxDamage() == 1)
-                is.func_190918_g(1);  
+                is.shrink(1);  
             if (is.getMaxDamage() > 1)
               is.setItemDamage(is.getMaxDamage()); 
           } else if (pc.cmpReload > 0) {

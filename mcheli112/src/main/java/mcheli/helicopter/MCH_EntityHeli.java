@@ -162,7 +162,7 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
     this.rotors = new MCH_Rotor[this.heliInfo.rotorList.size()];
     int i = 0;
     for (MCH_HeliInfo.Rotor r : this.heliInfo.rotorList) {
-      this.rotors[i] = new MCH_Rotor(r.bladeNum, r.bladeRot, this.world.isRemote ? 2 : 2, (float)r.pos.xCoord, (float)r.pos.yCoord, (float)r.pos.zCoord, (float)r.rot.xCoord, (float)r.rot.yCoord, (float)r.rot.zCoord, r.haveFoldFunc);
+      this.rotors[i] = new MCH_Rotor(r.bladeNum, r.bladeRot, this.world.isRemote ? 2 : 2, (float)r.pos.x, (float)r.pos.y, (float)r.pos.z, (float)r.rot.x, (float)r.rot.y, (float)r.rot.z, r.haveFoldFunc);
       i++;
     } 
   }
@@ -585,22 +585,22 @@ public class MCH_EntityHeli extends MCH_EntityAircraft {
       float yaw = getRotYaw();
       float pitch = getRotPitch();
       Vec3d pos = MCH_Lib.RotVec3(rotor_pos, -yaw, -pitch, -getRotRoll());
-      double x = this.posX + pos.xCoord;
-      double y = this.posY + pos.yCoord;
-      double z = this.posZ + pos.zCoord;
+      double x = this.posX + pos.x;
+      double y = this.posY + pos.y;
+      double z = this.posZ + pos.z;
       if (this.isFirstDamageSmoke)
         this.prevDamageSmokePos[ri] = new Vec3d(x, y, z); 
       Vec3d prev = this.prevDamageSmokePos[ri];
-      double dx = x - prev.xCoord;
-      double dy = y - prev.yCoord;
-      double dz = z - prev.zCoord;
+      double dx = x - prev.x;
+      double dy = y - prev.y;
+      double dz = z - prev.z;
       int num = (int)(MathHelper.sqrt(dx * dx + dy * dy + dz * dz) * 2.0F) + 1;
       double i;
       for (i = 0.0D; i < num; i++) {
         double p = (getHP() / getMaxHP());
         if (p < (this.rand.nextFloat() / 2.0F)) {
           float c = 0.2F + this.rand.nextFloat() * 0.3F;
-          MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", prev.xCoord + (x - prev.xCoord) * i / num, prev.yCoord + (y - prev.yCoord) * i / num, prev.zCoord + (z - prev.zCoord) * i / num);
+          MCH_ParticleParam prm = new MCH_ParticleParam(this.world, "smoke", prev.x + (x - prev.x) * i / num, prev.y + (y - prev.y) * i / num, prev.z + (z - prev.z) * i / num);
           prm.motionX = (this.rand.nextDouble() - 0.5D) * 0.3D;
           prm.motionY = this.rand.nextDouble() * 0.1D;
           prm.motionZ = (this.rand.nextDouble() - 0.5D) * 0.3D;

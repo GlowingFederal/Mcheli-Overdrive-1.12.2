@@ -63,36 +63,36 @@ public class MCH_AircraftGuiContainer extends Container {
       return null; 
     ItemStack itemStack = slot.getStack();
     MCH_Lib.DbgLog(player.world, "transferStackInSlot : %d :" + itemStack, new Object[] { Integer.valueOf(slotIndex) });
-    if (itemStack.func_190926_b())
-      return ItemStack.field_190927_a; 
+    if (itemStack.isEmpty())
+      return ItemStack.EMPTY; 
     if (slotIndex < getInventoryStartIndex()) {
       for (int i = getInventoryStartIndex(); i < this.inventorySlots.size(); i++) {
         Slot playerSlot = this.inventorySlots.get(i);
-        if (playerSlot.getStack().func_190926_b()) {
+        if (playerSlot.getStack().isEmpty()) {
           playerSlot.putStack(itemStack);
-          slot.putStack(ItemStack.field_190927_a);
+          slot.putStack(ItemStack.EMPTY);
           return itemStack;
         } 
       } 
     } else if (itemStack.getItem() instanceof MCH_ItemFuel) {
       for (int i = 0; i < 3; i++) {
-        if (iv.getFuelSlotItemStack(i).func_190926_b()) {
+        if (iv.getFuelSlotItemStack(i).isEmpty()) {
           iv.setInventorySlotContents(0 + i, itemStack);
-          slot.putStack(ItemStack.field_190927_a);
+          slot.putStack(ItemStack.EMPTY);
           return itemStack;
         } 
       } 
     } else if (itemStack.getItem() instanceof mcheli.parachute.MCH_ItemParachute) {
       int num = this.aircraft.getNumEjectionSeat();
       for (int i = 0; i < num; i++) {
-        if (iv.getParachuteSlotItemStack(i).func_190926_b()) {
+        if (iv.getParachuteSlotItemStack(i).isEmpty()) {
           iv.setInventorySlotContents(3 + i, itemStack);
-          slot.putStack(ItemStack.field_190927_a);
+          slot.putStack(ItemStack.EMPTY);
           return itemStack;
         } 
       } 
     } 
-    return ItemStack.field_190927_a;
+    return ItemStack.EMPTY;
   }
   
   public void onContainerClosed(EntityPlayer player) {
@@ -102,12 +102,12 @@ public class MCH_AircraftGuiContainer extends Container {
       int i;
       for (i = 0; i < 3; i++) {
         ItemStack is = iv.getFuelSlotItemStack(i);
-        if (!is.func_190926_b() && !(is.getItem() instanceof MCH_ItemFuel))
+        if (!is.isEmpty() && !(is.getItem() instanceof MCH_ItemFuel))
           dropPlayerItem(player, 0 + i); 
       } 
       for (i = 0; i < 2; i++) {
         ItemStack is = iv.getParachuteSlotItemStack(i);
-        if (!is.func_190926_b() && !(is.getItem() instanceof mcheli.parachute.MCH_ItemParachute))
+        if (!is.isEmpty() && !(is.getItem() instanceof mcheli.parachute.MCH_ItemParachute))
           dropPlayerItem(player, 3 + i); 
       } 
     } 
@@ -116,7 +116,7 @@ public class MCH_AircraftGuiContainer extends Container {
   public void dropPlayerItem(EntityPlayer player, int slotID) {
     if (!player.world.isRemote) {
       ItemStack itemstack = this.aircraft.getGuiInventory().removeStackFromSlot(slotID);
-      if (!itemstack.func_190926_b())
+      if (!itemstack.isEmpty())
         player.dropItem(itemstack, false); 
     } 
   }

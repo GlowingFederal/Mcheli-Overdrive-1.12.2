@@ -25,8 +25,8 @@ public class EntityBulletTest extends MCH_EntityBullet {
   }
   
   public boolean checkValid() {
-    double x = this.posX - this.firstPos.xCoord;
-    double z = this.posZ - this.firstPos.zCoord;
+    double x = this.posX - this.firstPos.x;
+    double z = this.posZ - this.firstPos.z;
     return (x * x + z * z < 3.38724E7D && this.posY > -10.0D);
   }
 }
