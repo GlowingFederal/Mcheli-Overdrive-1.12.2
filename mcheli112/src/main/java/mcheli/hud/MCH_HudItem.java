@@ -358,15 +358,23 @@ public abstract class MCH_HudItem extends Gui {
       is_heat_wpn = (wi.maxHeatCount > 0) ? 1 : 0;
       reloading = ws.isInPreparation() ? 1 : 0;
       display_mortar_dist = wi.displayMortarDistance ? 1 : 0;
+
       if (wi.delay > wi.reloadTime) {
-        rel_time = ws.countWait / ((wi.delay > 0) ? wi.delay : true);
-        if (rel_time < 0.0F)
-          rel_time = -rel_time; 
-        if (rel_time > 1.0F)
-          rel_time = 1.0F; 
+        // Ensure delay is not zero to avoid division by zero
+        float delay = (wi.delay > 0) ? wi.delay : 1.0F;
+        rel_time = ws.countWait / delay;
+        // Ensure rel_time is within the range [0.0F, 1.0F]
+        if (rel_time < 0.0F) {
+          rel_time = -rel_time;
+        }
+        if (rel_time > 1.0F) {
+          rel_time = 1.0F;
+        }
       } else {
-        rel_time = ws.countReloadWait / ((wi.reloadTime > 0) ? wi.reloadTime : true);
-      } 
+        // Ensure reloadTime is not zero to avoid division by zero
+        float reloadTime = (wi.reloadTime > 0) ? wi.reloadTime : 1.0F;
+        rel_time = ws.countReloadWait / reloadTime;
+      }
       if (wi.maxHeatCount > 0) {
         double hpp = ws.currentHeat / wi.maxHeatCount;
         wpn_heat = (hpp > 1.0D) ? 1.0D : hpp;
@@ -496,18 +504,22 @@ public abstract class MCH_HudItem extends Gui {
       MortarDist = (float)ac.getLandInDistance((Entity)player);
     } else {
       MortarDist = -1.0F;
-    } 
+    }
     if (wi.delay > wi.reloadTime) {
+      // Ensure that ws.countWait is of type float or double for accurate division
+      float reloadTime = (wi.delay > 0) ? wi.delay : 1.0F; // Prevent division by zero
       ReloadSec = (ws.countWait >= 0) ? ws.countWait : -ws.countWait;
-      ReloadPer = ws.countWait / ((wi.delay > 0) ? wi.delay : true);
+      ReloadPer = (ws.countWait / reloadTime); // Ensure ws.countWait and reloadTime are float
       if (ReloadPer < 0.0F)
-        ReloadPer = -ReloadPer; 
+        ReloadPer = -ReloadPer;
       if (ReloadPer > 1.0F)
-        ReloadPer = 1.0F; 
+        ReloadPer = 1.0F;
     } else {
+      // Ensure that ws.countReloadWait is of type float or double for accurate division
+      float reloadTime = (wi.reloadTime > 0) ? wi.reloadTime : 1.0F; // Prevent division by zero
       ReloadSec = ws.countReloadWait;
-      ReloadPer = ws.countReloadWait / ((wi.reloadTime > 0) ? wi.reloadTime : true);
-    } 
+      ReloadPer = (ws.countReloadWait / reloadTime); // Ensure ws.countReloadWait and reloadTime are float
+    }
     ReloadSec /= 20.0F;
     ReloadPer = (1.0F - ReloadPer) * 100.0F;
   }

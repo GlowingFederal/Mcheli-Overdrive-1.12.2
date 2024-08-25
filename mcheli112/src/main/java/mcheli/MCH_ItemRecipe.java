@@ -78,14 +78,18 @@ public class MCH_ItemRecipe implements MCH_IRecipeList {
   
   public static void registerItemRecipe(IForgeRegistry<IRecipe> registry) {
     registerCommonItemRecipe(registry);
-    for (MCH_HeliInfo info : ContentRegistries.heli().values())
-      addRecipeAndRegisterList((MCH_AircraftInfo)info, (Item)info.item, (MCH_AircraftInfoManager<MCH_AircraftInfo>)MCH_HeliInfoManager.getInstance()); 
-    for (MCP_PlaneInfo info : ContentRegistries.plane().values())
-      addRecipeAndRegisterList((MCH_AircraftInfo)info, (Item)info.item, (MCH_AircraftInfoManager<MCH_AircraftInfo>)MCP_PlaneInfoManager.getInstance()); 
-    for (MCH_TankInfo info : ContentRegistries.tank().values())
-      addRecipeAndRegisterList((MCH_AircraftInfo)info, (Item)info.item, (MCH_AircraftInfoManager<MCH_AircraftInfo>)MCH_TankInfoManager.getInstance()); 
-    for (MCH_VehicleInfo info : ContentRegistries.vehicle().values())
-      addRecipeAndRegisterList((MCH_AircraftInfo)info, (Item)info.item, (MCH_AircraftInfoManager<MCH_AircraftInfo>)MCH_VehicleInfoManager.getInstance()); 
+    for (MCH_HeliInfo info : ContentRegistries.heli().values()) {
+      addRecipeAndRegisterList(info, (Item)info.item, MCH_HeliInfoManager.getInstance());
+    }
+    for (MCP_PlaneInfo info : ContentRegistries.plane().values()) {
+      addRecipeAndRegisterList(info, (Item)info.item, MCP_PlaneInfoManager.getInstance());
+    }
+    for (MCH_TankInfo info : ContentRegistries.tank().values()) {
+      addRecipeAndRegisterList(info, (Item)info.item, MCH_TankInfoManager.getInstance());
+    }
+    for (MCH_VehicleInfo info : ContentRegistries.vehicle().values()) {
+      addRecipeAndRegisterList(info, (Item)info.item, MCH_VehicleInfoManager.getInstance());
+    }
     for (MCH_ThrowableInfo info : ContentRegistries.throwable().values()) {
       for (String s : info.recipeString) {
         if (s.length() >= 3) {

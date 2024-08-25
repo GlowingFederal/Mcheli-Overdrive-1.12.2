@@ -8,19 +8,21 @@ import java.util.Collection;
 import mcheli.__helper.block.EnumDirection8;
 import net.minecraft.block.properties.PropertyEnum;
 
+import java.util.List;
+
 public class PropertyDirection8 extends PropertyEnum<EnumDirection8> {
   protected PropertyDirection8(String name, Collection<EnumDirection8> allowedValues) {
     super(name, EnumDirection8.class, allowedValues);
   }
-  
+
   public static PropertyDirection8 create(String name) {
     return create(name, Predicates.alwaysTrue());
   }
-  
+
   public static PropertyDirection8 create(String name, Predicate<EnumDirection8> filter) {
-    return create(name, Collections2.filter(Lists.newArrayList((Object[])EnumDirection8.values()), filter));
+    return create(name, Collections2.filter(Lists.newArrayList(EnumDirection8.values()), filter));
   }
-  
+
   public static PropertyDirection8 create(String name, Collection<EnumDirection8> allowedValues) {
     return new PropertyDirection8(name, allowedValues);
   }

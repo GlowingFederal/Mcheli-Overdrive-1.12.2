@@ -138,15 +138,16 @@ public class W_WavefrontObject extends W_ModelCustom {
             if (face != null)
               this.currentGroupObject.faces.add(face); 
             continue;
-          } 
-          if ((currentLine.startsWith("g ") | currentLine.startsWith("o ")) != 0 && currentLine
-            .charAt(2) == '$') {
+          }
+          if ((currentLine.startsWith("g ") || currentLine.startsWith("o ")) && currentLine.charAt(2) == '$') {
             W_GroupObject group = parseGroupObject(currentLine, lineCount);
-            if (group != null)
-              if (this.currentGroupObject != null)
-                this.groupObjects.add(this.currentGroupObject);  
-            this.currentGroupObject = group;
-          } 
+            if (group != null) {
+              if (this.currentGroupObject != null) {
+                this.groupObjects.add(this.currentGroupObject);
+              }
+              this.currentGroupObject = group;
+            }
+          }
         } 
       } 
       this.groupObjects.add(this.currentGroupObject);

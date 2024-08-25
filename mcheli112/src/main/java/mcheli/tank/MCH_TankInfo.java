@@ -26,11 +26,11 @@ public class MCH_TankInfo extends MCH_AircraftInfo {
     this.weightType = 0;
     this.weightedCenterZ = 0.0F;
   }
-  
+
   public List<MCH_AircraftInfo.Wheel> getDefaultWheelList() {
     List<MCH_AircraftInfo.Wheel> list = new ArrayList<>();
-    list.add(new MCH_AircraftInfo.Wheel(this, this, new Vec3d(1.5D, -0.24D, 2.0D)));
-    list.add(new MCH_AircraftInfo.Wheel(this, this, new Vec3d(1.5D, -0.24D, -2.0D)));
+    list.add(new MCH_AircraftInfo.Wheel(this, new Vec3d(1.5D, -0.24D, 2.0D)));
+    list.add(new MCH_AircraftInfo.Wheel(this, new Vec3d(1.5D, -0.24D, -2.0D)));
     return list;
   }
   

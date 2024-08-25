@@ -44,9 +44,9 @@ public class MCH_GuiSpawnGunner extends MCH_Gui {
   }
   
   private Entity searchTarget(EntityPlayer player) {
-    MCH_EntityGunner mCH_EntityGunner;
-    MCH_EntitySeat mCH_EntitySeat;
-    MCH_EntityAircraft mCH_EntityAircraft;
+    MCH_EntityGunner mCH_EntityGunner = null;
+    MCH_EntitySeat mCH_EntitySeat = null;
+    MCH_EntityAircraft mCH_EntityAircraft = null;
     float f = 1.0F;
     float pitch = player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * f;
     float yaw = player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * f;

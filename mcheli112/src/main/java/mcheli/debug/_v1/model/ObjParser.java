@@ -68,15 +68,16 @@ public class ObjParser {
             if (face != null)
               group.addFace(face); 
             continue;
-          } 
-          if ((currentLine.startsWith("g ") | currentLine.startsWith("o ")) != 0 && currentLine
-            .charAt(2) == '$') {
+          }
+          if ((currentLine.startsWith("g ") || currentLine.startsWith("o ")) && currentLine.charAt(2) == '$') {
             _GroupObject.Builder group2 = parseGroupObject(currentLine, lineCount);
-            if (group2 != null)
-              if (group != null)
-                groupObjects.add(group.build());  
-            group = group2;
-          } 
+            if (group2 != null) {
+              if (group != null) {
+                groupObjects.add(group.build());
+              }
+              group = group2;
+            }
+          }
         } 
       } 
       groupObjects.add(group.build());

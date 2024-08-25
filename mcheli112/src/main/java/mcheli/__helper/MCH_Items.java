@@ -17,11 +17,14 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 @EventBusSubscriber(modid = "mcheli")
 public class MCH_Items {
   private static Set<Item> registryWrapper = Sets.newLinkedHashSet();
-  
+
   @SubscribeEvent
   static void onItemRegistryEvent(RegistryEvent.Register<Item> event) {
-    for (Item item : registryWrapper)
-      event.getRegistry().register((IForgeRegistryEntry)item); 
+    for (Item item : registryWrapper) {
+      if (item instanceof IForgeRegistryEntry) {
+        event.getRegistry().register(item);
+      }
+    }
   }
   
   public static Item register(Item item, String name) {
@@ -39,8 +42,8 @@ public class MCH_Items {
   public static Item get(String name) {
     return (Item)ForgeRegistries.ITEMS.getValue(MCH_Utils.suffix(name));
   }
-  
+
   public static String getName(Item item) {
-    return ForgeRegistries.ITEMS.getKey((IForgeRegistryEntry)item).toString();
+    return ForgeRegistries.ITEMS.getKey(item).toString();
   }
 }

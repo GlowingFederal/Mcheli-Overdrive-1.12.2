@@ -22,9 +22,13 @@ public class W_Item extends Item {
   public static Item getItemByName(String nm) {
     return (Item)ForgeRegistries.ITEMS.getValue(new ResourceLocation(nm));
   }
-  
+
   public static String getNameForItem(Item item) {
-    return ForgeRegistries.ITEMS.getKey((IForgeRegistryEntry)item).toString();
+    // Make sure that the item passed is indeed an instance of IForgeRegistryEntry
+    if (item instanceof IForgeRegistryEntry) {
+      return ForgeRegistries.ITEMS.getKey(item).toString();
+    }
+    return "Unknown Item";
   }
   
   public static Item getItemFromBlock(Block block) {

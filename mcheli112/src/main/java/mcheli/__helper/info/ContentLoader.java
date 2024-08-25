@@ -97,8 +97,8 @@ public abstract class ContentLoader {
     List<String> lines = null;
     try (BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(
             getInputStreamByName(filepath), StandardCharsets.UTF_8))) {
-      lines = bufferedreader.lines().collect((Collector)Collectors.toList());
-    } 
+      lines = bufferedreader.lines().collect(Collectors.toList());
+    }
     return new ContentEntry(filepath, this.domain, factory, lines, reload);
   }
   

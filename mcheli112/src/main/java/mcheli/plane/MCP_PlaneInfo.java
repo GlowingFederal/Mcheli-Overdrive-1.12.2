@@ -128,9 +128,9 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
     } else if (item.compareTo("addpartnozzle") == 0) {
       String[] s = data.split("\\s*,\\s*");
       if (s.length == 6) {
-        MCH_AircraftInfo.DrawnPart n = new MCH_AircraftInfo.DrawnPart(this, this, toFloat(s[0]), toFloat(s[1]), toFloat(s[2]), toFloat(s[3]), toFloat(s[4]), toFloat(s[5]), "nozzle" + this.nozzles.size());
+        MCH_AircraftInfo.DrawnPart n = new MCH_AircraftInfo.DrawnPart(this, toFloat(s[0]), toFloat(s[1]), toFloat(s[2]), toFloat(s[3]), toFloat(s[4]), toFloat(s[5]), "nozzle" + this.nozzles.size());
         this.nozzles.add(n);
-      } 
+      }
     } else if (item.compareTo("variablesweepwing") == 0) {
       this.isVariableSweepWing = toBool(data);
     } else if (item.compareTo("sweepwingspeed") == 0) {
@@ -164,9 +164,9 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
     public final int numBlade;
     
     public final int rotBlade;
-    
+
     public Blade(MCP_PlaneInfo paramMCP_PlaneInfo, int num, int r, float px, float py, float pz, float rx, float ry, float rz, String name) {
-      super(MCP_PlaneInfo.this, paramMCP_PlaneInfo, px, py, pz, rx, ry, rz, name);
+      super(MCP_PlaneInfo.this, px, py, pz, rx, ry, rz, name);
       this.numBlade = num;
       this.rotBlade = r;
     }
@@ -178,7 +178,7 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
     public final float maxRot;
     
     public Pylon(MCP_PlaneInfo paramMCP_PlaneInfo, float px, float py, float pz, float rx, float ry, float rz, float mr, String name) {
-      super(MCP_PlaneInfo.this, paramMCP_PlaneInfo, px, py, pz, rx, ry, rz, name);
+      super(MCP_PlaneInfo.this, px, py, pz, rx, ry, rz, name);
       this.maxRot = mr;
       this.maxRotFactor = this.maxRot / 90.0F;
     }
@@ -190,7 +190,7 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
     public final float maxRotFactor;
     
     public Rotor(MCP_PlaneInfo paramMCP_PlaneInfo, float x, float y, float z, float rx, float ry, float rz, float mrf, String model) {
-      super(MCP_PlaneInfo.this, paramMCP_PlaneInfo, x, y, z, rx, ry, rz, model);
+      super(MCP_PlaneInfo.this, x, y, z, rx, ry, rz, model);
       this.blades = new ArrayList<>();
       this.maxRotFactor = mrf;
     }
@@ -204,7 +204,7 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
     public List<MCP_PlaneInfo.Pylon> pylonList;
     
     public Wing(MCP_PlaneInfo paramMCP_PlaneInfo, float px, float py, float pz, float rx, float ry, float rz, float mr, String name) {
-      super(MCP_PlaneInfo.this, paramMCP_PlaneInfo, px, py, pz, rx, ry, rz, name);
+      super(MCP_PlaneInfo.this, px, py, pz, rx, ry, rz, name);
       this.maxRot = mr;
       this.maxRotFactor = this.maxRot / 90.0F;
       this.pylonList = null;

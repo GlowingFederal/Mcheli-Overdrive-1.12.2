@@ -102,9 +102,9 @@ public class ContentRegistry<T extends MCH_BaseInfo> {
       this.clazz = clazz;
       this.dirName = dir;
     }
-    
+
     public void put(E content) {
-      ContentRegistry.putTable(this.map, (TYPE)content);
+      ContentRegistry.putTable(this.map, content);
     }
     
     public ContentRegistry<E> build() {

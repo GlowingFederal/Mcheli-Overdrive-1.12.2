@@ -771,9 +771,10 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
       return (getNozzleRotation() <= 0.005F) ? 0 : 1; 
     return (getNozzleRotation() >= 89.995F) ? 2 : 1;
   }
-  
-  public float getFuleConsumptionFactor() {
-    return getFuelConsumptionFactor() * ((getVtolMode() == 2) ? true : true);
+
+  public float getFuelConsumptionFactor() {
+    // Assuming getVtolMode() == 2 should result in a different factor
+    return getFuelConsumptionFactor() * ((getVtolMode() == 2) ? 1.5f : 1.0f);
   }
   
   public float getNozzleRotation() {

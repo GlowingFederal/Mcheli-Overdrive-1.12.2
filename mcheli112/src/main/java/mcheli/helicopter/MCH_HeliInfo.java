@@ -88,9 +88,9 @@ public class MCH_HeliInfo extends MCH_AircraftInfo {
     public final boolean haveFoldFunc;
     
     public final boolean oldRenderMethod;
-    
+
     public Rotor(MCH_HeliInfo paramMCH_HeliInfo, int b, int br, float x, float y, float z, float rx, float ry, float rz, String model, boolean hf, boolean old) {
-      super(MCH_HeliInfo.this, paramMCH_HeliInfo, x, y, z, rx, ry, rz, model);
+      super(MCH_HeliInfo.this, x, y, z, rx, ry, rz, model);
       this.bladeNum = b;
       this.bladeRot = br;
       this.haveFoldFunc = hf;

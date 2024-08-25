@@ -144,7 +144,7 @@ public class MCH_ParticlesUtil {
       } else if (type.startsWith("blockcrack")) {
         entityfx = create(net.minecraft.client.particle.ParticleDigging.Factory::new, (World)mc.world, x, y, z, mx, my, mz, params);
       } else if (type.startsWith("blockdust")) {
-        entityfx = create(Factory::new, (World)mc.world, x, y, z, mx, my, mz, params);
+        entityfx = create(net.minecraft.client.particle.ParticleDigging.Factory::new, (World)mc.world, x, y, z, mx, my, mz, params);
       } 
       if (entityfx != null)
         mc.effectRenderer.addEffect(entityfx); 

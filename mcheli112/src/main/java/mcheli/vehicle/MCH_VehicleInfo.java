@@ -100,9 +100,9 @@ public class MCH_VehicleInfo extends MCH_AircraftInfo {
     public final boolean drawFP;
     
     public final float recoilBuf;
-    
+
     public VPart(MCH_VehicleInfo paramMCH_VehicleInfo, float x, float y, float z, String model, boolean drawfp, boolean roty, boolean rotp, int type, float rb) {
-      super(MCH_VehicleInfo.this, paramMCH_VehicleInfo, x, y, z, 0.0F, 0.0F, 0.0F, model);
+      super(MCH_VehicleInfo.this, x, y, z, 0.0F, 0.0F, 0.0F, model);
       this.rotYaw = roty;
       this.rotPitch = rotp;
       this.type = type;

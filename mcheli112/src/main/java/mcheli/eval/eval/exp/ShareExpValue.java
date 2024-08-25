@@ -72,7 +72,7 @@ public class ShareExpValue extends Expression {
   }
   
   protected void optimize(Variable var, Replace repl) {
-    MapVariable mapVariable;
+    MapVariable mapVariable = null;
     Variable bak = this.var;
     if (var == null)
       mapVariable = new MapVariable(); 

@@ -33,15 +33,16 @@ public class MCH_SoundsJson {
         listMultimap.put(key, name);
       } 
       lines.add("{");
-      for (String key : listMultimap.keySet()) {
+      for (Object key : listMultimap.keySet()) {
         cnt++;
         String sounds = Joiner.on(",").join((Iterable)listMultimap.get(key).stream()
-            .map(name -> '"' + MCH_Utils.suffix(name).toString() + '"').collect(Collectors.toList()));
+                .map(name -> '"' + MCH_Utils.suffix((String) name).toString() + '"')
+                .collect(Collectors.toList()));
         String line = "\"" + key + "\": {\"category\": \"master\",\"sounds\": [" + sounds + "]}";
         if (cnt < listMultimap.keySet().size())
-          line = line + ","; 
+          line = line + ",";
         lines.add(line);
-      } 
+      }
       lines.add("}");
       lines.add("");
     } 

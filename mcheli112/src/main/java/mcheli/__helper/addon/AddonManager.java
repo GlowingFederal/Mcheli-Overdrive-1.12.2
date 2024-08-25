@@ -33,9 +33,9 @@ public class AddonManager {
       return BuiltinAddonPack.instance(); 
     return ADDON_LIST.get(addonDomain);
   }
-  
+
   public static List<AddonPack> getLoadedAddons() {
-    return (List<AddonPack>)ImmutableList.builder().addAll(ADDON_LIST.values()).build();
+    return ImmutableList.copyOf(ADDON_LIST.values());
   }
   
   public static List<AddonPack> loadAddons(File addonDir) {

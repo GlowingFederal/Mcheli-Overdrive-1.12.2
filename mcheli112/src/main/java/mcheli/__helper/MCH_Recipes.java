@@ -17,12 +17,13 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 @EventBusSubscriber(modid = "mcheli")
 public class MCH_Recipes {
   private static final Set<IRecipe> registryWrapper = Sets.newLinkedHashSet();
-  
+
   @SubscribeEvent
   static void onRecipeRegisterEvent(RegistryEvent.Register<IRecipe> event) {
     MCH_ItemRecipe.registerItemRecipe(event.getRegistry());
-    for (IRecipe recipe : registryWrapper)
-      event.getRegistry().register((IForgeRegistryEntry)recipe); 
+    for (IRecipe recipe : registryWrapper) {
+      event.getRegistry().register(recipe);
+    }
   }
   
   public static void register(String name, IRecipe recipe) {

@@ -172,7 +172,7 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
   public List<MuzzleFlash> listMuzzleFlash;
   
   public List<MuzzleFlash> listMuzzleFlashSmoke;
-  
+
   public MCH_WeaponInfo(AddonResourceLocation location, String path) {
     super(location, path);
     this.name = location.getResourcePath();
@@ -493,7 +493,7 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
       } else if (item.equalsIgnoreCase("DamageFactor")) {
         String[] s = splitParam(data);
         if (s.length >= 2) {
-          Class<MCH_EntityVehicle> clazz;
+          Class<MCH_EntityVehicle> clazz = null;
           Class<? extends Entity> c = null;
           String className = s[0].toLowerCase();
           if (className.equals("player")) {
@@ -505,15 +505,15 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
           } else if (className.equals("tank")) {
             Class<MCH_EntityTank> clazz1 = MCH_EntityTank.class;
           } else if (className.equals("vehicle")) {
-            clazz = MCH_EntityVehicle.class;
-          } 
-          if (clazz != null) {
+            Class<MCH_EntityVehicle> clazz1 = MCH_EntityVehicle.class;
+          }
+          if (getClass() != null) {
             if (this.damageFactor == null)
-              this.damageFactor = new MCH_DamageFactor(); 
+              this.damageFactor = new MCH_DamageFactor();
             this.damageFactor.add(clazz, toFloat(s[1], 0.0F, 1000000.0F));
-          } 
-        } 
-      } 
+          }
+        }
+      }
     } 
   }
   

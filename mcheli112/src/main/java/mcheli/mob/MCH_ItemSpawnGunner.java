@@ -4,6 +4,7 @@ import java.util.List;
 import mcheli.MCH_MOD;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.aircraft.MCH_EntitySeat;
+import mcheli.mob.MCH_EntityGunner;
 import mcheli.wrapper.W_Item;
 import mcheli.wrapper.W_WorldFunc;
 import net.minecraft.creativetab.CreativeTabs;
@@ -25,6 +26,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class MCH_ItemSpawnGunner extends W_Item {
+
+
   public int primaryColor = 16777215;
   
   public int secondaryColor = 16777215;
@@ -37,9 +40,9 @@ public class MCH_ItemSpawnGunner extends W_Item {
   }
   
   public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand handIn) {
-    MCH_EntityGunner mCH_EntityGunner;
-    MCH_EntitySeat mCH_EntitySeat;
-    MCH_EntityAircraft mCH_EntityAircraft;
+    MCH_EntityGunner mCH_EntityGunner = null;
+    MCH_EntitySeat mCH_EntitySeat = null;
+    MCH_EntityAircraft mCH_EntityAircraft = null;
     ItemStack itemstack = player.getHeldItem(handIn);
     float f = 1.0F;
     float pitch = player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * f;
@@ -64,7 +67,7 @@ public class MCH_ItemSpawnGunner extends W_Item {
       if (gunner.getEntityBoundingBox().calculateIntercept(vec3, vec31) != null)
         if (target == null || player.getDistanceSq((Entity)gunner) < player.getDistanceSq(target))
           mCH_EntityGunner = gunner;  
-    } 
+    }
     if (mCH_EntityGunner == null) {
       List<MCH_EntitySeat> list1 = world.getEntitiesWithinAABB(MCH_EntitySeat.class, player
           .getEntityBoundingBox().grow(5.0D, 5.0D, 5.0D));
@@ -94,11 +97,11 @@ public class MCH_ItemSpawnGunner extends W_Item {
               mCH_EntityAircraft = ac;
             }   
       } 
-    } 
-    if (mCH_EntityAircraft instanceof MCH_EntityGunner) {
-      mCH_EntityAircraft.processInitialInteract(player, handIn);
-      return ActionResult.newResult(EnumActionResult.SUCCESS, itemstack);
-    } 
+    }
+  //  if (mCH_EntityAircraft instanceof MCH_EntityGunner) {
+  //    mCH_EntityAircraft.processInitialInteract(player, handIn);
+  //    return ActionResult.newResult(EnumActionResult.SUCCESS, itemstack);
+  //  }
     if (this.targetType == 1 && !world.isRemote && player.getTeam() == null) {
       player.sendMessage((ITextComponent)new TextComponentString("You are not on team."));
       return ActionResult.newResult(EnumActionResult.FAIL, itemstack);
@@ -120,7 +123,7 @@ public class MCH_ItemSpawnGunner extends W_Item {
       world.spawnEntity((Entity)gunner);
       gunner.startRiding((Entity)mCH_EntityAircraft);
       W_WorldFunc.MOD_playSoundAtEntity((Entity)gunner, "wrench", 1.0F, 3.0F);
-      MCH_EntityAircraft ac = (mCH_EntityAircraft instanceof MCH_EntityAircraft) ? mCH_EntityAircraft : ((MCH_EntitySeat)mCH_EntityAircraft).getParent();
+      MCH_EntityAircraft ac = (mCH_EntityAircraft instanceof MCH_EntityAircraft ? (MCH_EntityAircraft) mCH_EntityAircraft : null);
       String teamPlayerName = ScorePlayerTeam.formatPlayerName(player.getTeam(), player.getDisplayName().getFormattedText());
       String displayName = TextFormatting.GOLD + (ac.getAcInfo()).displayName + TextFormatting.RESET;
       int seatNo = ac.getSeatIdByEntity((Entity)gunner) + 1;

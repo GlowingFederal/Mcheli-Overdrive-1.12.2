@@ -407,10 +407,10 @@ public class MCH_DraftingTableGui extends W_GuiContainer {
             boolean lb = Mouse.isButtonDown(0);
             boolean rb = Mouse.isButtonDown(1);
             boolean mb = Mouse.isButtonDown(2);
-            list.add((lb ? (String)TextFormatting.AQUA : "") + "Mouse left button drag : Rotation model");
-            list.add((rb ? (String)TextFormatting.AQUA : "") + "Mouse right button drag : Zoom model");
-            list.add((mb ? (String)TextFormatting.AQUA : "") + "Mouse middle button drag : Move model");
-          } 
+            list.add((lb ? TextFormatting.AQUA + "Mouse left button drag : Rotation model" : "Mouse left button drag : Rotation model"));
+            list.add((rb ? TextFormatting.AQUA + "Mouse right button drag : Zoom model" : "Mouse right button drag : Zoom model"));
+            list.add((mb ? TextFormatting.AQUA + "Mouse middle button drag : Move model" : "Mouse middle button drag : Move model"));
+          }
         }  
       drawString(this.current.displayName, 120, 20, -1);
       drawItemRecipe(this.current.recipe, 121, 34);

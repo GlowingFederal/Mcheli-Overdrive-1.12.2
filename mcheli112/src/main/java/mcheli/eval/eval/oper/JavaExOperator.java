@@ -353,7 +353,7 @@ public class JavaExOperator implements Operator {
     if (xc.isAssignableFrom(yc) && x instanceof Comparable)
       return ((Comparable<Object>)x).compareTo(y); 
     if (yc.isAssignableFrom(xc) && y instanceof Comparable)
-      return -((Comparable)y).compareTo((T)x); 
+      return -((Comparable)y).compareTo(x);
     if (x.equals(y))
       return 0; 
     throw undefined(x, y);

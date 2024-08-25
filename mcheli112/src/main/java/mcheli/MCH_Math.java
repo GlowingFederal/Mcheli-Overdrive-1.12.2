@@ -71,8 +71,8 @@ public class MCH_Math {
     FMatrix m = QuatToMatrix(q);
     return MatrixToEuler(m);
   }
-  
-  public static FVector3D MatrixToEuler(FMatrix m) {
+
+  public static MCH_Math.FVector3D MatrixToEuler(MCH_Math.FMatrix m) {
     float xx = m.m00;
     float xy = m.m01;
     float xz = m.m02;
@@ -80,28 +80,35 @@ public class MCH_Math {
     float zx = m.m20;
     float zy = m.m21;
     float zz = m.m22;
-    float b = (float)-Math.asin(zy);
+    float b = (float)(-Math.asin((double)zy));
     float cosB = Cos(b);
-    if (Math.abs(cosB) >= 1.0E-4D) {
+    float a;
+    float c;
+    if((double)Math.abs(cosB) >= 1.0E-4D) {
       c = Atan2(zx, zz);
       float xy_cos = xy / cosB;
-      if (xy_cos > 1.0F) {
+      if(xy_cos > 1.0F) {
         xy_cos = 1.0F;
-      } else if (xy_cos < -1.0F) {
+      } else if(xy_cos < -1.0F) {
         xy_cos = -1.0F;
-      } 
-      a = (float)Math.asin(xy_cos);
-      if (Float.isNaN(a))
-        a = 0.0F; 
+      }
+
+      a = (float)Math.asin((double)xy_cos);
+      if(Float.isNaN(a)) {
+        a = 0.0F;
+      }
     } else {
       c = Atan2(-xz, xx);
       a = 0.0F;
-    } 
-    float a = (float)(a * 180.0D / PI);
-    b = (float)(b * 180.0D / PI);
-    float c = (float)(c * 180.0D / PI);
-    if (yy < 0.0F)
-      a = 180.0F - a; 
+    }
+
+    a = (float)((double)a * (180.0D / (double)PI));
+    b = (float)((double)b * (180.0D / (double)PI));
+    c = (float)((double)c * (180.0D / (double)PI));
+    if(yy < 0.0F) {
+      a = 180.0F - a;
+    }
+
     return newVec3D(-b, -c, -a);
   }
   
