@@ -399,46 +399,61 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     if (this.moveRight && !this.moveLeft)
       this.addkeyRotValue += rot * partialTicks; 
   }
-  
+
   public void onUpdateAngles(float partialTicks) {
-    if (isDestroyed())
-      return; 
-    if (this.isGunnerMode) {
-      setRotPitch(getRotPitch() * 0.95F);
-      setRotYaw(getRotYaw() + (getAcInfo()).autoPilotRot * 0.2F);
-      if (MathHelper.abs(getRotRoll()) > 20.0F)
-        setRotRoll(getRotRoll() * 0.95F); 
-    } 
-    updateRecoil(partialTicks);
-    setRotPitch(getRotPitch() + (this.WheelMng.targetPitch - getRotPitch()) * partialTicks);
-    setRotRoll(getRotRoll() + (this.WheelMng.targetRoll - getRotRoll()) * partialTicks);
-    boolean isFly = (MCH_Lib.getBlockIdY((Entity)this, 3, -3) == 0);
-    if (!isFly || ((getAcInfo()).isFloat && getWaterDepth() > 0.0D)) {
-      float gmy = 1.0F;
-      if (!isFly) {
-        gmy = (getAcInfo()).mobilityYawOnGround;
-        if (!(getAcInfo()).canRotOnGround) {
-          Block block = MCH_Lib.getBlockY((Entity)this, 3, -2, false);
-          if (!W_Block.isEqual(block, W_Block.getWater()) && !W_Block.isEqual(block, W_Blocks.AIR))
-            gmy = 0.0F; 
-        } 
-      } 
-      float pivotTurnThrottle = (getAcInfo()).pivotTurnThrottle;
-      double dx = this.posX - this.prevPosX;
-      double dz = this.posZ - this.prevPosZ;
-      double dist = dx * dx + dz * dz;
-      if (pivotTurnThrottle <= 0.0F || getCurrentThrottle() >= pivotTurnThrottle || this.throttleBack >= pivotTurnThrottle / 10.0F || dist > this.throttleBack * 0.01D) {
-        float sf = (float)Math.sqrt((dist <= 1.0D) ? dist : 1.0D);
-        if (pivotTurnThrottle <= 0.0F)
-          sf = 1.0F; 
-        float flag = (!this.throttleUp && this.throttleDown && getCurrentThrottle() < pivotTurnThrottle + 0.05D) ? -1.0F : 1.0F;
-        if (this.moveLeft && !this.moveRight)
-          setRotYaw(getRotYaw() - 0.6F * gmy * partialTicks * flag * sf); 
-        if (this.moveRight && !this.moveLeft)
-          setRotYaw(getRotYaw() + 0.6F * gmy * partialTicks * flag * sf); 
-      } 
-    } 
-    this.addkeyRotValue = (float)(this.addkeyRotValue * (1.0D - (0.1F * partialTicks)));
+    //updated
+    if(!this.isDestroyed()) {
+      if(super.isGunnerMode) {
+        this.setRotPitch(this.getRotPitch() * 0.95F);
+        this.setRotYaw(this.getRotYaw() + this.getAcInfo().autoPilotRot * 0.2F);
+        if(MathHelper.abs(this.getRotRoll()) > 20.0F) {
+          this.setRotRoll(this.getRotRoll() * 0.95F);
+        }
+      }
+
+      this.updateRecoil(partialTicks);
+      this.setRotPitch(this.getRotPitch() + (this.WheelMng.targetPitch - this.getRotPitch()) * partialTicks);
+      this.setRotRoll(this.getRotRoll() + (this.WheelMng.targetRoll - this.getRotRoll()) * partialTicks);
+      boolean isFly = MCH_Lib.getBlockIdY(this, 3, -3) == 0;
+
+      //logic for like rotation
+      if(!isFly || this.getAcInfo().isFloat && this.getWaterDepth() > 0.0D) {
+        float rotonground = 1.0F;
+        if(!isFly) {
+          rotonground = this.getAcInfo().mobilityYawOnGround;
+          if(!this.getAcInfo().canRotOnGround) {
+            Block pivotTurnThrottle = MCH_Lib.getBlockY(this, 3, -2, false);
+            if(!W_Block.isEqual(pivotTurnThrottle, W_Block.getWater()) && !W_Block.isEqual(pivotTurnThrottle, Blocks.AIR)) {
+              rotonground = 0.0F;
+            }
+          }
+        }
+
+        float pivotTurnThrottle1 = this.getAcInfo().pivotTurnThrottle;
+        double dx = super.posX - super.prevPosX;
+        double dz = super.posZ - super.prevPosZ;
+        double dist = dx * dx + dz * dz;
+
+        if(pivotTurnThrottle1 <= 0.0F || this.getCurrentThrottle() >= (double)pivotTurnThrottle1 || super.throttleBack >= pivotTurnThrottle1 / 10.0F || dist > (double)super.throttleBack * 0.01D) {
+          float sf = (float)Math.sqrt(dist <= 1.0D?dist:1.0D);
+          if(pivotTurnThrottle1 <= 0.0F) {
+            sf = 1.0F;
+          }
+
+          float flag = !super.throttleUp && super.throttleDown && this.getCurrentThrottle() < (double)pivotTurnThrottle1 + 0.05D?-1.0F:1.0F;
+          if(super.moveLeft && !super.moveRight) {
+            this.setRotYaw(this.getRotYaw() - 0.6F * rotonground * partialTicks * flag * sf);
+          }
+
+          if(super.moveRight && !super.moveLeft) {
+            this.setRotYaw(this.getRotYaw() + 0.6F * rotonground * partialTicks * flag * sf);
+          }
+
+        }
+      }
+
+      this.addkeyRotValue = (float)((double)this.addkeyRotValue * (1.0D - (double)(0.1F * partialTicks)));
+    }
   }
 
   protected void onUpdate_Control(float partialTicks) {
@@ -572,54 +587,69 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     }
 
   }
-  
+
   protected void onUpdate_Particle2() {
-    if (!this.world.isRemote)
-      return; 
-    if (getHP() >= getMaxHP() * 0.5D)
-      return; 
-    if (getTankInfo() == null)
-      return; 
-    int bbNum = (getTankInfo()).extraBoundingBox.size();
-    if (bbNum < 0)
-      bbNum = 0; 
-    if (this.isFirstDamageSmoke || this.prevDamageSmokePos.length != bbNum + 1)
-      this.prevDamageSmokePos = new Vec3d[bbNum + 1]; 
-    float yaw = getRotYaw();
-    float pitch = getRotPitch();
-    float roll = getRotRoll();
-    for (int ri = 0; ri < bbNum; ri++) {
-      if (getHP() >= getMaxHP() * 0.2D && getMaxHP() > 0) {
-        int d = (int)(((getHP() / getMaxHP()) - 0.2D) / 0.3D * 15.0D);
-        if (d <= 0 || this.rand.nextInt(d) > 0);
-      } else {
-        MCH_BoundingBox bb = (getTankInfo()).extraBoundingBox.get(ri);
-        Vec3d pos = getTransformedPosition(bb.offsetX, bb.offsetY, bb.offsetZ);
-        double x = pos.x;
-        double y = pos.y;
-        double z = pos.z;
-        onUpdate_Particle2SpawnSmoke(ri, x, y, z, 1.0F);
-      } 
-    } 
-    boolean b = true;
-    if (getHP() >= getMaxHP() * 0.2D && getMaxHP() > 0) {
-      int d = (int)(((getHP() / getMaxHP()) - 0.2D) / 0.3D * 15.0D);
-      if (d > 0 && this.rand.nextInt(d) > 0)
-        b = false; 
-    } 
-    if (b) {
-      double px = this.posX;
-      double py = this.posY;
-      double pz = this.posZ;
-      if (getSeatInfo(0) != null && (getSeatInfo(0)).pos != null) {
-        Vec3d pos = MCH_Lib.RotVec3(0.0D, (getSeatInfo(0)).pos.y, -2.0D, -yaw, -pitch, -roll);
-        px += pos.x;
-        py += pos.y;
-        pz += pos.z;
-      } 
-      onUpdate_Particle2SpawnSmoke(bbNum, px, py, pz, (bbNum == 0) ? 2.0F : 1.0F);
-    } 
-    this.isFirstDamageSmoke = false;
+    if(this.world.isRemote) {
+      if((double)this.getHP() < (double)this.getMaxHP() * 0.5D) {
+        if(this.getTankInfo() != null) {
+          int bbNum = this.getTankInfo().extraBoundingBox.size();
+          if(bbNum < 0) {
+            bbNum = 0;
+          }
+
+          if(super.isFirstDamageSmoke || super.prevDamageSmokePos.length != bbNum + 1) {
+            super.prevDamageSmokePos = new Vec3d[bbNum + 1];
+          }
+
+          float yaw = this.getRotYaw();
+          float pitch = this.getRotPitch();
+          float roll = this.getRotRoll();
+
+          int px;
+          double py;
+          double pz;
+          for(int b = 0; b < bbNum; ++b) {
+            if((double)this.getHP() >= (double)this.getMaxHP() * 0.2D && this.getMaxHP() > 0) {
+              px = (int)(((double)this.getHP() / (double)this.getMaxHP() - 0.2D) / 0.3D * 15.0D);
+              if(px > 0 && super.rand.nextInt(px) > 0) {
+                continue;
+              }
+            }
+
+            MCH_BoundingBox var15 = (MCH_BoundingBox)this.getTankInfo().extraBoundingBox.get(b);
+            Vec3d pos = this.getTransformedPosition(var15.offsetX, var15.offsetY, var15.offsetZ);
+            py = pos.x;
+            pz = pos.y;
+            double pos1 = pos.z;
+            this.onUpdate_Particle2SpawnSmoke(b, py, pz, pos1, 1.0F);
+          }
+
+          boolean var14 = true;
+          if((double)this.getHP() >= (double)this.getMaxHP() * 0.2D && this.getMaxHP() > 0) {
+            px = (int)(((double)this.getHP() / (double)this.getMaxHP() - 0.2D) / 0.3D * 15.0D);
+            if(px > 0 && super.rand.nextInt(px) > 0) {
+              var14 = false;
+            }
+          }
+
+          if(var14) {
+            double var16 = super.posX;
+            py = super.posY;
+            pz = super.posZ;
+            if(this.getSeatInfo(0) != null && this.getSeatInfo(0).pos != null) {
+              Vec3d var17 = MCH_Lib.RotVec3(0.0D, this.getSeatInfo(0).pos.y, -2.0D, -yaw, -pitch, -roll);
+              var16 += var17.x;
+              py += var17.y;
+              pz += var17.z;
+            }
+
+            this.onUpdate_Particle2SpawnSmoke(bbNum, var16, py, pz, bbNum == 0?2.0F:1.0F);
+          }
+
+          super.isFirstDamageSmoke = false;
+        }
+      }
+    }
   }
   
   public void onUpdate_Particle2SpawnSmoke(int ri, double x, double y, double z, float size) {
@@ -726,7 +756,8 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       if(!this.isDestroyed() && (super.onGround || MCH_Lib.getBlockIdY(this, 1, -2) > 0)) {
         super.motionX *= 0.95D;
         super.motionZ *= 0.95D;
-        this.applyOnGroundPitch(0.95F);
+        //this.applyOnGroundPitch(0.95F);
+        //System.out.println(aircraftPitch);
       }
 
       if(this.isInWater()) {
@@ -784,6 +815,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     }
 
     float throttle = (float)(this.getCurrentThrottle() / 10.0D);
+    //im gonna scream
     Vec3d v = MCH_Lib.Rot2Vec3(this.getRotYaw(), this.getRotPitch() - 10.0F);
     if(!levelOff) {
       super.motionY += v.y * (double)throttle / 8.0D;

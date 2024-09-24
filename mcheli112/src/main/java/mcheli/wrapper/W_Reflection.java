@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class W_Reflection {
   public static RenderManager getRenderManager(Render<?> render) {
@@ -63,23 +64,25 @@ public class W_Reflection {
   public static ItemRenderer getItemRenderer() {
     return (Minecraft.getMinecraft()).entityRenderer.itemRenderer;
   }
-  
+
+  private static final String[] ITEMSTACK_MAINHAND_FIELD = {"itemStackMainHand", "field_187467_f"};
+
   public static void setItemRendererMainHand(ItemStack itemToRender) {
     try {
-      ObfuscationReflectionHelper.setPrivateValue(ItemRenderer.class, getItemRenderer(), itemToRender, "itemStackMainHand");
+      ReflectionHelper.setPrivateValue(ItemRenderer.class, getItemRenderer(), itemToRender, ITEMSTACK_MAINHAND_FIELD);
     } catch (Exception e) {
       e.printStackTrace();
-    } 
+    }
   }
-  
+
   @Nonnull
   public static ItemStack getItemRendererMainHand() {
     try {
-      return (ItemStack)ObfuscationReflectionHelper.getPrivateValue(ItemRenderer.class, getItemRenderer(), "itemStackMainHand");
+      return ReflectionHelper.getPrivateValue(ItemRenderer.class, getItemRenderer(), ITEMSTACK_MAINHAND_FIELD);
     } catch (Exception e) {
       e.printStackTrace();
       return ItemStack.EMPTY;
-    } 
+    }
   }
   
   public static void setItemRendererMainProgress(float equippedProgress) {
