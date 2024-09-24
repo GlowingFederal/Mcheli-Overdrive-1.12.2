@@ -1,10 +1,8 @@
 package mcheli.aircraft;
 
 import javax.annotation.Nullable;
-import mcheli.MCH_ClientCommonTickHandler;
-import mcheli.MCH_ClientEventHook;
-import mcheli.MCH_Config;
-import mcheli.MCH_Lib;
+
+import mcheli.*;
 import mcheli.__helper.MCH_ColorInt;
 import mcheli.__helper.MCH_Utils;
 import mcheli.__helper.client._IModelCustom;
@@ -48,36 +46,40 @@ public abstract class MCH_RenderAircraft<T extends MCH_EntityAircraft> extends W
   protected MCH_RenderAircraft(RenderManager renderManager) {
     super(renderManager);
   }
-  
+
   public void doRender(T entity, double posX, double posY, double posZ, float par8, float tickTime) {
-    T t = entity;
-    MCH_AircraftInfo info = t.getAcInfo();
-    if (info != null) {
+    MCH_EntityAircraft ac = (MCH_EntityAircraft)entity;
+    MCH_AircraftInfo info = ac.getAcInfo();
+    if(info != null) {
       GL11.glPushMatrix();
-      float yaw = calcRot(t.getRotYaw(), ((MCH_EntityAircraft)t).prevRotationYaw, tickTime);
-      float pitch = t.calcRotPitch(tickTime);
-      float roll = calcRot(t.getRotRoll(), ((MCH_EntityAircraft)t).prevRotationRoll, tickTime);
-      if (MCH_Config.EnableModEntityRender.prmBool)
-        renderRiddenEntity((MCH_EntityAircraft)t, tickTime, yaw, pitch + info.entityPitch, roll + info.entityRoll, info.entityWidth, info.entityHeight); 
-      if (!shouldSkipRender((Entity)entity)) {
-        setCommonRenderParam(info.smoothShading, t.getBrightnessForRender());
-        if (t.isDestroyed()) {
+      float yaw = this.calcRot(ac.getRotYaw(), ac.prevRotationYaw, tickTime);
+      float pitch = ac.calcRotPitch(tickTime);
+      float roll = this.calcRot(ac.getRotRoll(), ac.prevRotationRoll, tickTime);
+      MCH_Config var10000 = MCH_MOD.config;
+      if(MCH_Config.EnableModEntityRender.prmBool) {
+        this.renderRiddenEntity(ac, tickTime, yaw, pitch + info.entityPitch, roll + info.entityRoll, info.entityWidth, info.entityHeight);
+      }
+
+      if(!shouldSkipRender(entity)) {
+        this.setCommonRenderParam(info.smoothShading, ac.getBrightnessForRender());
+        if(ac.isDestroyed()) {
           GL11.glColor4f(0.15F, 0.15F, 0.15F, 1.0F);
         } else {
-          GL11.glColor4f(0.75F, 0.75F, 0.75F, (float)MCH_Config.__TextureAlpha.prmDouble);
-        } 
-        renderAircraft((MCH_EntityAircraft)t, posX, posY, posZ, yaw, pitch, roll, tickTime);
-        renderCommonPart((MCH_EntityAircraft)t, info, posX, posY, posZ, tickTime);
-        renderLight(posX, posY, posZ, tickTime, (MCH_EntityAircraft)t, info);
-        restoreCommonRenderParam();
-      } 
+          GL11.glColor4f(0.75F, 0.75F, 0.75F, 1.0F);
+        }
+
+        this.renderAircraft(ac, posX, posY, posZ, yaw, pitch, roll, tickTime);
+        this.renderCommonPart(ac, info, posX, posY, posZ, tickTime);
+        renderLight(posX, posY, posZ, tickTime, ac, info);
+        this.restoreCommonRenderParam();
+      }
+
       GL11.glPopMatrix();
-      MCH_GuiTargetMarker.addMarkEntityPos(1, (ITargetMarkerObject)entity, posX, posY + info.markerHeight, posZ);
-      MCH_ClientLightWeaponTickHandler.markEntity((Entity)entity, posX, posY, posZ);
-      renderEntityMarker((Entity)t);
-      if (MCH_Config.TestMode.prmBool)
-        WeaponPointRenderer.renderWeaponPoints((MCH_EntityAircraft)t, info, posX, posY, posZ); 
-    } 
+      MCH_GuiTargetMarker.addMarkEntityPos(1, entity, posX, posY + (double)info.markerHeight, posZ);
+      MCH_ClientLightWeaponTickHandler.markEntity(entity, posX, posY, posZ);
+      renderEntityMarker(ac);
+    }
+
   }
   
   public boolean shouldRender(T livingEntity, ICamera camera, double camX, double camY, double camZ) {

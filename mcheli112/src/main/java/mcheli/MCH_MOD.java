@@ -194,7 +194,7 @@ public class MCH_MOD {
     proxy.loadConfig("config/mcheli.cfg");
     config = proxy.config;
     ContentRegistries.loadContents(addonDir);
-    MCH_SoundsJson.updateGenerated();
+    MCH_SoundsJson.updateGenerated(sourcePath + "/assets/" + "mcheli" + "/");
     MCH_Lib.Log("Register item", new Object[0]);
     registerItemSpawnGunner();
     registerItemRangeFinder();

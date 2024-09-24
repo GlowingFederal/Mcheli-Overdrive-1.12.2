@@ -709,113 +709,147 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     this.rotDestroyedRoll = 0.0F;
     this.rotDestroyedYaw = 0.0F;
   }
-  
+
   public int getClientPositionDelayCorrection() {
-    return ((getTankInfo()).weightType == 1) ? 2 : ((getTankInfo() == null) ? 7 : 7);
+    return this.getTankInfo() == null?7:(this.getTankInfo().weightType == 1?2:7);
   }
-  
+
   protected void onUpdate_Client() {
-    if (getRiddenByEntity() != null)
-      if (W_Lib.isClientPlayer(getRiddenByEntity()))
-        (getRiddenByEntity()).rotationPitch = (getRiddenByEntity()).prevRotationPitch;  
-    if (this.aircraftPosRotInc > 0) {
-      applyServerPositionAndRotation();
+    if(this.getRiddenByEntity() != null && W_Lib.isClientPlayer(this.getRiddenByEntity())) {
+      this.getRiddenByEntity().rotationPitch = this.getRiddenByEntity().prevRotationPitch;
+    }
+
+    if(super.aircraftPosRotInc > 0) {
+      this.applyServerPositionAndRotation();
     } else {
-      setPosition(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-      if (!isDestroyed() && (this.onGround || MCH_Lib.getBlockIdY((Entity)this, 1, -2) > 0)) {
-        this.motionX *= 0.95D;
-        this.motionZ *= 0.95D;
-        applyOnGroundPitch(0.95F);
-      } 
-      if (isInWater()) {
-        this.motionX *= 0.99D;
-        this.motionZ *= 0.99D;
-      } 
-    } 
-    updateWheels();
-    onUpdate_Particle2();
-    updateSound();
-    if (this.world.isRemote) {
-      onUpdate_ParticleLandingGear();
-      onUpdate_ParticleSplash();
-      onUpdate_ParticleSandCloud(true);
-    } 
-    updateCamera(this.posX, this.posY, this.posZ);
+      this.setPosition(super.posX + super.motionX, super.posY + super.motionY, super.posZ + super.motionZ);
+      if(!this.isDestroyed() && (super.onGround || MCH_Lib.getBlockIdY(this, 1, -2) > 0)) {
+        super.motionX *= 0.95D;
+        super.motionZ *= 0.95D;
+        this.applyOnGroundPitch(0.95F);
+      }
+
+      if(this.isInWater()) {
+        super.motionX *= 0.99D;
+        super.motionZ *= 0.99D;
+      }
+    }
+
+    this.updateWheels();
+    this.onUpdate_Particle2();
+    this.updateSound();
+    if(this.world.isRemote) {
+      this.onUpdate_ParticleLandingGear();
+      this.onUpdate_ParticleSplash();
+      this.onUpdate_ParticleSandCloud(true);
+    }
+
+    this.updateCamera(super.posX, super.posY, super.posZ);
   }
   
   public void applyOnGroundPitch(float factor) {}
-  
+
   private void onUpdate_Server() {
-    double prevMotion = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+    //todo gear shifts here
+    Entity rdnEnt = this.getRiddenByEntity();
+    double prevMotion = Math.sqrt(super.motionX * super.motionX + super.motionZ * super.motionZ);
     double dp = 0.0D;
-    if (canFloatWater())
-      dp = getWaterDepth(); 
-    boolean levelOff = this.isGunnerMode;
-    if (dp == 0.0D) {
-      if (!levelOff) {
-        this.motionY += 0.04D + (!isInWater() ? (getAcInfo()).gravity : (getAcInfo()).gravityInWater);
-        this.motionY += -0.047D * (1.0D - getCurrentThrottle());
+    if(this.canFloatWater()) {
+      dp = this.getWaterDepth();
+    }
+
+    boolean levelOff = super.isGunnerMode;
+    if(dp == 0.0D) {
+      if(!levelOff) {
+        super.motionY += 0.04D + (double)(!this.isInWater()?this.getAcInfo().gravity:this.getAcInfo().gravityInWater);
+        super.motionY += -0.047D * (1.0D - this.getCurrentThrottle());
       } else {
-        this.motionY *= 0.8D;
-      } 
-    } else if (MathHelper.abs(getRotRoll()) >= 40.0F || dp < 1.0D) {
-      this.motionY -= 1.0E-4D;
-      this.motionY += 0.007D * getCurrentThrottle();
+        super.motionY *= 0.8D;
+      }
     } else {
-      if (this.motionY < 0.0D)
-        this.motionY /= 2.0D; 
-      this.motionY += 0.007D;
-    } 
-    float throttle = (float)(getCurrentThrottle() / 10.0D);
-    Vec3d v = MCH_Lib.Rot2Vec3(getRotYaw(), getRotPitch() - 10.0F);
-    if (!levelOff)
-      this.motionY += v.y * throttle / 8.0D; 
+      if(MathHelper.abs(this.getRotRoll()) < 40.0F) {
+        ;
+      }
+
+      if(dp < 1.0D) {
+        super.motionY -= 1.0E-4D;
+        super.motionY += 0.007D * this.getCurrentThrottle();
+      } else {
+        if(super.motionY < 0.0D) {
+          super.motionY /= 2.0D;
+        }
+
+        super.motionY += 0.007D;
+      }
+    }
+
+    float throttle = (float)(this.getCurrentThrottle() / 10.0D);
+    Vec3d v = MCH_Lib.Rot2Vec3(this.getRotYaw(), this.getRotPitch() - 10.0F);
+    if(!levelOff) {
+      super.motionY += v.y * (double)throttle / 8.0D;
+    }
+
     boolean canMove = true;
-    if (!(getAcInfo()).canMoveOnGround) {
-      Block block = MCH_Lib.getBlockY((Entity)this, 3, -2, false);
-      if (!W_Block.isEqual(block, W_Block.getWater()) && !W_Block.isEqual(block, W_Blocks.AIR))
-        canMove = false; 
-    } 
-    if (canMove)
-      if ((getAcInfo()).enableBack && this.throttleBack > 0.0F) {
-        this.motionX -= v.x * this.throttleBack;
-        this.motionZ -= v.z * this.throttleBack;
+    if(!this.getAcInfo().canMoveOnGround) {
+      Block motion = MCH_Lib.getBlockY(this, 3, -2, false);
+      if(!W_Block.isEqual(motion, W_Block.getWater()) && !W_Block.isEqual(motion, Blocks.AIR)) {
+        canMove = false;
+      }
+    }
+
+    if(canMove) {
+      if(this.getAcInfo().enableBack && super.throttleBack > 0.0F) {
+        super.motionX -= v.x * (double)super.throttleBack;
+        super.motionZ -= v.z * (double)super.throttleBack;
       } else {
-        this.motionX += v.x * throttle;
-        this.motionZ += v.z * throttle;
-      }  
-    double motion = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-    float speedLimit = getMaxSpeed();
-    if (motion > speedLimit) {
-      this.motionX *= speedLimit / motion;
-      this.motionZ *= speedLimit / motion;
-      motion = speedLimit;
-    } 
-    if (motion > prevMotion && this.currentSpeed < speedLimit) {
-      this.currentSpeed += (speedLimit - this.currentSpeed) / 35.0D;
-      if (this.currentSpeed > speedLimit)
-        this.currentSpeed = speedLimit; 
+        super.motionX += v.x * (double)throttle;
+        super.motionZ += v.z * (double)throttle;
+      }
+    }
+
+    double motion1 = Math.sqrt(super.motionX * super.motionX + super.motionZ * super.motionZ);
+    float speedLimit = this.getMaxSpeed();
+    if(motion1 > (double)speedLimit) {
+      super.motionX *= (double)speedLimit / motion1;
+      super.motionZ *= (double)speedLimit / motion1;
+      motion1 = (double)speedLimit;
+    }
+
+    if(motion1 > prevMotion && super.currentSpeed < (double)speedLimit) {
+      super.currentSpeed += ((double)speedLimit - super.currentSpeed) / 35.0D;
+      if(super.currentSpeed > (double)speedLimit) {
+        super.currentSpeed = (double)speedLimit;
+      }
     } else {
-      this.currentSpeed -= (this.currentSpeed - 0.07D) / 35.0D;
-      if (this.currentSpeed < 0.07D)
-        this.currentSpeed = 0.07D; 
-    } 
-    if (this.onGround || MCH_Lib.getBlockIdY((Entity)this, 1, -2) > 0) {
-      this.motionX *= (getAcInfo()).motionFactor;
-      this.motionZ *= (getAcInfo()).motionFactor;
-      if (MathHelper.abs(getRotPitch()) < 40.0F)
-        applyOnGroundPitch(0.8F); 
-    } 
-    updateWheels();
-    move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-    this.motionY *= 0.95D;
-    this.motionX *= (getAcInfo()).motionFactor;
-    this.motionZ *= (getAcInfo()).motionFactor;
-    setRotation(getRotYaw(), getRotPitch());
-    onUpdate_updateBlock();
-    updateCollisionBox();
-    if (getRiddenByEntity() != null && (getRiddenByEntity()).isDead)
-      unmountEntity(); 
+      super.currentSpeed -= (super.currentSpeed - 0.07D) / 35.0D;
+      if(super.currentSpeed < 0.07D) {
+        super.currentSpeed = 0.07D;
+      }
+    }
+
+    if(super.onGround || MCH_Lib.getBlockIdY(this, 1, -2) > 0) {
+      super.motionX *= (double)this.getAcInfo().motionFactor;
+      super.motionZ *= (double)this.getAcInfo().motionFactor;
+      if(MathHelper.abs(this.getRotPitch()) < 40.0F) {
+        this.applyOnGroundPitch(0.8F);
+      }
+    }
+
+    this.updateWheels();
+    this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+    super.motionY *= 0.95D;
+    super.motionX *= (double)this.getAcInfo().motionFactor;
+    super.motionZ *= (double)this.getAcInfo().motionFactor;
+    this.setRotation(this.getRotYaw(), this.getRotPitch());
+    this.onUpdate_updateBlock();
+    this.updateCollisionBox();
+    if(this.getRiddenByEntity() != null && this.getRiddenByEntity().isDead) {
+      this.unmountEntity();
+      //super.riddenByEntity = null;
+    }
+
+    //if(this.) todo gear check
+
   }
   
   private void collisionEntity(AxisAlignedBB bb) {
