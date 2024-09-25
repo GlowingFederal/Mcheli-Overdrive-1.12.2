@@ -412,7 +412,8 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       }
 
       this.updateRecoil(partialTicks);
-      this.setRotPitch(this.getRotPitch() + (this.WheelMng.targetPitch - this.getRotPitch()) * partialTicks);
+      //this.setRotPitch(this.getRotPitch() + (this.WheelMng.targetPitch - this.getRotPitch()) * partialTicks);
+      //my bones hurt
       this.setRotRoll(this.getRotRoll() + (this.WheelMng.targetRoll - this.getRotRoll()) * partialTicks);
       boolean isFly = MCH_Lib.getBlockIdY(this, 3, -3) == 0;
 
