@@ -828,16 +828,13 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   
   @Nullable
   public MCH_AircraftInfo.CameraPosition getCameraPosInfo() {
-    if (getAcInfo() == null)
-      return null; 
-    Entity player = MCH_Lib.getClientPlayer();
-    int sid = getSeatIdByEntity(player);
-    if (sid == 0 && canSwitchCameraPos())
-      if (getCameraId() > 0 && getCameraId() < (getAcInfo()).cameraPosition.size())
-        return (getAcInfo()).cameraPosition.get(getCameraId());  
-    if (sid > 0 && sid < (getSeatsInfo()).length && (getSeatsInfo()[sid]).invCamPos)
-      return getSeatsInfo()[sid].getCamPos(); 
-    return (getAcInfo()).cameraPosition.get(0);
+    if(this.getAcInfo() == null) {
+      return null;
+    } else {
+      Entity player = MCH_Lib.getClientPlayer();
+      int sid = this.getSeatIdByEntity(player);
+      return sid == 0 && this.canSwitchCameraPos() && this.getCameraId() > 0 && this.getCameraId() < this.getAcInfo().cameraPosition.size()?(MCH_AircraftInfo.CameraPosition)this.getAcInfo().cameraPosition.get(this.getCameraId()):(sid > 0 && sid < this.getSeatsInfo().length && this.getSeatsInfo()[sid].invCamPos?this.getSeatsInfo()[sid].getCamPos():(MCH_AircraftInfo.CameraPosition)this.getAcInfo().cameraPosition.get(0));
+    }
   }
   
   public int getCameraId() {
@@ -1403,148 +1400,217 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   }
   
   public abstract void onUpdateAircraft();
-  
+
   public void onUpdate() {
-    if (getCountOnUpdate() < 2)
-      this.prevPosition.clear(new Vec3d(this.posX, this.posY, this.posZ)); 
-    this.prevCurrentThrottle = getCurrentThrottle();
+    if(this.getCountOnUpdate() < 2) {
+      this.prevPosition.clear(new Vec3d(super.posX, super.posY, super.posZ));
+    }
+
+
+
+    this.prevCurrentThrottle = this.getCurrentThrottle();
     this.lastBBDamageFactor = 1.0F;
-    updateControl();
-    checkServerNoMove();
-    onUpdate_RidingEntity();
-    Iterator<UnmountReserve> itr = this.listUnmountReserve.iterator();
-    while (itr.hasNext()) {
-      UnmountReserve ur = itr.next();
-      if (ur.entity != null && !ur.entity.isDead) {
-        ur.entity.setPosition(ur.posX, ur.posY, ur.posZ);
-        ur.entity.fallDistance = this.fallDistance;
-      } 
-      if (ur.cnt > 0)
-        ur.cnt--; 
-      if (ur.cnt == 0)
-        itr.remove(); 
-    } 
-    if (isDestroyed() && getCountOnUpdate() % 20 == 0)
-      for (int sid = 0; sid < getSeatNum() + 1; sid++) {
-        Entity entity = getEntityBySeatId(sid);
-        if (entity != null)
-          if (sid != 0 || !isUAV())
-            if (MCH_Config.applyDamageVsEntity(entity, DamageSource.IN_FIRE, 1.0F) > 0.0F)
-              entity.setFire(5);   
-      }  
-    if (this.aircraftRotChanged || this.aircraftRollRev)
-      if (this.world.isRemote && getRiddenByEntity() != null) {
-        MCH_PacketIndRotation.send(this);
-        this.aircraftRotChanged = false;
-        this.aircraftRollRev = false;
-      }  
-    if (!this.world.isRemote)
-      if ((int)this.prevRotationRoll != (int)getRotRoll()) {
-        float roll = MathHelper.wrapDegrees(getRotRoll());
-        this.dataManager.set(ROT_ROLL, Integer.valueOf((int)roll));
-      }  
-    this.prevRotationRoll = getRotRoll();
-    if (!this.world.isRemote)
-      if (isTargetDrone() && !isDestroyed())
-        if (getCountOnUpdate() > 20 && !canUseFuel()) {
-          setDamageTaken(getMaxHP());
-          destroyAircraft();
-          MCH_Explosion.newExplosion(this.world, null, null, this.posX, this.posY, this.posZ, 2.0F, 2.0F, true, true, true, true, 5);
-        }   
-    if (this.world.isRemote && getAcInfo() != null)
-      if (getHP() <= 0 && getDespawnCount() <= 0)
-        destroyAircraft();  
-    if (!this.world.isRemote && getDespawnCount() > 0) {
-      setDespawnCount(getDespawnCount() - 1);
-      if (getDespawnCount() <= 1)
-        setDead(true); 
-    } 
+    this.updateControl();
+    this.checkServerNoMove();
+    this.onUpdate_RidingEntity();
+    Iterator itr = this.listUnmountReserve.iterator();
+
+    while(itr.hasNext()) {
+      MCH_EntityAircraft.UnmountReserve ft = (MCH_EntityAircraft.UnmountReserve)itr.next();
+      if(ft.entity != null && !ft.entity.isDead) {
+        ft.entity.setPosition(ft.posX, ft.posY, ft.posZ);
+        ft.entity.fallDistance = super.fallDistance;
+      }
+
+      if(ft.cnt > 0) {
+        --ft.cnt;
+      }
+
+      if(ft.cnt == 0) {
+        itr.remove();
+      }
+    }
+
+    //TODO: idrk
+
+    //if (isInLava()) {
+    //   // Apply lava damage at regular intervals
+    //   if (worldObj.getWorldTime() % 20 == 0) { // Apply damage every second (20 ticks)
+    //      attackEntityFrom(DamageSource.LAVA, lavaDamageAmount);
+    //   }
+    //}
+
+    Entity e;
+    int var7;
+    if(this.isDestroyed() && this.getCountOnUpdate() % 20 == 0) {
+      for(var7 = 0; var7 < this.getSeatNum() + 1; ++var7) {
+        e = this.getEntityBySeatId(var7);
+        if(e != null && (var7 != 0 || !this.isUAV())) {
+          MCH_Config var10000 = MCH_MOD.config;
+          if(MCH_Config.applyDamageVsEntity(e, DamageSource.IN_FIRE, 1.0F) > 0.0F) {
+            e.setFire(5);
+            //TODO: add damage for HMG/GVC here
+          }
+        }
+      }
+    }
+
+    if((this.aircraftRotChanged || this.aircraftRollRev) && super.world.isRemote && this.getRiddenByEntity() != null) {
+      MCH_PacketIndRotation.send(this);
+      this.aircraftRotChanged = false;
+      this.aircraftRollRev = false;
+    }
+
+    if(!super.world.isRemote && (int)this.prevRotationRoll != (int)this.getRotRoll()) {
+      float var8 = MathHelper.wrapDegrees(this.getRotRoll());
+      //this.getDataWatcher().updateObject(26, new Short((short)((int)var8)));
+      this.dataManager.set(ROT_ROLL, Integer.valueOf((int)var8));
+      //todo: problem child cancer probably idk tho bc planes dont have the big cancer
+    }
+
+    this.prevRotationRoll = this.getRotRoll();
+    if(!super.world.isRemote && this.isTargetDrone() && !this.isDestroyed() && this.getCountOnUpdate() > 20 && !this.canUseFuel()) {
+      this.setDamageTaken(this.getMaxHP());
+      this.destroyAircraft();
+      MCH_Explosion.newExplosion(super.world, (Entity)null, (Entity)null, super.posX, super.posY, super.posZ, 2.0F, 2.0F, true, true, true, true, 5);
+    }
+
+    if(super.world.isRemote && this.getAcInfo() != null && this.getHP() <= 0 && this.getDespawnCount() <= 0) {
+      this.destroyAircraft();
+    }
+
+    if(!super.world.isRemote && this.getDespawnCount() > 0) {
+      this.setDespawnCount(this.getDespawnCount() - 1);
+      if(this.getDespawnCount() <= 1) {
+        this.setDead(true);
+      }
+    }
+
     super.onUpdate();
-    if (getParts() != null)
-      for (Entity entity : getParts()) {
-        if (entity != null)
-          entity.onUpdate(); 
-      }  
-    updateNoCollisionEntities();
-    updateUAV();
-    supplyFuel();
-    supplyAmmoToOtherAircraft();
-    updateFuel();
-    repairOtherAircraft();
-    if (this.modeSwitchCooldown > 0)
-      this.modeSwitchCooldown--; 
-    if (this.lastRiddenByEntity == null && getRiddenByEntity() != null)
-      onRidePilotFirstUpdate(); 
-    if (this.countOnUpdate == 0)
-      onFirstUpdate(); 
-    this.countOnUpdate++;
-    if (this.countOnUpdate >= 1000000)
-      this.countOnUpdate = 1; 
-    if (this.world.isRemote)
-      this.commonStatus = ((Integer)this.dataManager.get(STATUS)).intValue(); 
-    this.fallDistance = 0.0F;
+    if(this.getParts() != null) {
+      Entity[] var9 = this.getParts();
+      int var10 = var9.length;
+
+      for(int prevOnGround = 0; prevOnGround < var10; ++prevOnGround) {
+        Entity prevMotionY = var9[prevOnGround];
+        if(prevMotionY != null) {
+          prevMotionY.onUpdate();
+        }
+      }
+    }
+
+    this.updateNoCollisionEntities();
+    this.updateUAV();
+    this.supplyFuel();
+    this.supplyAmmoToOtherAircraft();
+    this.updateFuel();
+    this.repairOtherAircraft();
+    if(this.modeSwitchCooldown > 0) {
+      --this.modeSwitchCooldown;
+    }
+
+    if(this.lastRiddenByEntity == null && this.getRiddenByEntity() != null) {
+      this.onRidePilotFirstUpdate();
+    }
+
+    if(this.countOnUpdate == 0) {
+      this.onFirstUpdate();
+    }
+
+    ++this.countOnUpdate;
+    if(this.countOnUpdate >= 1000000) {
+      this.countOnUpdate = 1;
+    }
+
+    if(super.world.isRemote) {
+      //this.commonStatus = this.getDataWatcher().getWatchableObjectInt(23);
+      this.commonStatus = ((Integer)this.dataManager.get(STATUS)).intValue();
+    }
+
+    super.fallDistance = 0.0F;
     Entity riddenByEntity = getRiddenByEntity();
-    if (riddenByEntity != null)
-      riddenByEntity.fallDistance = 0.0F; 
-    if (this.missileDetector != null)
-      this.missileDetector.update(); 
-    if (this.soundUpdater != null)
-      this.soundUpdater.update(); 
-    if (getTowChainEntity() != null && (getTowChainEntity()).isDead)
-      setTowChainEntity((MCH_EntityChain)null); 
-    updateSupplyAmmo();
-    autoRepair();
-    int ft = getFlareTick();
+    if (riddenByEntity != null) {
+      riddenByEntity.fallDistance = 0.0F;
+    }
+
+    if(this.missileDetector != null) {
+      this.missileDetector.update();
+    }
+
+    if(this.soundUpdater != null) {
+      this.soundUpdater.update();
+    }
+
+    if(this.getTowChainEntity() != null && this.getTowChainEntity().isDead) {
+      this.setTowChainEntity((MCH_EntityChain)null);
+    }
+
+    this.updateSupplyAmmo();
+    this.autoRepair();
+    var7 = this.getFlareTick();
     this.flareDv.update();
-    if (!this.world.isRemote && getFlareTick() == 0 && ft != 0)
-      setCommonStatus(0, false); 
-    Entity e = getRiddenByEntity();
-    if (e != null && !e.isDead && !isDestroyed()) {
+    if(!super.world.isRemote && this.getFlareTick() == 0 && var7 != 0) {
+      this.setCommonStatus(0, false);
+    }
+
+    e = this.getRiddenByEntity();
+    if(e != null && !e.isDead && !this.isDestroyed()) {
       this.lastRiderYaw = e.rotationYaw;
       this.prevLastRiderYaw = e.prevRotationYaw;
       this.lastRiderPitch = e.rotationPitch;
       this.prevLastRiderPitch = e.prevRotationPitch;
-    } else if (getTowedChainEntity() != null || getRidingEntity() != null) {
-      this.lastRiderYaw = this.rotationYaw;
-      this.prevLastRiderYaw = this.prevRotationYaw;
-      this.lastRiderPitch = this.rotationPitch;
-      this.prevLastRiderPitch = this.prevRotationPitch;
-    } 
-    updatePartCameraRotate();
-    updatePartWheel();
-    updatePartCrawlerTrack();
-    updatePartLightHatch();
-    regenerationMob();
-    if (getRiddenByEntity() == null && this.lastRiddenByEntity != null)
-      unmountEntity(); 
-    updateExtraBoundingBox();
-    boolean prevOnGround = this.onGround;
-    double prevMotionY = this.motionY;
-    onUpdateAircraft();
-    if (getAcInfo() != null)
-      updateParts(getPartStatus()); 
-    if (this.recoilCount > 0)
-      this.recoilCount--; 
-    if (!W_Entity.isEqual(MCH_MOD.proxy.getClientPlayer(), getRiddenByEntity()))
-      updateRecoil(1.0F); 
-    if (!this.world.isRemote && isDestroyed() && !isExploded())
-      if (!prevOnGround && this.onGround && prevMotionY < -0.2D) {
-        explosionByCrash(prevMotionY);
-        this.damageSinceDestroyed = getMaxHP();
-      }  
-    onUpdate_PartRotation();
-    onUpdate_ParticleSmoke();
-    updateSeatsPosition(this.posX, this.posY, this.posZ, false);
-    updateHitBoxPosition();
-    onUpdate_CollisionGroundDamage();
-    onUpdate_UnmountCrew();
-    onUpdate_Repelling();
-    checkRideRack();
-    if (this.lastRidingEntity == null && getRidingEntity() != null)
-      onRideEntity(getRidingEntity()); 
-    this.lastRiddenByEntity = getRiddenByEntity();
-    this.lastRidingEntity = getRidingEntity();
-    this.prevPosition.put(new Vec3d(this.posX, this.posY, this.posZ));
+    } else if(this.getTowedChainEntity() != null || getRidingEntity() != null) {
+      this.lastRiderYaw = super.rotationYaw;
+      this.prevLastRiderYaw = super.prevRotationYaw;
+      this.lastRiderPitch = super.rotationPitch;
+      this.prevLastRiderPitch = super.prevRotationPitch;
+    }
+
+    this.updatePartCameraRotate();
+    this.updatePartWheel();
+    this.updatePartCrawlerTrack();
+    this.updatePartLightHatch();
+    this.regenerationMob();
+    if(this.getRiddenByEntity() == null && this.lastRiddenByEntity != null) {
+      this.unmountEntity();
+    }
+
+    this.updateExtraBoundingBox();
+    boolean var11 = super.onGround;
+    double var12 = super.motionY;
+    this.onUpdateAircraft();
+    if(this.getAcInfo() != null) {
+      this.updateParts(this.getPartStatus());
+    }
+
+    if(this.recoilCount > 0) {
+      --this.recoilCount;
+    }
+
+    if(!W_Entity.isEqual(MCH_MOD.proxy.getClientPlayer(), this.getRiddenByEntity())) {
+      this.updateRecoil(1.0F);
+    }
+
+    if(!this.world.isRemote && this.isDestroyed() && !this.isExploded() && !var11 && super.onGround && var12 < -0.2D) {
+      this.explosionByCrash(var12);
+      this.damageSinceDestroyed = this.getMaxHP();
+    }
+
+    this.onUpdate_PartRotation();
+    this.onUpdate_ParticleSmoke();
+    this.updateSeatsPosition(super.posX, super.posY, super.posZ, false);
+    this.updateHitBoxPosition();
+    this.onUpdate_CollisionGroundDamage();
+    this.onUpdate_UnmountCrew();
+    this.onUpdate_Repelling();
+    this.checkRideRack();
+    if(this.lastRidingEntity == null && this.getRidingEntity() != null) {
+      this.onRideEntity(this.getRidingEntity());
+    }
+
+    this.lastRiddenByEntity = this.getRiddenByEntity();
+    this.lastRidingEntity = this.getRidingEntity();
+    this.prevPosition.put(new Vec3d(super.posX, super.posY, super.posZ));
   }
   
   private void updateNoCollisionEntities() {
@@ -4099,21 +4165,22 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   public boolean isCameraView(Entity entity) {
     return (getIsGunnerMode(entity) || isUAV());
   }
-  
+
   public void updateCamera(double x, double y, double z) {
-    if (!this.world.isRemote)
-      return; 
-    if (getTVMissile() != null) {
-      this.camera.setPosition(this.TVmissile.posX, this.TVmissile.posY, this.TVmissile.posZ);
-      this.camera.setCameraZoom(1.0F);
-      this.TVmissile.isSpawnParticle = !isMissileCameraMode(this.TVmissile.shootingEntity);
-    } else {
-      setTVMissile((MCH_EntityTvMissile)null);
-      MCH_AircraftInfo.CameraPosition cpi = getCameraPosInfo();
-      Vec3d cp = (cpi != null) ? cpi.pos : Vec3d.ZERO;
-      Vec3d v = MCH_Lib.RotVec3(cp, -getRotYaw(), -getRotPitch(), -getRotRoll());
-      this.camera.setPosition(x + v.x, y + v.y, z + v.z);
-    } 
+    if(this.world.isRemote) {
+      if(this.getTVMissile() != null) {
+        this.camera.setPosition(this.TVmissile.posX, this.TVmissile.posY, this.TVmissile.posZ);
+        this.camera.setCameraZoom(1.0F);
+        this.TVmissile.isSpawnParticle = !this.isMissileCameraMode(this.TVmissile.shootingEntity);
+      } else {
+        this.setTVMissile((MCH_EntityTvMissile)null);
+        MCH_AircraftInfo.CameraPosition cpi = this.getCameraPosInfo();
+        Vec3d cp = cpi != null?cpi.pos:new Vec3d(0.0D, 0.0D, 0.0D);
+        Vec3d v = MCH_Lib.RotVec3(cp, -this.getRotYaw(), -this.getRotPitch(), -this.getRotRoll());
+        this.camera.setPosition(x + v.x, y + v.y, z + v.z);
+      }
+
+    }
   }
   
   public void updateCameraRotate(float yaw, float pitch) {

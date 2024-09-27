@@ -90,62 +90,69 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
     this.sweepWingSpeed = (float)(this.sweepWingSpeed * MCH_Config.AllPlaneSpeed.prmDouble);
     return super.validate();
   }
-  
+
   public void loadItemData(String item, String data) {
     super.loadItemData(item, data);
-    if (item.compareTo("addpartrotor") == 0) {
-      String[] s = data.split("\\s*,\\s*");
-      if (s.length >= 6) {
-        float m = (s.length >= 7) ? (toFloat(s[6], -180.0F, 180.0F) / 90.0F) : 1.0F;
-        Rotor e = new Rotor(this, toFloat(s[0]), toFloat(s[1]), toFloat(s[2]), toFloat(s[3]), toFloat(s[4]), toFloat(s[5]), m, "rotor" + this.rotorList.size());
-        this.rotorList.add(e);
-      } 
-    } else if (item.compareTo("addblade") == 0) {
-      int idx = this.rotorList.size() - 1;
-      Rotor r = (this.rotorList.size() > 0) ? this.rotorList.get(idx) : null;
-      if (r != null) {
-        String[] s = data.split("\\s*,\\s*");
-        if (s.length == 8) {
-          Blade b = new Blade(this, toInt(s[0]), toInt(s[1]), toFloat(s[2]), toFloat(s[3]), toFloat(s[4]), toFloat(s[5]), toFloat(s[6]), toFloat(s[7]), "blade" + idx);
-          r.blades.add(b);
-        } 
-      } 
-    } else if (item.compareTo("addpartwing") == 0) {
-      String[] s = data.split("\\s*,\\s*");
-      if (s.length == 7) {
-        Wing n = new Wing(this, toFloat(s[0]), toFloat(s[1]), toFloat(s[2]), toFloat(s[3]), toFloat(s[4]), toFloat(s[5]), toFloat(s[6]), "wing" + this.wingList.size());
-        this.wingList.add(n);
-      } 
-    } else if (item.equalsIgnoreCase("AddPartPylon")) {
-      String[] s = data.split("\\s*,\\s*");
-      if (s.length >= 7 && this.wingList.size() > 0) {
-        Wing w = this.wingList.get(this.wingList.size() - 1);
-        if (w.pylonList == null)
-          w.pylonList = new ArrayList<>(); 
-        Pylon n = new Pylon(this, toFloat(s[0]), toFloat(s[1]), toFloat(s[2]), toFloat(s[3]), toFloat(s[4]), toFloat(s[5]), toFloat(s[6]), w.modelName + "_pylon" + w.pylonList.size());
-        w.pylonList.add(n);
-      } 
-    } else if (item.compareTo("addpartnozzle") == 0) {
-      String[] s = data.split("\\s*,\\s*");
-      if (s.length == 6) {
-        MCH_AircraftInfo.DrawnPart n = new MCH_AircraftInfo.DrawnPart(this, toFloat(s[0]), toFloat(s[1]), toFloat(s[2]), toFloat(s[3]), toFloat(s[4]), toFloat(s[5]), "nozzle" + this.nozzles.size());
-        this.nozzles.add(n);
+    String[] s;
+    if(item.compareTo("addpartrotor") == 0) {
+      s = data.split("\\s*,\\s*");
+      if(s.length >= 6) {
+        float n = s.length >= 7?this.toFloat(s[6], -180.0F, 180.0F) / 90.0F:1.0F;
+        MCP_PlaneInfo.Rotor n1 = new MCP_PlaneInfo.Rotor(this.toFloat(s[0]), this.toFloat(s[1]), this.toFloat(s[2]), this.toFloat(s[3]), this.toFloat(s[4]), this.toFloat(s[5]), n, "rotor" + this.rotorList.size());
+        this.rotorList.add(n1);
       }
-    } else if (item.compareTo("variablesweepwing") == 0) {
-      this.isVariableSweepWing = toBool(data);
-    } else if (item.compareTo("sweepwingspeed") == 0) {
-      this.sweepWingSpeed = toFloat(data, 0.0F, 5.0F);
-    } else if (item.compareTo("enablevtol") == 0) {
-      this.isEnableVtol = toBool(data);
-    } else if (item.compareTo("defaultvtol") == 0) {
-      this.isDefaultVtol = toBool(data);
-    } else if (item.compareTo("vtolyaw") == 0) {
-      this.vtolYaw = toFloat(data, 0.0F, 1.0F);
-    } else if (item.compareTo("vtolpitch") == 0) {
-      this.vtolPitch = toFloat(data, 0.01F, 1.0F);
-    } else if (item.compareTo("enableautopilot") == 0) {
-      this.isEnableAutoPilot = toBool(data);
-    } 
+    } else if(item.compareTo("addblade") == 0) {
+      int s1 = this.rotorList.size() - 1;
+      MCP_PlaneInfo.Rotor n2 = this.rotorList.size() > 0?(MCP_PlaneInfo.Rotor)this.rotorList.get(s1):null;
+      if(n2 != null) {
+        String[] n4 = data.split("\\s*,\\s*");
+        if(n4.length == 8) {
+          MCP_PlaneInfo.Blade b = new MCP_PlaneInfo.Blade(this.toInt(n4[0]), this.toInt(n4[1]), this.toFloat(n4[2]), this.toFloat(n4[3]), this.toFloat(n4[4]), this.toFloat(n4[5]), this.toFloat(n4[6]), this.toFloat(n4[7]), "blade" + s1);
+          n2.blades.add(b);
+        }
+      }
+    } else {
+      MCP_PlaneInfo.Wing n3;
+      if(item.compareTo("addpartwing") == 0) {
+        s = data.split("\\s*,\\s*");
+        if(s.length == 7) {
+          n3 = new MCP_PlaneInfo.Wing(this.toFloat(s[0]), this.toFloat(s[1]), this.toFloat(s[2]), this.toFloat(s[3]), this.toFloat(s[4]), this.toFloat(s[5]), this.toFloat(s[6]), "wing" + this.wingList.size());
+          this.wingList.add(n3);
+        }
+      } else if(item.equalsIgnoreCase("AddPartPylon")) {
+        s = data.split("\\s*,\\s*");
+        if(s.length >= 7 && this.wingList.size() > 0) {
+          n3 = (MCP_PlaneInfo.Wing)this.wingList.get(this.wingList.size() - 1);
+          if(n3.pylonList == null) {
+            n3.pylonList = new ArrayList();
+          }
+
+          MCP_PlaneInfo.Pylon n6 = new MCP_PlaneInfo.Pylon(this.toFloat(s[0]), this.toFloat(s[1]), this.toFloat(s[2]), this.toFloat(s[3]), this.toFloat(s[4]), this.toFloat(s[5]), this.toFloat(s[6]), n3.modelName + "_pylon" + n3.pylonList.size());
+          n3.pylonList.add(n6);
+        }
+      } else if(item.compareTo("addpartnozzle") == 0) {
+        s = data.split("\\s*,\\s*");
+        if(s.length == 6) {
+          MCH_AircraftInfo.DrawnPart n5 = new MCH_AircraftInfo.DrawnPart(this.toFloat(s[0]), this.toFloat(s[1]), this.toFloat(s[2]), this.toFloat(s[3]), this.toFloat(s[4]), this.toFloat(s[5]), "nozzle" + this.nozzles.size());
+          this.nozzles.add(n5);
+        }
+      } else if(item.compareTo("variablesweepwing") == 0) {
+        this.isVariableSweepWing = this.toBool(data);
+      } else if(item.compareTo("sweepwingspeed") == 0) {
+        this.sweepWingSpeed = this.toFloat(data, 0.0F, 5.0F);
+      } else if(item.compareTo("enablevtol") == 0) {
+        this.isEnableVtol = this.toBool(data);
+      } else if(item.compareTo("defaultvtol") == 0) {
+        this.isDefaultVtol = this.toBool(data);
+      } else if(item.compareTo("vtolyaw") == 0) {
+        this.vtolYaw = this.toFloat(data, 0.0F, 1.0F);
+      } else if(item.compareTo("vtolpitch") == 0) {
+        this.vtolPitch = this.toFloat(data, 0.01F, 1.0F);
+      } else if(item.compareTo("enableautopilot") == 0) {
+        this.isEnableAutoPilot = this.toBool(data);
+      }
+    }
+
   }
   
   public String getDirectoryName() {
@@ -159,39 +166,41 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
   public void onPostReload() {
     MCH_MOD.proxy.registerModelsPlane(this, true);
   }
-  
+
   public class Blade extends MCH_AircraftInfo.DrawnPart {
+
     public final int numBlade;
-    
     public final int rotBlade;
 
-    public Blade(MCP_PlaneInfo paramMCP_PlaneInfo, int num, int r, float px, float py, float pz, float rx, float ry, float rz, String name) {
-      super(MCP_PlaneInfo.this, px, py, pz, rx, ry, rz, name);
+
+    public Blade(int num, int r, float px, float py, float pz, float rx, float ry, float rz, String name) {
+      super(px, py, pz, rx, ry, rz, name);
       this.numBlade = num;
       this.rotBlade = r;
     }
   }
-  
+
   public class Pylon extends MCH_AircraftInfo.DrawnPart {
+
     public final float maxRotFactor;
-    
     public final float maxRot;
-    
-    public Pylon(MCP_PlaneInfo paramMCP_PlaneInfo, float px, float py, float pz, float rx, float ry, float rz, float mr, String name) {
-      super(MCP_PlaneInfo.this, px, py, pz, rx, ry, rz, name);
+
+
+    public Pylon(float px, float py, float pz, float rx, float ry, float rz, float mr, String name) {
+      super(px, py, pz, rx, ry, rz, name);
       this.maxRot = mr;
       this.maxRotFactor = this.maxRot / 90.0F;
     }
   }
-  
+
   public class Rotor extends MCH_AircraftInfo.DrawnPart {
+
     public List<MCP_PlaneInfo.Blade> blades;
-    
     public final float maxRotFactor;
-    
-    public Rotor(MCP_PlaneInfo paramMCP_PlaneInfo, float x, float y, float z, float rx, float ry, float rz, float mrf, String model) {
-      super(MCP_PlaneInfo.this, x, y, z, rx, ry, rz, model);
-      this.blades = new ArrayList<>();
+
+
+    public Rotor(float x, float y, float z, float rx, float ry, float rz, float mrf, String model) {
+      super(x, y, z, rx, ry, rz, model);
       this.maxRotFactor = mrf;
     }
   }
@@ -202,9 +211,9 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
     public final float maxRot;
     
     public List<MCP_PlaneInfo.Pylon> pylonList;
-    
-    public Wing(MCP_PlaneInfo paramMCP_PlaneInfo, float px, float py, float pz, float rx, float ry, float rz, float mr, String name) {
-      super(MCP_PlaneInfo.this, px, py, pz, rx, ry, rz, name);
+
+    public Wing(float px, float py, float pz, float rx, float ry, float rz, float mr, String name) {
+      super(px, py, pz, rx, ry, rz, name);
       this.maxRot = mr;
       this.maxRotFactor = this.maxRot / 90.0F;
       this.pylonList = null;

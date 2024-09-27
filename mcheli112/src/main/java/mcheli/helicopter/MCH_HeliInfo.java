@@ -53,19 +53,20 @@ public class MCH_HeliInfo extends MCH_AircraftInfo {
       return "heli_gnr"; 
     return "gunner";
   }
-  
+
   public void loadItemData(String item, String data) {
     super.loadItemData(item, data);
-    if (item.compareTo("enablefoldblade") == 0) {
-      this.isEnableFoldBlade = toBool(data);
-    } else if (item.compareTo("addrotor") == 0 || item.compareTo("addrotorold") == 0) {
+    if(item.compareTo("enablefoldblade") == 0) {
+      this.isEnableFoldBlade = this.toBool(data);
+    } else if(item.compareTo("addrotor") == 0 || item.compareTo("addrotorold") == 0) {
       String[] s = data.split("\\s*,\\s*");
-      if (s.length == 8 || s.length == 9) {
-        boolean cfb = (s.length == 9 && toBool(s[8]));
-        Rotor e = new Rotor(this, toInt(s[0]), toInt(s[1]), toFloat(s[2]), toFloat(s[3]), toFloat(s[4]), toFloat(s[5]), toFloat(s[6]), toFloat(s[7]), "blade" + this.rotorList.size(), cfb, (item.compareTo("addrotorold") == 0));
+      if(s.length == 8 || s.length == 9) {
+        boolean cfb = s.length == 9 && this.toBool(s[8]);
+        MCH_HeliInfo.Rotor e = new MCH_HeliInfo.Rotor(this.toInt(s[0]), this.toInt(s[1]), this.toFloat(s[2]), this.toFloat(s[3]), this.toFloat(s[4]), this.toFloat(s[5]), this.toFloat(s[6]), this.toFloat(s[7]), "blade" + this.rotorList.size(), cfb, item.compareTo("addrotorold") == 0);
         this.rotorList.add(e);
-      } 
-    } 
+      }
+    }
+
   }
   
   public String getDirectoryName() {
@@ -89,8 +90,8 @@ public class MCH_HeliInfo extends MCH_AircraftInfo {
     
     public final boolean oldRenderMethod;
 
-    public Rotor(MCH_HeliInfo paramMCH_HeliInfo, int b, int br, float x, float y, float z, float rx, float ry, float rz, String model, boolean hf, boolean old) {
-      super(MCH_HeliInfo.this, x, y, z, rx, ry, rz, model);
+    public Rotor(int b, int br, float x, float y, float z, float rx, float ry, float rz, String model, boolean hf, boolean old) {
+      super(x, y, z, rx, ry, rz, model);
       this.bladeNum = b;
       this.bladeRot = br;
       this.haveFoldFunc = hf;

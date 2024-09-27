@@ -43,37 +43,43 @@ public class MCH_VehicleInfo extends MCH_AircraftInfo {
   public String getDefaultHudName(int seatId) {
     return "vehicle";
   }
-  
+
   public void loadItemData(String item, String data) {
     super.loadItemData(item, data);
-    if (item.compareTo("canmove") == 0) {
-      this.isEnableMove = toBool(data);
-    } else if (item.compareTo("canrotation") == 0) {
-      this.isEnableRot = toBool(data);
-    } else if (item.compareTo("rotationpitchmin") == 0) {
+    if(item.compareTo("canmove") == 0) {
+      this.isEnableMove = this.toBool(data);
+    } else if(item.compareTo("canrotation") == 0) {
+      this.isEnableRot = this.toBool(data);
+    } else if(item.compareTo("rotationpitchmin") == 0) {
       super.loadItemData("minrotationpitch", data);
-    } else if (item.compareTo("rotationpitchmax") == 0) {
+    } else if(item.compareTo("rotationpitchmax") == 0) {
       super.loadItemData("maxrotationpitch", data);
-    } else if (item.compareTo("addpart") == 0) {
-      String[] s = data.split("\\s*,\\s*");
-      if (s.length >= 7) {
-        float rb = (s.length >= 8) ? toFloat(s[7]) : 0.0F;
-        VPart n = new VPart(this, toFloat(s[4]), toFloat(s[5]), toFloat(s[6]), "part" + this.partList.size(), toBool(s[0]), toBool(s[1]), toBool(s[2]), toInt(s[3]), rb);
-        this.partList.add(n);
-      } 
-    } else if (item.compareTo("addchildpart") == 0) {
-      if (this.partList.size() > 0) {
-        String[] s = data.split("\\s*,\\s*");
-        if (s.length >= 7) {
-          float rb = (s.length >= 8) ? toFloat(s[7]) : 0.0F;
-          VPart p = this.partList.get(this.partList.size() - 1);
-          if (p.child == null)
-            p.child = new ArrayList<>(); 
-          VPart n = new VPart(this, toFloat(s[4]), toFloat(s[5]), toFloat(s[6]), p.modelName + "_" + p.child.size(), toBool(s[0]), toBool(s[1]), toBool(s[2]), toInt(s[3]), rb);
+    } else {
+      String[] s;
+      float rb;
+      MCH_VehicleInfo.VPart p;
+      if(item.compareTo("addpart") == 0) {
+        s = data.split("\\s*,\\s*");
+        if(s.length >= 7) {
+          rb = s.length >= 8?this.toFloat(s[7]):0.0F;
+          p = new MCH_VehicleInfo.VPart(this.toFloat(s[4]), this.toFloat(s[5]), this.toFloat(s[6]), "part" + this.partList.size(), this.toBool(s[0]), this.toBool(s[1]), this.toBool(s[2]), this.toInt(s[3]), rb);
+          this.partList.add(p);
+        }
+      } else if(item.compareTo("addchildpart") == 0 && this.partList.size() > 0) {
+        s = data.split("\\s*,\\s*");
+        if(s.length >= 7) {
+          rb = s.length >= 8?this.toFloat(s[7]):0.0F;
+          p = (MCH_VehicleInfo.VPart)this.partList.get(this.partList.size() - 1);
+          if(p.child == null) {
+            p.child = new ArrayList();
+          }
+
+          MCH_VehicleInfo.VPart n = new MCH_VehicleInfo.VPart(this.toFloat(s[4]), this.toFloat(s[5]), this.toFloat(s[6]), p.modelName + "_" + p.child.size(), this.toBool(s[0]), this.toBool(s[1]), this.toBool(s[2]), this.toInt(s[3]), rb);
           p.child.add(n);
-        } 
-      } 
-    } 
+        }
+      }
+    }
+
   }
   
   public String getDirectoryName() {
@@ -101,8 +107,8 @@ public class MCH_VehicleInfo extends MCH_AircraftInfo {
     
     public final float recoilBuf;
 
-    public VPart(MCH_VehicleInfo paramMCH_VehicleInfo, float x, float y, float z, String model, boolean drawfp, boolean roty, boolean rotp, int type, float rb) {
-      super(MCH_VehicleInfo.this, x, y, z, 0.0F, 0.0F, 0.0F, model);
+    public VPart(float x, float y, float z, String model, boolean drawfp, boolean roty, boolean rotp, int type, float rb) {
+      super(x, y, z, 0.0F, 0.0F, 0.0F, model);
       this.rotYaw = roty;
       this.rotPitch = rotp;
       this.type = type;

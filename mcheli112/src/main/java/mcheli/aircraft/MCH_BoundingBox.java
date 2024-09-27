@@ -8,7 +8,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 
 public class MCH_BoundingBox {
-  private AxisAlignedBB boundingBox;
+  public AxisAlignedBB boundingBox;
+  public final AxisAlignedBB backupBoundingBox;
   
   public final double offsetX;
   
@@ -21,11 +22,13 @@ public class MCH_BoundingBox {
   public final float height;
   
   public Vec3d rotatedOffset;
+  public Vec3d nowPos;
+  public Vec3d prevPos;
   
   public List<Vec3d> pos = new ArrayList<>();
   
   public final float damegeFactor;
-  
+
   public MCH_BoundingBox(double x, double y, double z, float w, float h, float df) {
     this.offsetX = x;
     this.offsetY = y;
@@ -33,8 +36,11 @@ public class MCH_BoundingBox {
     this.width = w;
     this.height = h;
     this.damegeFactor = df;
-    this.boundingBox = new AxisAlignedBB(x - (w / 2.0F), y - (h / 2.0F), z - (w / 2.0F), x + (w / 2.0F), y + (h / 2.0F), z + (w / 2.0F));
-    updatePosition(0.0D, 0.0D, 0.0D, 0.0F, 0.0F, 0.0F);
+    this.boundingBox = new AxisAlignedBB(x - (double)(w / 2.0F), y - (double)(h / 2.0F), z - (double)(w / 2.0F), x + (double)(w / 2.0F), y + (double)(h / 2.0F), z + (double)(w / 2.0F));
+    this.backupBoundingBox = new AxisAlignedBB(x - (double)(w / 2.0F), y - (double)(h / 2.0F), z - (double)(w / 2.0F), x + (double)(w / 2.0F), y + (double)(h / 2.0F), z + (double)(w / 2.0F));
+    this.nowPos = new Vec3d(x, y, z);
+    this.prevPos = new Vec3d(x, y, z);
+    this.updatePosition(0.0D, 0.0D, 0.0D, 0.0F, 0.0F, 0.0F);
   }
   
   public void add(double x, double y, double z) {
@@ -46,7 +52,7 @@ public class MCH_BoundingBox {
   public MCH_BoundingBox copy() {
     return new MCH_BoundingBox(this.offsetX, this.offsetY, this.offsetZ, this.width, this.height, this.damegeFactor);
   }
-  
+
   public void updatePosition(double posX, double posY, double posZ, float yaw, float pitch, float roll) {
     Vec3d v = new Vec3d(this.offsetX, this.offsetY, this.offsetZ);
     this.rotatedOffset = MCH_Lib.RotVec3(v, -yaw, -pitch, -roll);
@@ -62,6 +68,24 @@ public class MCH_BoundingBox {
     double z = (cp.z + pp.z) / 2.0D;
     this.boundingBox = new AxisAlignedBB(x - sx, y - sy, z - sz, x + sx, y + sy, z + sz);
   }
+
+  /*
+  public void updatePosition(double posX, double posY, double posZ, float yaw, float pitch, float roll) {
+    Vec3d v = new Vec3d(this.offsetX, this.offsetY, this.offsetZ);
+    this.rotatedOffset = MCH_Lib.RotVec3(v, -yaw, -pitch, -roll);
+    add(posX + this.rotatedOffset.x, posY + this.rotatedOffset.y, posZ + this.rotatedOffset.z);
+    int index = MCH_Config.HitBoxDelayTick.prmInt;
+    Vec3d cp = (index + 0 < this.pos.size()) ? this.pos.get(index + 0) : this.pos.get(this.pos.size() - 1);
+    Vec3d pp = (index + 1 < this.pos.size()) ? this.pos.get(index + 1) : this.pos.get(this.pos.size() - 1);
+    double sx = (this.width + Math.abs(cp.x - pp.x)) / 2.0D;
+    double sy = (this.height + Math.abs(cp.y - pp.y)) / 2.0D;
+    double sz = (this.width + Math.abs(cp.z - pp.z)) / 2.0D;
+    double x = (cp.x + pp.x) / 2.0D;
+    double y = (cp.y + pp.y) / 2.0D;
+    double z = (cp.z + pp.z) / 2.0D;
+    this.boundingBox = new AxisAlignedBB(x - sx, y - sy, z - sz, x + sx, y + sy, z + sz);
+  }
+   */
   
   public AxisAlignedBB getBoundingBox() {
     return this.boundingBox;
