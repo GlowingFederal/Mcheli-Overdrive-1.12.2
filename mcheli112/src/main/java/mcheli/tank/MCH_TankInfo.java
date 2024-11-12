@@ -24,7 +24,7 @@ public class MCH_TankInfo extends MCH_AircraftInfo {
     super(location, path);
     this.item = null;
     this.weightType = 0;
-    //this.weightedCenterZ = 0.0F;
+    this.weightedCenterZ = 0.0F;
   }
 
   public List<MCH_AircraftInfo.Wheel> getDefaultWheelList() {
