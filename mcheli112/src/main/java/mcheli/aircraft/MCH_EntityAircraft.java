@@ -2031,19 +2031,46 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
   public float getGiveDamageRot() {
     return 40.0F;
   }
-  
+
   public void applyServerPositionAndRotation() {
-    double rpinc = this.aircraftPosRotInc;
-    double yaw = MathHelper.wrapDegrees(this.aircraftYaw - getRotYaw());
-    double roll = MathHelper.wrapDegrees(getServerRoll() - getRotRoll());
-    if (!isDestroyed() && (!W_Lib.isClientPlayer(getRiddenByEntity()) || getRidingEntity() != null)) {
-      setRotYaw((float)(getRotYaw() + yaw / rpinc));
-      setRotPitch((float)(getRotPitch() + (this.aircraftPitch - getRotPitch()) / rpinc));
-      setRotRoll((float)(getRotRoll() + roll / rpinc));
-    } 
-    setPosition(this.posX + (this.aircraftX - this.posX) / rpinc, this.posY + (this.aircraftY - this.posY) / rpinc, this.posZ + (this.aircraftZ - this.posZ) / rpinc);
-    setRotation(getRotYaw(), getRotPitch());
-    this.aircraftPosRotInc--;
+    double increment = (double) this.aircraftPosRotInc;
+
+    // Accurate wrapping and double precision
+    double yawDiff = MathHelper.wrapDegrees(this.aircraftYaw - this.getRotYaw());
+    double rollDiff = MathHelper.wrapDegrees(this.getServerRoll() - this.getRotRoll());
+
+    //System.out.println("applyServerPositionAndRotation called:");
+    //System.out.println("  Current Yaw: " + this.getRotYaw() + ", Target Yaw: " + this.aircraftYaw + ", Yaw Difference: " + yawDiff);
+    //System.out.println("  Current Roll: " + this.getRotRoll() + ", Target Roll: " + this.getServerRoll() + ", Roll Difference: " + rollDiff);
+
+    if (!this.isDestroyed() && (!W_Lib.isClientPlayer(this.getRiddenByEntity()) || this.getRidingEntity() != null)) {
+      // Smooth interpolation
+      float newRotYaw = (float) (this.getRotYaw() + yawDiff / increment);
+      float newRotPitch = (float) (this.getRotPitch() + (this.aircraftPitch - this.getRotPitch()) / increment);
+      float newRotRoll = (float) (this.getRotRoll() + rollDiff / increment);
+
+      // Apply the new rotations
+      this.setRotYaw(newRotYaw);
+      this.setRotPitch(newRotPitch);
+      this.setRotRoll(newRotRoll);
+
+      //System.out.println("  New Rotations: Yaw=" + newRotYaw + ", Pitch=" + newRotPitch + ", Roll=" + newRotRoll);
+    }
+
+    // Smooth position interpolation
+    this.setPosition(
+            super.posX + (this.aircraftX - super.posX) / increment,
+            super.posY + (this.aircraftY - super.posY) / increment,
+            super.posZ + (this.aircraftZ - super.posZ) / increment
+    );
+    this.setRotation(this.getRotYaw(), this.getRotPitch());
+
+    //possible culprit of the bullshit??????
+    //commenting this out makes vehicles behave like leap frogger but it might also cause the vehicle shake bug so I'm like actually lost as to what to do here
+    --this.aircraftPosRotInc;
+
+    //System.out.println("  New Position: X=" + super.posX + ", Y=" + super.posY + ", Z=" + super.posZ);
+    //System.out.println("  Remaining Increment: " + this.aircraftPosRotInc);
   }
   
   protected void autoRepair() {
