@@ -727,17 +727,18 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo implements IItemCont
     } else if (item.equalsIgnoreCase("SetWheelPos")) {
       String[] s = splitParam(data);
       if (s.length >= 4) {
-        float x = Math.abs(toFloat(s[0]));
-        float y = toFloat(s[1]);
-        this.wheels.clear();
-        for (int i = 2; i < s.length; i++)
-          this.wheels.add(new Wheel(this, new Vec3d(x, y, toFloat(s[i])))); 
-        Collections.sort(this.wheels, new Comparator<Wheel>() {
-              public int compare(MCH_AircraftInfo.Wheel arg0, MCH_AircraftInfo.Wheel arg1) {
-                return (arg0.pos.z > arg1.pos.z) ? -1 : 1;
-              }
-            });
-      } 
+        float x = Math.abs(toFloat(s[0])); // Parse and ensure x is non-negative
+        float y = toFloat(s[1]); // Parse y coordinate
+        this.wheels.clear(); // Clear existing wheels
+
+        // Loop through remaining parameters to populate wheel positions
+        for (int i = 2; i < s.length; i++) {
+          this.wheels.add(new Wheel(this, new Vec3d(x, y, toFloat(s[i])))); // Create wheels with Vec3d
+        }
+
+        // Sort the wheels based on their z-coordinate in descending order
+        this.wheels.sort((wheel1, wheel2) -> Double.compare(wheel2.pos.z, wheel1.pos.z));
+      }
     } else if (item.equalsIgnoreCase("ExclusionSeat")) {
       String[] s = splitParam(data);
       if (s.length >= 2) {
