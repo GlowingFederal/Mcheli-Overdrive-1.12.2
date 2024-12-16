@@ -57,7 +57,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
   public float addkeyRotValue;
   
   public final MCH_WheelManager WheelMng;
-  private float customYOffset;
+  public float customYOffset;
   public float partialTicks;
 
   @Override

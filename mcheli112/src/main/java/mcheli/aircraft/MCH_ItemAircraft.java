@@ -46,13 +46,14 @@ public abstract class MCH_ItemAircraft extends W_Item {
   public abstract MCH_EntityAircraft createAircraft(World paramWorld, double paramDouble1, double paramDouble2, double paramDouble3, ItemStack paramItemStack);
   
   public MCH_EntityAircraft onTileClick(ItemStack itemStack, World world, float rotationYaw, int x, int y, int z) {
-    MCH_EntityAircraft ac = createAircraft(world, (x + 0.5F), (y + 1.0F), (z + 0.5F), itemStack);
+    MCH_EntityAircraft ac = this.createAircraft(world, (double)((float)x + 0.5F), (double)((float)y + 1.0F), (double)((float)z + 0.5F), itemStack);
     if (ac == null)
       return null; 
-    ac.initRotationYaw((((MathHelper.floor((rotationYaw * 4.0F / 360.0F) + 0.5D) & 0x3) - 1) * 90));
-    if (!world.getCollisionBoxes((Entity)ac, ac.getEntityBoundingBox().grow(-0.1D, -0.1D, -0.1D)).isEmpty())
-      return null; 
-    return ac;
+    ac.initRotationYaw((((MathHelper.floor((rotationYaw * 4.0F / 360.0F) + 0.5D) & 3) - 1) * 90));
+    //if (!world.getCollisionBoxes((Entity)ac, ac.getEntityBoundingBox().grow(-0.1D, -0.1D, -0.1D)).isEmpty())
+    //  return null;
+    //return ac;
+    return !world.getCollisionBoxes(ac, ac.getEntityBoundingBox().grow(-0.1D, -0.1D, -0.1D)).isEmpty()?null:ac;
   }
   
   public String toString() {
@@ -116,7 +117,7 @@ public abstract class MCH_ItemAircraft extends W_Item {
             return ActionResult.newResult(EnumActionResult.FAIL, itemstack); 
         } 
       } 
-      spawnAircraft(itemstack, world, player, mop.getBlockPos());
+      this.spawnAircraft(itemstack, world, player, mop.getBlockPos());
     } 
     return ActionResult.newResult(EnumActionResult.SUCCESS, itemstack);
   }
