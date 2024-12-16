@@ -280,8 +280,12 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       setEntityBoundingBox(v.bb);
     } 
     boolean flag = (this.onGround || (d3 != y && d3 < 0.0D));
-    for (MCH_BoundingBox ebb : this.extraBoundingBox)
-      ebb.updatePosition(this.posX, this.posY, this.posZ, getRotYaw(), getRotPitch(), getRotRoll()); 
+    MCH_BoundingBox[] prevPX = super.extraBoundingBox;
+    int len$ = prevPX.length;
+    for(int prevPZ = 0; prevPZ < len$; ++prevPZ) {
+      MCH_BoundingBox ebb = prevPX[prevPZ];
+      ebb.updatePosition(super.posX, super.posY, super.posZ, this.getRotYaw(), this.getRotPitch(), this.getRotRoll());
+    }
     if (x != 0.0D) {
       ClacAxisBB v = calculateXOffset(list1, getEntityBoundingBox(), x);
       x = v.value;
@@ -412,9 +416,11 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       }
 
       this.updateRecoil(partialTicks);
+      //todo: blame
       this.setRotPitch(this.getRotPitch() + (this.WheelMng.targetPitch - this.getRotPitch()) * partialTicks);
       this.setRotRoll(this.getRotRoll() + (this.WheelMng.targetRoll - this.getRotRoll()) * partialTicks);
       boolean isFly = MCH_Lib.getBlockIdY(this, 3, -3) == 0;
+      System.out.println("isfly" + isFly);
 
       //logic for like rotation
       if(!isFly || this.getAcInfo().isFloat && this.getWaterDepth() > 0.0D) {
@@ -756,7 +762,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       if(!this.isDestroyed() && (super.onGround || MCH_Lib.getBlockIdY(this, 1, -2) > 0)) {
         super.motionX *= 0.95D;
         super.motionZ *= 0.95D;
-        //this.applyOnGroundPitch(0.95F);
+        this.applyOnGroundPitch(0.95F);
         //System.out.println(aircraftPitch);
       }
 
@@ -1049,13 +1055,14 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       partialTicks = 0.4F;
     if (partialTicks > 0.9F)
       partialTicks = 0.6F;
-    this.lowPassPartialTicks.put(partialTicks);
-    partialTicks = this.lowPassPartialTicks.getAvg();
-    float ac_pitch = getRotPitch();
-    float ac_yaw = getRotYaw();
-    float ac_roll = getRotRoll();
-    if (isFreeLookMode())
+    super.lowPassPartialTicks.put(partialTicks);
+    partialTicks = super.lowPassPartialTicks.getAvg();
+    float ac_pitch = this.getRotPitch();
+    float ac_yaw = this.getRotYaw();
+    float ac_roll = this.getRotRoll();
+    if (this.isFreeLookMode()) {
       x = y = 0.0F;
+  }
     float yaw = 0.0F;
     float pitch = 0.0F;
     float roll = 0.0F;
@@ -1063,9 +1070,12 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     MCH_Math.MatTurnZ(m_add, roll / 180.0F * 3.1415927F);
     MCH_Math.MatTurnX(m_add, pitch / 180.0F * 3.1415927F);
     MCH_Math.MatTurnY(m_add, yaw / 180.0F * 3.1415927F);
-    MCH_Math.MatTurnZ(m_add, (float)((getRotRoll() / 180.0F) * Math.PI));
-    MCH_Math.MatTurnX(m_add, (float)((getRotPitch() / 180.0F) * Math.PI));
-    MCH_Math.MatTurnY(m_add, (float)((getRotYaw() / 180.0F) * Math.PI));
+    //MCH_Math.MatTurnZ(m_add, (float)((kill() / 180.0F) * Math.PI));
+    //MCH_Math.MatTurnX(m_add, (float)((getRotPitch() / 180.0F) * Math.PI));
+    //MCH_Math.MatTurnY(m_add, (float)((getRotYaw() / 180.0F) * Math.PI));
+    MCH_Math.MatTurnZ(m_add, (float)((double)(this.getRotRoll() / 180.0F) * 3.141592653589793D));
+    MCH_Math.MatTurnX(m_add, (float)((double)(this.getRotPitch() / 180.0F) * 3.141592653589793D));
+    MCH_Math.MatTurnY(m_add, (float)((double)(this.getRotYaw() / 180.0F) * 3.141592653589793D));
     MCH_Math.FVector3D v = MCH_Math.MatrixToEuler(m_add);
     v.x = MCH_Lib.RNG(v.x, -90.0F, 90.0F);
     v.z = MCH_Lib.RNG(v.z, -90.0F, 90.0F);
@@ -1073,28 +1083,32 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       v.z -= 360.0F;
     if (v.z < -180.0F)
       v.z += 360.0F;
-    setRotYaw(v.y);
-    setRotPitch(v.x);
-    setRotRoll(v.z);
-    onUpdateAngles(partialTicks);
-    if ((getAcInfo()).limitRotation) {
-      v.x = MCH_Lib.RNG(getRotPitch(), -90.0F, 90.0F);
-      v.z = MCH_Lib.RNG(getRotRoll(), -90.0F, 90.0F);
-      setRotPitch(v.x);
-      setRotRoll(v.z);
+    this.setRotYaw(v.y);
+    this.setRotPitch(v.x);
+    this.setRotRoll(v.z);
+    this.onUpdateAngles(partialTicks);
+    if(this.getAcInfo().limitRotation) {
+      v.x = MCH_Lib.RNG(this.getRotPitch(), -90.0F, 90.0F);
+      v.z = MCH_Lib.RNG(this.getRotRoll(), -90.0F, 90.0F);
+      this.setRotPitch(v.x);
+      this.setRotRoll(v.z);
     }
     if (MathHelper.abs(getRotPitch()) > 90.0F) {
       MCH_Lib.DbgLog(true, "MCH_EntityAircraft.setAngles Error:Pitch=%.1f", new Object[] { Float.valueOf(getRotPitch()) });
       setRotPitch(0.0F);
     }
-    if (getRotRoll() > 180.0F)
-      setRotRoll(getRotRoll() - 360.0F);
-    if (getRotRoll() < -180.0F)
-      setRotRoll(getRotRoll() + 360.0F);
-    this.prevRotationRoll = getRotRoll();
-    this.prevRotationPitch = getRotPitch();
-    if (getRidingEntity() == null)
-      this.prevRotationYaw = getRotYaw();
+    if(this.getRotRoll() > 180.0F) {
+      this.setRotRoll(this.getRotRoll() - 360.0F);
+    }
+
+    if(this.getRotRoll() < -180.0F) {
+      this.setRotRoll(this.getRotRoll() + 360.0F);
+    }
+
+    super.prevRotationRoll = this.getRotRoll();
+    this.prevRotationPitch = this.getRotPitch();
+    if (this.getRidingEntity() == null)
+      this.prevRotationYaw = this.getRotYaw();
     float deltaLimit = (getAcInfo()).cameraRotationSpeed * partialTicks;
     MCH_WeaponSet ws = getCurrentWeapon(player);
     deltaLimit *= (ws != null && ws.getInfo() != null) ? (ws.getInfo()).cameraRotationSpeedPitch : 1.0F;
@@ -1125,17 +1139,17 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
     } else {
       player.turn(0.0F, deltaY);
     }
-    float playerYaw = MathHelper.wrapDegrees(getRotYaw() - player.rotationYaw);
-    float playerPitch = getRotPitch() * MathHelper.cos((float)(playerYaw * Math.PI / 180.0D)) + -getRotRoll() * MathHelper.sin((float)(playerYaw * Math.PI / 180.0D));
+    float playerYaw = MathHelper.wrapDegrees(this.getRotYaw() - player.rotationYaw);
+    float playerPitch = this.getRotPitch() * MathHelper.cos((float)((double)playerYaw * 3.141592653589793D / 180.0D)) + -this.getRotRoll() * MathHelper.sin((float)((double)playerYaw * 3.141592653589793D / 180.0D));
     if (MCH_MOD.proxy.isFirstPerson()) {
       player.rotationPitch = MCH_Lib.RNG(player.rotationPitch, playerPitch + (getAcInfo()).minRotationPitch, playerPitch +
           (getAcInfo()).maxRotationPitch);
       player.rotationPitch = MCH_Lib.RNG(player.rotationPitch, -90.0F, 90.0F);
     }
     player.prevRotationPitch = player.rotationPitch;
-    if ((getRidingEntity() == null && ac_yaw != getRotYaw()) || ac_pitch != getRotPitch() || ac_roll !=
-      getRotRoll())
-      this.aircraftRotChanged = true;
+    if(this.getRidingEntity() == null && ac_yaw != this.getRotYaw() || ac_pitch != this.getRotPitch() || ac_roll != this.getRotRoll()) {
+      super.aircraftRotChanged = true;
+    }
   }
   
   public float getSoundVolume() {
