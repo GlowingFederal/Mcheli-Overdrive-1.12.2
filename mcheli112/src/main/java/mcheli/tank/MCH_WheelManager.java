@@ -97,10 +97,10 @@ public class MCH_WheelManager {
 
       for(wc = 0; wc < rv; ++wc) {
         pitch = zmog[wc];
-        pitch.motionY *= 0.15D;
+        //pitch.motionY *= 0.15D;
         pitch.move(MoverType.SELF, pitch.motionX, pitch.motionY, pitch.motionZ);
         double var32 = 1.0D;
-        pitch.move(MoverType.SELF,0.0D, -0.1D * var32, 0.0D);
+        pitch.move(MoverType.SELF, 0.0D, -0.1D * var32, 0.0D);
       }
 
       int var28 = -1;
@@ -139,9 +139,13 @@ public class MCH_WheelManager {
       }
 
       Vec3d var29 = Vec3d.ZERO;
+      //todo: blame createvectorhelper(0.0D, 0.0D, 0.0D);
 
-      //Vec3D.createVectorHelper(0.0D, 0.0D, 0.0D);
       Vec3d var31 = ac.getTransformedPosition(this.weightedCenter);
+      //todo blame
+      //var31.x -= ac.posX;
+      //var31.y = this.weightedCenter.y;
+      //var31.z -= ac.posZ;
       var31 = new Vec3d(var31.x - ac.posX, this.weightedCenter.y, var31.z - ac.posZ);
 
       for(int var33 = 0; var33 < this.wheels.length / 2; ++var33) {
@@ -156,17 +160,26 @@ public class MCH_WheelManager {
           i$ = 0.0D;
         }
 
+        //var29.x += len$.x * i$;
+        //var29.y += len$.y * i$;
+        //var29.z += len$.z * i$;
+        //todo blame again
         var29 = var29.add(new Vec3d(len$.x * i$, len$.y * i$, len$.z * i$));
+
         if(showLog) {
-          double yawRadians = Math.toRadians(ac.getRotYaw());
+          //todo blame
+          //len$.rotateAroundY((float)((double)ac.getRotYaw() * 3.141592653589793D / 180.0D));
+
+          double yawRadians = Math.toRadians(ac.getRotYaw()); // Convert yaw to radians
           double cos = Math.cos(yawRadians);
           double sin = Math.sin(yawRadians);
-          Vec3d rotatedLen = new Vec3d(
-          len$.x * cos - len$.z * sin,
-                  len$.y,
-                  len$.x * sin + len$.z * cos
+
+          len$ = new Vec3d(
+                  len$.x * cos - len$.z * sin, // Rotate X
+                  len$.y,                     // Y remains unchanged
+                  len$.x * sin + len$.z * cos  // Rotate Z
           );
-          len$ = rotatedLen;
+
           MCH_Lib.DbgLog(ac.world, "%2d : %.2f :[%+.1f, %+.1f, %+.1f][%s %d %d][%+.2f(%+.2f), %+.2f(%+.2f)][%+.1f, %+.1f, %+.1f]", new Object[]{Integer.valueOf(var33), Double.valueOf(i$), Double.valueOf(len$.x), Double.valueOf(len$.y), Double.valueOf(len$.z), var34.isPlus?"+":"-", Integer.valueOf(var34.onGround?1:0), Integer.valueOf(ogpf.onGround?1:0), Double.valueOf(var34.posY - var34.prevPosY), Double.valueOf(var34.motionY), Double.valueOf(ogpf.posY - ogpf.prevPosY), Double.valueOf(ogpf.motionY), Double.valueOf(len$.x), Double.valueOf(len$.y), Double.valueOf(len$.z)});
         }
       }
@@ -177,15 +190,18 @@ public class MCH_WheelManager {
         ac.motionZ += var29.z / 50.0D;
       }
 
-      double yawRadians = Math.toRadians(ac.getRotYaw());
+      //todo blaaaaaaaameee
+      //var29.rotateAroundY((float)((double)ac.getRotYaw() * 3.141592653589793D / 180.0D));
+      double yawRadians = Math.toRadians(ac.getRotYaw()); // Convert yaw to radians
       double cos = Math.cos(yawRadians);
       double sin = Math.sin(yawRadians);
 
       var29 = new Vec3d(
-              var29.x * cos - var29.z * sin,
-              var29.y,
-              var29.x * sin + var29.z * cos
+              var29.x * cos - var29.z * sin, // New X after yaw rotation
+              var29.y,                      // Y remains unchanged
+              var29.x * sin + var29.z * cos  // New Z after yaw rotation
       );
+
       float var35 = (float)(90.0D - Math.atan2(var29.y, var29.z) * 180.0D / 3.141592653589793D);
       float var36 = -((float)(90.0D - Math.atan2(var29.y, var29.x) * 180.0D / 3.141592653589793D));
       float var37 = ac.getAcInfo().onGroundPitchFactor;

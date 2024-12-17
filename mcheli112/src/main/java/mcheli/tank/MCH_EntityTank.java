@@ -266,103 +266,132 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       z = ((AxisAlignedBB)list.get(k5)).calculateZOffset(bb, z); 
     return new ClacAxisBB(z, bb.offset(0.0D, 0.0D, z));
   }
-  
-  public void move(MoverType type, double x, double y, double z) {
-    this.world.profiler.startSection("move");
-    double d2 = x;
-    double d3 = y;
-    double d4 = z;
-    List<AxisAlignedBB> list1 = getCollisionBoxes((Entity)this, getEntityBoundingBox().expand(x, y, z));
-    AxisAlignedBB axisalignedbb = getEntityBoundingBox();
-    if (y != 0.0D) {
-      ClacAxisBB v = calculateYOffset(list1, getEntityBoundingBox(), y);
-      y = v.value;
-      setEntityBoundingBox(v.bb);
-    } 
-    boolean flag = (this.onGround || (d3 != y && d3 < 0.0D));
+
+  public void move(double parX, double parY, double parZ) {
+    super.world.profiler.startSection("move");
+    //todo blame
+    //ysize
+    super.stepHeight *= 0.4F;
+    double nowPosX = super.posX;
+    double nowPosY = super.posY;
+    double nowPosZ = super.posZ;
+    double mx = parX;
+    double my = parY;
+    double mz = parZ;
+    List<AxisAlignedBB> list = getCollisionBoxes((Entity)this, getEntityBoundingBox().expand(parX, parY, parZ));
+    AxisAlignedBB backUpAxisalignedBB = getEntityBoundingBox();
+    ClacAxisBB v = calculateYOffset(list, getEntityBoundingBox(), parY);
+    parY = v.value;
+    setEntityBoundingBox(v.bb);
+    //parY = this.calculateYOffset(list, getEntityBoundingBox(), parY);
+    boolean flag1 = super.onGround || my != parY && my < 0.0D;
     MCH_BoundingBox[] prevPX = super.extraBoundingBox;
     int len$ = prevPX.length;
+
     for(int prevPZ = 0; prevPZ < len$; ++prevPZ) {
       MCH_BoundingBox ebb = prevPX[prevPZ];
       ebb.updatePosition(super.posX, super.posY, super.posZ, this.getRotYaw(), this.getRotPitch(), this.getRotRoll());
     }
-    if (x != 0.0D) {
-      ClacAxisBB v = calculateXOffset(list1, getEntityBoundingBox(), x);
-      x = v.value;
-      if (x != 0.0D)
-        setEntityBoundingBox(v.bb); 
-    } 
-    if (z != 0.0D) {
-      ClacAxisBB v = calculateZOffset(list1, getEntityBoundingBox(), z);
-      z = v.value;
-      if (z != 0.0D)
-        setEntityBoundingBox(v.bb); 
-    } 
-    if (this.stepHeight > 0.0F && flag && (d2 != x || d4 != z)) {
-      double d14 = x;
-      double d6 = y;
-      double d7 = z;
+
+    //parX = this.calculateXOffset(list, super.getEntityBoundingBox(), parX);
+    //parZ = this.calculateZOffset(list, super.getEntityBoundingBox(), parZ);
+    //im so fucking lost
+
+    if (parX != 0.0D) {
+      ClacAxisBB vx = calculateXOffset(list, super.getEntityBoundingBox(), parX);
+      parX = vx.value;
+      if (parX != 0.0D)
+        setEntityBoundingBox(vx.bb);
+    }
+    if (parZ != 0.0D) {
+      ClacAxisBB vz = calculateZOffset(list, super.getEntityBoundingBox(), parZ);
+      parZ = vz.value;
+      if (parZ != 0.0D)
+        setEntityBoundingBox(vz.bb);
+    }
+
+    double minX;
+    double var38;
+    double var39;
+    if(super.stepHeight > 0.0F && flag1 && super.height < 0.05F && (mx != parX || mz != parZ)) {
+      double d14 = parX;
+      double d6 = parY;
+      double d7 = parZ;
       AxisAlignedBB axisalignedbb1 = getEntityBoundingBox();
-      setEntityBoundingBox(axisalignedbb);
-      y = this.stepHeight;
-      List<AxisAlignedBB> list = getCollisionBoxes((Entity)this, getEntityBoundingBox().expand(d2, y, d4));
+      setEntityBoundingBox(axisalignedbb1);
+      parY = this.stepHeight;
+      List<AxisAlignedBB> list1 = getCollisionBoxes((Entity)this, getEntityBoundingBox().expand(mx, parY, mz));
       AxisAlignedBB axisalignedbb2 = getEntityBoundingBox();
-      AxisAlignedBB axisalignedbb3 = axisalignedbb2.expand(d2, 0.0D, d4);
-      double d8 = y;
-      ClacAxisBB v = calculateYOffset(list, axisalignedbb3, axisalignedbb2, d8);
-      d8 = v.value;
-      axisalignedbb2 = v.bb;
-      double d18 = d2;
-      v = calculateXOffset(list, axisalignedbb2, d18);
+      AxisAlignedBB axisalignedbb3 = axisalignedbb2.expand(mx, 0.0D, mz);
+      double d8 = parY;
+      ClacAxisBB vy = calculateYOffset(list1, axisalignedbb3, axisalignedbb2, d8);
+      d8 = vy.value;
+      axisalignedbb2 = vy.bb;
+      double d18 = mx;
+      v = calculateXOffset(list1, axisalignedbb2, d18);
       d18 = v.value;
       axisalignedbb2 = v.bb;
-      double d19 = d4;
-      v = calculateZOffset(list, axisalignedbb2, d19);
+      double d19 = mz;
+      v = calculateZOffset(list1, axisalignedbb2, d19);
       d19 = v.value;
       axisalignedbb2 = v.bb;
       AxisAlignedBB axisalignedbb4 = getEntityBoundingBox();
-      double d20 = y;
-      v = calculateYOffset(list, axisalignedbb4, d20);
+      double d20 = parY;
+      v = calculateYOffset(list1, axisalignedbb4, d20);
       d20 = v.value;
       axisalignedbb4 = v.bb;
-      double d21 = d2;
-      v = calculateXOffset(list, axisalignedbb4, d21);
+      double d21 = mx;
+      v = calculateXOffset(list1, axisalignedbb4, d21);
       d21 = v.value;
       axisalignedbb4 = v.bb;
-      double d22 = d4;
-      v = calculateZOffset(list, axisalignedbb4, d22);
+      double d22 = mz;
+      v = calculateZOffset(list1, axisalignedbb4, d22);
       d22 = v.value;
       axisalignedbb4 = v.bb;
       double d23 = d18 * d18 + d19 * d19;
       double d9 = d21 * d21 + d22 * d22;
       if (d23 > d9) {
-        x = d18;
-        z = d19;
-        y = -d8;
+        parX = d18;
+        parZ = d19;
+        parY = -d8;
         setEntityBoundingBox(axisalignedbb2);
       } else {
-        x = d21;
-        z = d22;
-        y = -d20;
+        parX = d21;
+        parZ = d22;
+        parY = -d20;
         setEntityBoundingBox(axisalignedbb4);
-      } 
-      v = calculateYOffset(list, getEntityBoundingBox(), y);
-      y = v.value;
+      }
+      v = calculateYOffset(list, getEntityBoundingBox(), parY);
+      parY = v.value;
       setEntityBoundingBox(v.bb);
-      if (d14 * d14 + d7 * d7 >= x * x + z * z) {
-        x = d14;
-        y = d6;
-        z = d7;
+      if (d14 * d14 + d7 * d7 >= parX * parX + parZ * parZ) {
+        parX = d14;
+        parY = d6;
+        parZ = d7;
         setEntityBoundingBox(axisalignedbb1);
-      } 
-    } 
-    this.world.profiler.endSection();
-    this.world.profiler.startSection("rest");
-    resetPositionToBB();
-    this.collidedHorizontally = (d2 != x || d4 != z);
-    this.collidedVertically = (d3 != y);
-    this.onGround = (this.collidedVertically && d3 < 0.0D);
-    this.collided = (this.collidedHorizontally || this.collidedVertically);
+      }
+    }
+
+    var38 = super.posX;
+    var39 = super.posZ;
+    super.world.profiler.endSection();
+    super.world.profiler.startSection("rest");
+    AxisAlignedBB boundingBox = this.getEntityBoundingBox(); // Get the bounding box
+
+    minX = boundingBox.minX;
+    double var40 = boundingBox.minZ;
+    double maxX = boundingBox.maxX;
+    double maxZ = boundingBox.maxZ;
+
+    super.posX = (minX + maxX) / 2.0D;
+    this.posY = this.getEntityBoundingBox().minY + (double) this.customYOffset - (double) this.stepHeight;
+
+    super.posZ = (var40 + maxZ) / 2.0D;
+    super.collidedHorizontally = mx != parX || mz != parZ;
+    super.collidedVertically = my != parY;
+    super.onGround = my != parY && my < 0.0D;
+    super.collided = super.collidedHorizontally || super.collidedVertically;
+
     int j6 = MathHelper.floor(this.posX);
     int i1 = MathHelper.floor(this.posY - 0.20000000298023224D);
     int k6 = MathHelper.floor(this.posZ);
@@ -375,25 +404,32 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       if (block1 instanceof net.minecraft.block.BlockFence || block1 instanceof net.minecraft.block.BlockWall || block1 instanceof net.minecraft.block.BlockFenceGate) {
         iblockstate = iblockstate1;
         blockpos = blockpos1;
-      } 
-    } 
-    updateFallState(y, this.onGround, iblockstate, blockpos);
-    if (d2 != x)
-      this.motionX = 0.0D; 
-    if (d4 != z)
-      this.motionZ = 0.0D; 
-    Block block = iblockstate.getBlock();
-    if (d3 != y)
-      block.onLanded(this.world, (Entity)this); 
+      }
+    }
+
+    //this.updateFallState(parY, super.onGround);
+    this.updateFallState(parY, super.onGround, iblockstate, blockpos);
+    if(mx != parX) {
+      super.motionX = 0.0D;
+    }
+
+    if(my != parY) {
+      super.motionY = 0.0D;
+    }
+
+    if(mz != parZ) {
+      super.motionZ = 0.0D;
+    }
+
     try {
-      doBlockCollisions();
-    } catch (Throwable throwable) {
-      CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Checking entity block collision");
+      this.doBlockCollisions();
+    } catch (Throwable var37) {
+      CrashReport crashreport = CrashReport.makeCrashReport(var37, "Checking entity tile collision");
       CrashReportCategory crashreportcategory = crashreport.makeCategory("Entity being checked for collision");
-      addEntityCrashInfo(crashreportcategory);
-      throw new ReportedException(crashreport);
-    } 
-    this.world.profiler.endSection();
+      this.addEntityCrashInfo(crashreportcategory);
+    }
+
+    super.world.profiler.endSection();
   }
   
   private void rotationByKey(float partialTicks) {
